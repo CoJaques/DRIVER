@@ -1,0 +1,133 @@
+
+<!DOCTYPE html>
+
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Helper &#8212; Documentation DRV 2024 </title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/color.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/translations.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Recherche" href="../search.html" />
+    <link rel="next" title="Mise en place de SSH sur la carte" href="ssh.html" />
+    <link rel="prev" title="Laboratoire de Conception de Drivers — semestre d’été 2023-2024" href="../index.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="helper">
+<span id="id1"></span><h1>Helper<a class="headerlink" href="#helper" title="Lien permanent vers ce titre">¶</a></h1>
+<figure class="align-right">
+<a class="reference internal image-reference" href="../_images/logo_drv.png"><img alt="../_images/logo_drv.png" src="../_images/logo_drv.png" style="width: 6cm;" /></a>
+</figure>
+<section id="verification-du-style-de-code">
+<h2>Vérification du style de code<a class="headerlink" href="#verification-du-style-de-code" title="Lien permanent vers ce titre">¶</a></h2>
+<p>Afin de vérifier le respect du style de code du kernel Linux, le script <code class="code bash docutils literal notranslate"><span class="pre">style_check</span></code> est mis à disposition.
+Celui-ci se trouve dans le dossier <code class="code bash docutils literal notranslate"><span class="pre">material/helper</span></code>. Il prend comme unique argument le fichier à contrôler.
+Avant utilisation, il faut installer les outils <code class="code bash docutils literal notranslate"><span class="pre">meld</span></code> et <code class="code bash docutils literal notranslate"><span class="pre">clang-format</span></code> (<code class="code bash docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt</span> <span class="pre">install</span> <span class="pre">meld</span> <span class="pre">clang-format</span></code>).</p>
+<p>L’outil <code class="code bash docutils literal notranslate"><span class="pre">meld</span></code> est une interface graphique montrant les différences entre deux fichiers côte à côte et d’appliquer les changements directement dans le fichier voulu.
+Il est très utile lors de merge ou pour voir ce qui à changer dans le code avec Git.
+Les commandes <code class="code bash docutils literal notranslate"><span class="pre">git</span> <span class="pre">difftool</span></code> et <code class="code bash docutils literal notranslate"><span class="pre">git</span> <span class="pre">mergetool</span></code> dans un repo Git permet de l’utiliser pour ces cas-là.</p>
+<p>Le script fourni fait en sorte que le fichier de gauche soit l’original et celui de droite la version formatée par <code class="code bash docutils literal notranslate"><span class="pre">clang-format</span></code>.
+Ce dernier est en fichier temporaire et sera supprimé après fermeture de l’outil. Vous pouvez cependant appliquer les différences sur le fichier original !
+<code class="code bash docutils literal notranslate"><span class="pre">clang-format</span></code> est un bon outil de formatage automatique, mais ne permet pas de tout faire, garder un oeil critique sur les changements proposés.</p>
+<p>Pour simplifier son utilisation, un lien symbolique peut être créé vers le script dans le dossier <code class="code bash docutils literal notranslate"><span class="pre">/usr/bin/local</span></code></p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>sudo ln -s <span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/material/helper/style_check.sh /usr/local/bin/style_check
+</pre></div>
+</div>
+<figure class="align-center" id="id2">
+<img alt="../_images/meld.png" src="../_images/meld.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 1 </span><span class="caption-text">Exemple de meld sur un fichier, avec à gauche le fichier original et à droite les corrections proposées automatiquement.
+Ici, certaines indentations était faite avec des espaces et sont donc corrigées en tabulation, également certains espacements
+n’étaient pas correctement respecté.</span><a class="headerlink" href="#id2" title="Lien permanent vers cette image">¶</a></p>
+</figcaption>
+</figure>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">DRV 2024</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Helper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ssh.html">Mise en place SSH</a></li>
+<li class="toctree-l1"><a class="reference internal" href="eval_criterion.html">Consigne de rendu</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lab_00/lab_00.html">Laboratoire 0</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="../index.html" title="Chapitre précédent">Laboratoire de Conception de Drivers — semestre d’été 2023-2024</a></li>
+      <li>Next: <a href="ssh.html" title="Chapitre suivant">Mise en place de SSH sur la carte</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Recherche rapide</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2024, REDS institute.
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

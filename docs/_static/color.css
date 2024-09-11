@@ -1,0 +1,45 @@
+.red {
+    color: red;
+}
+
+.orange {
+    color: orange;
+}
+
+.green {
+    color: green;
+}
+
+.blue {
+    color: blue;
+}
+
+.boldred {
+    color: white;
+    background-color: red;
+    font-weight: bold;
+}
+
+.boldorange {
+    color: white;
+    background-color: orange;
+    font-weight: bold;
+}
+
+.boldgreen {
+    color: white;
+    background-color: green;
+    font-weight: bold;
+}
+
+.boldblue {
+    color: white;
+    background-color: blue;
+    font-weight: bold;
+}
+
+.boldblack {
+    color: white;
+    background-color: black;
+    font-weight: bold;
+}
