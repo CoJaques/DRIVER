@@ -1,5 +1,5 @@
 #################################################################
-Laboratoire de Conception de Drivers --- semestre d'été 2023-2024
+Laboratoire de Conception de Drivers --- semestre d'été 2024-2025
 #################################################################
 
 .. only:: html
