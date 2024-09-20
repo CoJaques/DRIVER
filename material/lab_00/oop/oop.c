@@ -19,6 +19,16 @@ struct ShapeFuncTable {
 	void (*destructor_) (struct Shape *obj);
 };
 
+struct VolumeFuncTable;
+struct Volume {
+	struct Shape super;
+	struct VolumeFuncTable *funcTable;
+};
+
+struct VolumeFuncTable {
+	void (*printVolume) (struct Volume *obj);
+};
+
 struct Shape *Shape_init () { assert (0); }
 void Shape_destroy(__attribute__ ((unused)) struct Shape *obj) { }
 
@@ -142,7 +152,7 @@ struct Shape *Circle_init(int initx, int inity, int initr)
 /* parallelepiped rectangle class */
 struct ParallelepipedRectangle 
 {
-	struct Shape super;
+	struct Volume super;
 	int x;
 	int y;
 	int width;
@@ -153,8 +163,15 @@ struct ParallelepipedRectangle
 void ParallelepipedRectangle_printArea(struct Shape *obj)
 {
 	struct ParallelepipedRectangle *cdata = (struct ParallelepipedRectangle *) obj;
-	double area = cdata->width * cdata->height * cdata->depth;
+	double area = 2 * (cdata->width * cdata->height + cdata->width * cdata->depth + cdata->height * cdata->depth);
 	printf("Parallelepiped Rectangle area is %.2f\n", area);
+}
+
+void ParallelepipedRectangle_printVolume(struct Volume *obj)
+{
+	struct ParallelepipedRectangle *cdata = (struct ParallelepipedRectangle *) obj;
+	double volume = cdata->width * cdata->height * cdata->depth;
+	printf("Parallelepiped Rectangle volume is %.2f\n", volume);
 }
 
 void ParallelepipedRectangle_moveTo(struct Shape *obj, int newx, int newy)
@@ -171,14 +188,18 @@ void ParallelepipedRectangle_destroy(struct Shape *obj)
 	free(obj);
 }
 
-struct ParralelepipedRectangleFuncTable {
-	struct ShapeFuncTable super;
+struct ParallelepipedRectangleFuncTable {
+    struct ShapeFuncTable shape;
+    struct VolumeFuncTable volume;
 } parallelepipedRectangleFuncTable = {
-		     {
-		      .printArea = ParallelepipedRectangle_printArea,
-		      .moveTo = ParallelepipedRectangle_moveTo,
-		      .destructor_ = ParallelepipedRectangle_destroy
-		     }
+    {
+        .printArea = ParallelepipedRectangle_printArea,
+        .moveTo = ParallelepipedRectangle_moveTo,
+        .destructor_ = ParallelepipedRectangle_destroy
+    },
+    {
+        .printVolume = ParallelepipedRectangle_printVolume
+    }
 };
 
 struct Shape *ParralelepipedRectangle_init(int initx, int inity,
@@ -187,7 +208,9 @@ struct Shape *ParralelepipedRectangle_init(int initx, int inity,
 	struct ParallelepipedRectangle *obj =
 		(struct ParallelepipedRectangle *) malloc(sizeof(struct ParallelepipedRectangle));
 	obj->super.funcTable =
-		(struct ShapeFuncTable *) &parallelepipedRectangleFuncTable;
+		(struct VolumeFuncTable *) &parallelepipedRectangleFuncTable.volume;
+	obj->super.super.funcTable =
+		(struct ShapeFuncTable *) &parallelepipedRectangleFuncTable.shape;
 	obj->x = initx;
 	obj->y = inity;
 	obj->width = initw;
@@ -199,6 +222,8 @@ struct Shape *ParralelepipedRectangle_init(int initx, int inity,
 #define Shape_PRINTAREA(obj) (((struct Shape *) (obj))->funcTable->printArea((obj)))
 #define Shape_MOVETO(obj, newx, newy)					\
 	(((struct Shape *) (obj))->funcTable->moveTo((obj),(newx), (newy)))
+
+#define ParallelepipedeRectangle_PRINTVOLUME(obj) (((struct Volume *) (obj))->funcTable->printVolume((obj)))
 
 #define Rectangle_SETWIDTH(obj, width)					\
 	((struct RectangleFuncTable *) ((struct Shape *) (obj))->funcTable)->setWidth((obj), (width))
@@ -223,6 +248,11 @@ int main () {
 		Shape_PRINTAREA(shapes[i]);
 		handleShape(shapes[i]);
 	}
+
+	/* print the volume of the parallelepipede */
+	struct Volume *v = (struct Volume*) shapes[2];
+	ParallelepipedeRectangle_PRINTVOLUME(v);
+
 	/* Accessing Rectangle specific data */
 	r = Rectangle_init(1, 2, 3, 4);
 	Rectangle_SETWIDTH(r, 5);
