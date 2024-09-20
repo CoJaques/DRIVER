@@ -26,7 +26,7 @@ void print_size(char str_array[])
 	       sizeof(double_var), sizeof(double),
 	       sizeof(char_var), sizeof(unsigned char),
 	       sizeof(str_ptr), sizeof(char *),
-	       sizeof(str_array), sizeof(str_out));
+	       sizeof((char*)str_array), sizeof(str_out));
 
 	printf("Of course, I can trick the function sizeof() with the appropriate cast...\n"
 	       "For instance, sizeof((char)double_var) = %ld\n\n",

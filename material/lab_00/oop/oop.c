@@ -139,6 +139,63 @@ struct Shape *Circle_init(int initx, int inity, int initr)
 	return (struct Shape *) obj;
 }
 
+/* parallelepiped rectangle class */
+struct ParallelepipedRectangle 
+{
+	struct Shape super;
+	int x;
+	int y;
+	int width;
+	int height;
+	int depth;
+};
+
+void ParallelepipedRectangle_printArea(struct Shape *obj)
+{
+	struct ParallelepipedRectangle *cdata = (struct ParallelepipedRectangle *) obj;
+	double area = cdata->width * cdata->height * cdata->depth;
+	printf("Parallelepiped Rectangle area is %.2f\n", area);
+}
+
+void ParallelepipedRectangle_moveTo(struct Shape *obj, int newx, int newy)
+{
+	struct ParallelepipedRectangle *cdata = (struct ParallelepipedRectangle *) obj;
+	cdata->x = newx;
+	cdata->y = newy;
+	printf("Moving your Parallelepiped to (%d, %d)\n", cdata->x, cdata->y);
+}
+
+void ParallelepipedRectangle_destroy(struct Shape *obj)
+{
+	Shape_destroy(obj);
+	free(obj);
+}
+
+struct ParralelepipedRectangleFuncTable {
+	struct ShapeFuncTable super;
+} parallelepipedRectangleFuncTable = {
+		     {
+		      .printArea = ParallelepipedRectangle_printArea,
+		      .moveTo = ParallelepipedRectangle_moveTo,
+		      .destructor_ = ParallelepipedRectangle_destroy
+		     }
+};
+
+struct Shape *ParralelepipedRectangle_init(int initx, int inity,
+									int initw, int inith, int initd)
+{
+	struct ParallelepipedRectangle *obj =
+		(struct ParallelepipedRectangle *) malloc(sizeof(struct ParallelepipedRectangle));
+	obj->super.funcTable =
+		(struct ShapeFuncTable *) &parallelepipedRectangleFuncTable;
+	obj->x = initx;
+	obj->y = inity;
+	obj->width = initw;
+	obj->height = inith;
+	obj->depth = initd;
+	return (struct Shape *) obj;
+}
+
 #define Shape_PRINTAREA(obj) (((struct Shape *) (obj))->funcTable->printArea((obj)))
 #define Shape_MOVETO(obj, newx, newy)					\
 	(((struct Shape *) (obj))->funcTable->moveTo((obj),(newx), (newy)))
@@ -155,13 +212,14 @@ void handleShape(struct Shape *s) {
 
 int main () {
 	int i;
-	struct Shape *shapes[2];
+	struct Shape *shapes[3];
 	struct Shape *r;
 
 	/* Using shapes polymorphically */
 	shapes[0] = Rectangle_init(20, 12, 123, 321);
 	shapes[1] = Circle_init(21, 12, 2012);
-	for (i = 0; i < 2; ++ i) {
+	shapes[2] = ParralelepipedRectangle_init(21, 12, 10, 11, 12);
+	for (i = 0; i < 3; ++ i) {
 		Shape_PRINTAREA(shapes[i]);
 		handleShape(shapes[i]);
 	}
@@ -170,6 +228,7 @@ int main () {
 	Rectangle_SETWIDTH(r, 5);
 	Shape_PRINTAREA(r);
 	Shape_DESTROY(r);
+
 	for (i = 1; i >= 0; --i)
 		Shape_DESTROY(shapes[i]);
 }
