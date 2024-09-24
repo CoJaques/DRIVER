@@ -11,7 +11,8 @@ int id2 = 2;
 
 void second()
 {
-	printf("I am %s (id = %d) and I introduce no-one :(\n", SECOND_NAME, id2);
+	printf("I am %s (id = %d) and I introduce no-one :(\n", SECOND_NAME,
+	       id2);
 }
 
 #endif // SECOND_H
