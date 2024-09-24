@@ -1,3 +1,5 @@
+Colin Jaques 
+
 # Exercice 1
 Le problème est lié au fait qu'il y a des inclusions circulaire entre first et second, l'utilisation
 des guars permet de régler le soucis.
