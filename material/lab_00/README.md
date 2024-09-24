@@ -37,3 +37,42 @@ J'ai pu trouver les attributs suivants :
 # Exercice 7
 
 Dans mon cas, lors de la compilation sans attribut, mes propriétés sont alignées sur le type le plus grand càd le double. Tandis qu'avec l'attribut `__attribute__((packed))` les propriétés ne sont pas alignées, ce qui génère un décalage de 4 byte pour mon double. Normalement il devrait être aligné sur 8 bytes mais ne l'est pas dans ce cas. De ce fait, les adresses retournées par container_of ne sont pas correctes lorsqu'on utilise la macro sur la deuxième ou troisième propriété.
+
+# Exercice 9
+
+Dans le cas d'un code de ce type : 
+
+```c
+int test(int num) {
+    int y = 1;
+    int z = y + num;
+    return z;
+}
+
+ou
+
+int test(int num) {
+    volatile int y = 1;
+    int z = y + num;
+    return z;
+}
+
+```
+
+## sans optimisation -O0
+sans optimisation on se rend compte que les 2 codes sont similaires, à chaque fois que y est accèder, cela se fait via la pile sans exception.
+
+dans le cas du -03, si la variable n'est pas déclarée comme volatile, le code est optimisé et le code assembleur va simplement ajouté 1 au paramètre et retourner le résultat.
+
+Dans le cas de l'ajout de volatile, le compilateur ne peut pas optimiser le code et doit donc accéder à la variable y à chaque fois qu'elle est utilisée.
+
+# Exercice 10
+Lors de l'utilisation de la constante 42, il n'y a pas de warning. Lors de l'execution du code, on se rend compte que la valeur est shiftée de 42%32 bits, donc de 10 bits.
+
+J'ai le même comportement avec une entrée utilisateur.
+
+Par contre lors de la compilation avec UBSAN, j'ai le message suivant :
+
+```
+ubsan_user.c:18:23: runtime error: shift exponent 42 is too large for 32-bit type 'unsigned int'
+```
