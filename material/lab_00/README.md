@@ -33,3 +33,7 @@ J'ai pu trouver les attributs suivants :
 | `__attribute__((packed))`               | Force le compilateur à ne pas ajouter de remplissage entre les membres de la structure.        |
 | `__attribute__((nonnull))`              | Indique que les pointeurs passés à la fonction ne doivent pas être nuls.                      |
 | `__attribute__((__aligned__(SMP_CACHE_BYTES)))` | Aligne la variable sur la taille de cache du processeur pour optimiser l'accès.              |
+
+# Exercice 7
+
+Dans mon cas, lors de la compilation sans attribut, mes propriétés sont alignées sur le type le plus grand càd le double. Tandis qu'avec l'attribut `__attribute__((packed))` les propriétés ne sont pas alignées, ce qui génère un décalage de 4 byte pour mon double. Normalement il devrait être aligné sur 8 bytes mais ne l'est pas dans ce cas. De ce fait, les adresses retournées par container_of ne sont pas correctes lorsqu'on utilise la macro sur la deuxième ou troisième propriété.
