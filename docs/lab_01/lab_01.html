@@ -1,0 +1,978 @@
+
+<!DOCTYPE html>
+
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Laboratoire 1 — Introduction &#8212; Documentation DRV 2024 </title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/color.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/translations.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Recherche" href="../search.html" />
+    <link rel="next" title="Tutoriel 1 — Prise en main" href="../tuto_01/tuto_01.html" />
+    <link rel="prev" title="Laboratoire 0 — Consolidation du langage C" href="../lab_00/lab_00.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="laboratoire-1-introduction">
+<span id="laboratoire1"></span><h1>Laboratoire 1 — Introduction<a class="headerlink" href="#laboratoire-1-introduction" title="Lien permanent vers ce titre">¶</a></h1>
+<figure class="align-right">
+<a class="reference internal image-reference" href="../_images/logo_drv.png"><img alt="../_images/logo_drv.png" src="../_images/logo_drv.png" style="width: 6cm;" /></a>
+</figure>
+<p>Le but de ces laboratoires est de vous familiariser avec les méthodologies de développement pour la création de drivers.
+En effet (comme pour beaucoup de choses dans la vie réelle), il y a un gros décalage entre ce qu’on peut connaître sur la
+théorie du fonctionnement d’un système d’exploitation et l’application de ces concepts dans la pratique.
+En particulier, les drivers se situent dans une couche assez délicate, car ils sont à l’interface entre le monde utilisateur et le
+matériel sous-jacent, donc ils sont affectés par les erreurs des deux mondes.</p>
+<p>Dans ces consignes on vous invitera souvent à pousser vos investigations plus loin.
+Essayez de donner une réponse par vous-mêmes aux questions qu’on vous posera,
+cela vous aidera à mieux comprendre le sujet !</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Il est souvent très très difficile comprendre si une erreur est liée à une mauvaise manipulation au niveau logiciel utilisateur,
+à un bug dans le driver, à un bug du hardware, … !</p>
+</div>
+<section id="objectifs">
+<h2>Objectifs<a class="headerlink" href="#objectifs" title="Lien permanent vers ce titre">¶</a></h2>
+<section id="preparation-de-l-environnement-de-developpement-et-prise-en-main-de-la-carte-de1-soc">
+<h3>Préparation de l’environnement de développement et prise en main de la carte DE1-SoC<a class="headerlink" href="#preparation-de-l-environnement-de-developpement-et-prise-en-main-de-la-carte-de1-soc" title="Lien permanent vers ce titre">¶</a></h3>
+<ul class="simple">
+<li><p>Configurer l’écosystème de développement pour le cours DRV</p></li>
+<li><p>Communiquer avec la carte via le réseau et la console</p></li>
+<li><p>Connaître les fonctionnalités de base de U-Boot</p></li>
+<li><p>Utiliser U-Boot afin d’interagir directement avec les périphériques de la DE1-SoC</p></li>
+<li><p>Utiliser la toolchain de cross-compilation Linux afin de produire des exécutables destinés à la distribution Linux de la DE1-SoC</p></li>
+</ul>
+</section>
+<section id="premieres-interactions-hw-sw">
+<h3>Premières interactions HW-SW<a class="headerlink" href="#premieres-interactions-hw-sw" title="Lien permanent vers ce titre">¶</a></h3>
+<ul class="simple">
+<li><p>Manipuler le hardware DE1-SoC depuis un logiciel userspace</p></li>
+</ul>
+</section>
+</section>
+<section id="materiel-necessaire">
+<h2>Matériel nécessaire<a class="headerlink" href="#materiel-necessaire" title="Lien permanent vers ce titre">¶</a></h2>
+<p>Dans ce laboratoire on préparera l’écosystème de développement qu’on utilisera pour toute la durée du cours.</p>
+<p>Pour cela, il vous faudra télécharger les éléments suivants :</p>
+<ul class="simple">
+<li><p>une toolchain de cross-compilation Linux (déjà installée sur les machines de laboratoire et dans la
+machine virtuelle). On utilisera une toolchain de Linaro, que vous pouvez
+télécharger <a class="reference external" href="https://releases.linaro.org/components/toolchain/binaries/6.4-2018.05/arm-linux-gnueabihf/gcc-linaro-6.4.1-2018.05-x86_64_arm-linux-gnueabihf.tar.xz">ici</a></p></li>
+<li><p>une archive <code class="file docutils literal notranslate"><span class="pre">drv-2024-boot.tar.gz</span></code> contenant les fichiers nécessaires au boot de la DE1-SoC [disponible <a class="reference external" href="http://reds-data.heig-vd.ch/cours/2024_drv/drv-2024-boot.tar.gz">ici</a>]</p></li>
+<li><p>une archive <code class="file docutils literal notranslate"><span class="pre">drv-2024-sdcard.tar.gz</span></code> contenant une image d’une carte SD pour la DE1-SoC [disponible <a class="reference external" href="http://reds-data.heig-vd.ch/cours/2024_drv/drv-2024-sdcard.tar.gz">ici</a>]</p></li>
+<li><p>la documentation Altera, disponible dans le git du laboratoire (<code class="file docutils literal notranslate"><span class="pre">material/lab_01/</span></code>).</p></li>
+</ul>
+</section>
+<section id="id1">
+<h2>Préparation de l’environnement de développement et prise en main de la carte DE1-SoC<a class="headerlink" href="#id1" title="Lien permanent vers ce titre">¶</a></h2>
+<section id="presentation-de-la-carte-de1-soc">
+<h3>Présentation de la carte DE1-SoC<a class="headerlink" href="#presentation-de-la-carte-de1-soc" title="Lien permanent vers ce titre">¶</a></h3>
+<p>La carte <a class="reference external" href="https://www.terasic.com.tw/cgi-bin/page/archive.pl?Language=English&amp;No=836">DE1-SoC</a>
+est une carte de développement robuste et low-cost qui intègre un processeur ARM Cortex-A9 (dual core)
+avec une FPGA (grâce au chip <a class="reference external" href="https://www.intel.com/content/www/us/en/products/programmable/soc/cyclone-v.html">Cyclone V SoC</a>).</p>
+<p>Dans ce cours on se focalisera sur le processeur ARM (aussi appelé HPS – <em>Hard Processor System</em>).
+Dans d’autres cours vous pourrez découvrir comment faire interagir ce processeur avec la partie FPGA
+(aussi appelée PL – <em>Programmable Logic</em>).</p>
+<p>Au début du cours on utilisera l’image crée par Intel-Altera dans le contexte du
+<a class="reference external" href="https://www.intel.com/content/www/us/en/developer/topic-technology/fpga-academic/overview.html">Intel-Altera University Program</a>.
+On customisera ensuite le noyau pour répondre à nos besoins.</p>
+<div class="admonition warning">
+<p class="admonition-title">Avertissement</p>
+<p>Les outputs des commandes montrés ci-dessous sont ce que j’obtiens sur <strong>ma</strong> machine.
+Ces textes changent d’une machine à l’autre, si vous utilisez une machine virtuelle,
+si vous avez fait des mises à jour, …
+Regardez donc ce qui le texte <strong>dit</strong>, et non seulement s’il est identique à ce qui
+est noté ci-dessous !!!</p>
+</div>
+</section>
+<section id="preparation-de-la-carte">
+<h3>Préparation de la carte<a class="headerlink" href="#preparation-de-la-carte" title="Lien permanent vers ce titre">¶</a></h3>
+<p>Avant d’allumer la carte, assurez-vous que les switches du MODE SELECT (MSEL) sous
+la carte soient comme dans la figure ci-dessous.</p>
+<figure class="align-center">
+<a class="reference internal image-reference" href="../_images/msel.png"><img alt="../_images/msel.png" src="../_images/msel.png" style="width: 6cm;" /></a>
+</figure>
+<p>Ces switches sont utilisés pour dire à la DE1-SoC comment la FPGA sera configurée.
+Avec la configuration ci-dessus, ce sera Linux qui se chargera de la tâche.</p>
+</section>
+<section id="configuration-du-pc">
+<h3>Configuration du PC<a class="headerlink" href="#configuration-du-pc" title="Lien permanent vers ce titre">¶</a></h3>
+<p>Pour la suite du cours, on partira du principe que vous travaillez sous Linux
+— soit avec une machine virtuelle/machine de laboratoire, soit avec votre ordinateur portable.
+Pour la connexion avec la carte, il faut que votre carte réseau ait l’adresse <strong>192.168.0.1</strong>.
+La DE1-SoC aura, elle, l’adresse <strong>192.168.0.2</strong>.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Les commandes ci-dessous ont été testées dans une distribution de
+Linux Ubuntu-like.
+Des différences sont possibles si vous utilisez une autre
+distribution.</p>
+</div>
+</section>
+<section id="preparation-de-la-carte-sd">
+<h3>Préparation de la carte SD<a class="headerlink" href="#preparation-de-la-carte-sd" title="Lien permanent vers ce titre">¶</a></h3>
+<p>Une fois téléchargé l’archive contenant l’image de la carte SD, vous devez identifier le dispositif associé avec le lecteur de cartes avec la commande <strong>dmesg</strong>:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">HOST:~$ </span>dmesg
+<span class="go">...</span>
+<span class="go">130088.305550] sd 6:0:0:1: [sde] 31422464 512-byte logical blocks: (16.1 GB/15.0 GiB)</span>
+<span class="go">[130088.306567] sd 6:0:0:1: [sde] Write Protect is off</span>
+<span class="go">[130088.306575] sd 6:0:0:1: [sde] Mode Sense: 2f 00 00 00</span>
+<span class="go">[130088.307716] sd 6:0:0:1: [sde] Write cache: disabled, read cache: enabled, doesn&#39;t support DPO or FUA</span>
+<span class="go">[130088.313749]  sde: sde1 sde2 sde3</span>
+<span class="go">[130088.316561] sd 6:0:0:1: [sde] Attached SCSI removable disk</span>
+</pre></div>
+</div>
+<figure class="align-center">
+<a class="reference internal image-reference" href="../_images/skull.png"><img alt="../_images/skull.png" src="../_images/skull.png" style="width: 6cm;" /></a>
+</figure>
+<p>Dans <strong>mon</strong> cas, il s’agit de <code class="file docutils literal notranslate"><span class="pre">/dev/sde</span></code>. FAITES BIEN ATTENTION AU NOM QUE
+<strong>VOUS</strong> OBTENEZ !</p>
+<p><span class="boldred">Dans la commande ci-dessous, il faudra remplacer</span>
+<code class="file docutils literal notranslate"><span class="pre">VOTREDISPOSITIF</span></code>
+<span class="boldred">avec le nom du dispositif que vous avez obtenu grâce à dmesg.</span></p>
+<p>Vous pourrez ainsi préparer la carte avec les commandes :</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">HOST:~$ </span>tar xzvf drv-2024-sdcard.tar.gz
+<span class="gp">HOST:~$ </span>sudo dd <span class="k">if</span><span class="o">=</span>drv-2024-sdcard.img <span class="nv">of</span><span class="o">=</span>/dev/VOTREDISPOSITIF <span class="nv">bs</span><span class="o">=</span>4M <span class="nv">conv</span><span class="o">=</span>fsync <span class="nv">status</span><span class="o">=</span>progress
+</pre></div>
+</div>
+<p>Replacez la carte SD dans la board DE1-SoC une fois la copie terminée !</p>
+<p>Vous trouverez davantage d’informations sur la commande <code class="code docutils literal notranslate"><span class="pre">dd</span></code> <a class="reference external" href="https://en.wikipedia.org/wiki/Dd_(Unix)">ici</a>.</p>
+</section>
+<section id="configuration-des-serveurs-nfs-et-tftp">
+<h3>Configuration des serveurs NFS et TFTP<a class="headerlink" href="#configuration-des-serveurs-nfs-et-tftp" title="Lien permanent vers ce titre">¶</a></h3>
+<p>Ces deux services, sur la machine hôte, vont vous permettre d’échanger des fichiers entre la carte cible et la machine hôte.
+En particulier, on utilisera TFTP pour « envoyer » à la DE1-SoC le noyau Linux (et le Device Tree), alors qu’on utilisera
+NFS pour garder une partie du filesystem sur notre ordinateur.
+Cela a un double avantage :</p>
+<ul class="simple">
+<li><p>On travaillera directement sur l’ordinateur, sans devoir à chaque fois échanger explicitement les fichiers entre la DE1-SoC et le PC (plus efficace).</p></li>
+<li><p>On évitera d’écrire en continu sur la carte SD (donc on évitera de l’endommager pour rien).</p></li>
+</ul>
+<p>Il faut d’abord vérifier que ces deux services soient installés et actifs.
+Si ce n’est pas le cas sur votre machine, installez les paquets
+<strong>nfs-kernel-server</strong> et <strong>tftpd-hpa</strong>.</p>
+<p>Il faut ensuite éditer le fichier <code class="file docutils literal notranslate"><span class="pre">/etc/exports</span></code> pour dire à NFS quels répertoires on veut partager
+et avec qui :</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>/export        192.168.0.0/24(rw,no_subtree_check,sync,no_root_squash)
+/export/drv    192.168.0.0/24(rw,no_subtree_check,sync,no_root_squash)
+</pre></div>
+</div>
+<p>Bien sûr, maintenant il faudra créer le répertoire <code class="file docutils literal notranslate"><span class="pre">/export/drv</span></code>.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">HOST:~$ </span>sudo mkdir -p /export/drv
+<span class="gp">HOST:~$ </span>sudo chown reds:reds /export -R
+</pre></div>
+</div>
+<p>Dans ce répertoire on pourra mettre des fichiers à partager avec la DE1-SoC.
+Il faudra ensuite redémarrer NFS pour que la configuration soit relue.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">HOST:~$ </span>sudo service nfs-kernel-server restart
+</pre></div>
+</div>
+<p>Maintenant, en regardant l’état du serveur NFS, vous devriez avoir
+(<strong>le message pourrait changer selon la version du serveur!!</strong>) :</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">HOST:~$ </span>service nfs-kernel-server status
+<span class="go">* nfs-server.service - NFS server and services</span>
+<span class="go">        Loaded: loaded (/lib/systemd/system/nfs-server.service; enabled; vendor preset: enabled)</span>
+<span class="go">    Drop-In: /run/systemd/generator/nfs-server.service.d</span>
+<span class="go">                └─order-with-mounts.conf</span>
+<span class="go">        Active: active (exited) since Wed 2022-08-18 07:12:14 CEST; 1 day 3h ago</span>
+<span class="go">    Process: 1021 ExecStartPre=/usr/sbin/exportfs -r (code=exited, status=0/SUCCESS)</span>
+<span class="go">    Process: 1026 ExecStart=/usr/sbin/rpc.nfsd $RPCNFSDARGS (code=exited, status=0/SUCCESS)</span>
+<span class="go">    Main PID: 1026 (code=exited, status=0/SUCCESS)</span>
+
+<span class="go">Aug 18 07:12:13 rri-nb01 systemd[1]: Starting NFS server and services...</span>
+<span class="go">Aug 18 07:12:14 rri-nb01 systemd[1]: Finished NFS server and services.</span>
+</pre></div>
+</div>
+<p>Vous pouvez vérifier les répertoires partagés avec la commande</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">HOST:~$ </span>sudo showmount -e localhost
+<span class="go">Export list for host:</span>
+<span class="go">/export/drv 192.168.0.0/24</span>
+<span class="go">/export     192.168.0.0/24</span>
+</pre></div>
+</div>
+<p>Vérifions ensuite que le serveur TFTP soit actif (le message pourrait changer selon la version du
+serveur) :</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">HOST:~$ </span>/etc/init.d/tftpd-hpa status
+<span class="go">* tftpd-hpa.service - LSB: HPA&#39;s tftp server</span>
+<span class="go">  Loaded: loaded (/etc/init.d/tftpd-hpa; generated)</span>
+<span class="go">  Active: active (running) since Thu 2022-08-19 11:36:18 CEST; 13min ago</span>
+<span class="go">    Docs: man:systemd-sysv-generator(8)</span>
+<span class="go"> Process: 2071 ExecStart=/etc/init.d/tftpd-hpa start (code=exited, status=0/SUCCESS)</span>
+<span class="go">   Tasks: 1 (limit: 9485)</span>
+<span class="go">  Memory: 1.2M</span>
+<span class="go">  CGroup: /system.slice/tftpd-hpa.service</span>
+<span class="go">          └─2095 /usr/sbin/in.tftpd --listen --user reds --address :69 -s /home/reds/tftpboot</span>
+
+<span class="go">Aug 19 11:36:18 reds2022 systemd[1]: Starting LSB: HPA&#39;s tftp server...</span>
+<span class="go">Aug 19 11:36:18 reds2022 tftpd-hpa[2071]:  * Starting HPA&#39;s tftpd in.tftpd</span>
+<span class="go">Aug 19 11:36:18 reds2022 tftpd-hpa[2071]:    ...done.</span>
+<span class="go">Aug 19 11:36:18 reds2022 systemd[1]: Started LSB: HPA&#39;s tftp server.</span>
+</pre></div>
+</div>
+<p>Si l’on regarde son fichier de configuration <code class="file docutils literal notranslate"><span class="pre">/etc/default/tftpd-hpa</span></code>, on verra les lignes suivantes :</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">HOST:~$ </span>cat /etc/default/tftpd-hpa
+<span class="gp"># </span>/etc/default/tftpd-hpa
+
+<span class="go">TFTP_USERNAME=&quot;reds&quot;</span>
+<span class="go">TFTP_DIRECTORY=&quot;/home/reds/tftpboot&quot;</span>
+<span class="go">TFTP_ADDRESS=&quot;:69&quot;</span>
+<span class="go">TFTP_OPTIONS=&quot;-s&quot;</span>
+</pre></div>
+</div>
+<p>On devra donc mettre dans <code class="file docutils literal notranslate"><span class="pre">/home/reds/tftpboot</span></code> l’image du noyau (<code class="file docutils literal notranslate"><span class="pre">zImage</span></code>) et
+le fichier du Device Tree (<code class="file docutils literal notranslate"><span class="pre">socfpga.dtb</span></code>) contenus dans l’archive <code class="file docutils literal notranslate"><span class="pre">drv-2024-boot.tar.gz</span></code>.
+Ensuite, donnez les droits de lecture à tout le monde à ces fichiers avec</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">HOST:~$ </span><span class="nb">cd</span> /home/reds/tftpboot
+<span class="gp">HOST:~$ </span>chmod <span class="m">777</span> *
+</pre></div>
+</div>
+</section>
+<section id="configuration-reseau-de-la-machine-virtuelle">
+<h3>Configuration réseau de la machine virtuelle<a class="headerlink" href="#configuration-reseau-de-la-machine-virtuelle" title="Lien permanent vers ce titre">¶</a></h3>
+<div class="admonition warning">
+<p class="admonition-title">Avertissement</p>
+<p>Lisez cette section <strong>uniquement</strong> si vous travaillez avec la machine virtuelle !</p>
+</div>
+<p>Pour qu’il soit possible faire le boot et partager des répertoires à travers la machine virtuelle, il
+faut que la configuration de la machine virtuelle soit adaptée.
+En particulier, il faudra ajouter une deuxième carte réseau qui soit bridgée sur votre carte Ethernet
+(celle que vous utilisez pour vous connecter à la DE1-SoC).
+Le nom de votre carte pourrait changer, dans <strong>mon</strong> cas, il s’agissait de <strong>eth2</strong> (voir image ci-dessous).</p>
+<figure class="align-center" id="id2">
+<a class="reference internal image-reference" href="../_images/virtualbox_net.png"><img alt="../_images/virtualbox_net.png" src="../_images/virtualbox_net.png" style="width: 600px;" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 2 </span><span class="caption-text">Ajout de la carte réseau dans Virtualbox.</span><a class="headerlink" href="#id2" title="Lien permanent vers cette image">¶</a></p>
+</figcaption>
+</figure>
+<p>Une fois cela fait (il faut que la machine virtuelle soit éteinte), vous devez la configurer afin
+qu’elle ait l’adresse <em>192.168.0.1</em>, netmask <em>255.255.255.0</em>, ne mettez rien comme gateway (voir
+figure ci-dessous). Redémarrez afin que les changements soient pris en compte (le NetworkManager d’Ubuntu
+est souvent un peu têtu…). Si l’adresse n’est toujours pas la bonne, cliquez sur
+la connexion correspondante dans le NetworkManager (cela devrait la recharger et tout devrait être bon).</p>
+<figure class="align-center" id="id3">
+<a class="reference internal image-reference" href="../_images/network_device.png"><img alt="../_images/network_device.png" src="../_images/network_device.png" style="width: 600px;" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 3 </span><span class="caption-text">Configuration de la carte réseau dans la VM Linux.</span><a class="headerlink" href="#id3" title="Lien permanent vers cette image">¶</a></p>
+</figcaption>
+</figure>
+<p>Assurez-vous que la machine hôte n’ait pas l’adresse <em>192.168.0.1</em> pour la carte
+que vous avez bridgé — sinon il aura un conflit (vous pouvez changer cette
+adresse, p.ex., en <em>192.168.0.11</em>).</p>
+<p>De plus, vous devrez donner accès au port USB en cochant la case comme dans la figure qui suit.</p>
+<figure class="align-center" id="id4">
+<a class="reference internal image-reference" href="../_images/usb_conf.png"><img alt="../_images/usb_conf.png" src="../_images/usb_conf.png" style="width: 600px;" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 4 </span><span class="caption-text">Configuration de la porte USB dans VirtualBox.</span><a class="headerlink" href="#id4" title="Lien permanent vers cette image">¶</a></p>
+</figcaption>
+</figure>
+<p>Si vous ne voyez la porte en cliquant, c’est possible que l’utilisateur de la
+machine hôte ne soit pas dans le groupe <em>vboxusers</em>. Vous pouvez l’ajouter avec :</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">HOST:~$ </span>sudo usermod -aG vboxusers <span class="nv">$USER</span>
+</pre></div>
+</div>
+<p>Il faut ensuite faire logout/login (dans la machine hôte) pour que cela soit pris en compte.</p>
+</section>
+<section id="connexion-console-a-la-carte">
+<h3>Connexion console à la carte<a class="headerlink" href="#connexion-console-a-la-carte" title="Lien permanent vers ce titre">¶</a></h3>
+<p>La connexion à la console série se fait sur le connecteur mini-USB situé près du lecteur de cartes SD.
+Sur le même côté, une prise Ethernet est aussi disponible.
+Connectez la carte et mettez-la sous tension.</p>
+<p>Vérifiez d’abord que la carte soit bien détectée par l’ordinateur à l’aide de la commande <code class="code bash docutils literal notranslate"><span class="pre">lsusb</span></code>.
+La réponse devrait contenir la ligne suivante :</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Bus 001 Device 008: ID 0403:6001 Future Technology Devices International, Ltd FT232 USB-Serial (UART) IC
+</pre></div>
+</div>
+<p>Le convertisseur série/USB de la DE1-SoC apparaît sous la forme d’un fichier <code class="file docutils literal notranslate"><span class="pre">ttyUSBX</span></code> dans le répertoire <code class="file docutils literal notranslate"><span class="pre">/dev</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>C’est où sur la carte ce chip ? N’hésitez pas à explorer les composants sur la
+carte à l’aide de la feuille incluse dans la boîte de la carte !</p>
+</div>
+<p>Utilisez l’outil <strong>picocom</strong> (ou <strong>minicom</strong>, si vous le préférez) afin d’ouvrir une session de terminal avec la carte.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">HOST:~$ </span>picocom -b <span class="m">115200</span> /dev/ttyUSB0
+</pre></div>
+</div>
+<p>Si vous avez des soucis de permissions, cela veut dire que l’utilisateur local n’est pas dans le groupe <strong>dialout</strong>.
+Vous pouvez vérifier cela avec la commande <code class="code console docutils literal notranslate"><span class="generic prompt"><span class="pre">HOST:~$</span> </span><span class="pre">groups</span> <span class="punctuation"><span class="pre">|</span></span> <span class="pre">grep</span> <span class="pre">dialout</span></code>.
+Si cela est le cas, vous pouvez ajouter l’utilisateur au groupe avec la commande</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">HOST:~$ </span>sudo usermod -aG dialout <span class="nv">$USER</span>
+</pre></div>
+</div>
+<p>Ensuite il faudra fermer la session et la rouvrir, afin que les groupes soient
+lus à nouveau par le système d’exploitation.</p>
+<p>Picocom devrait vous retourner plusieurs lignes, pour terminer avec</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>[    2.269306] Freeing unused kernel memory: 468K (c0823000 - c0898000)
+[    2.338863] usb 1-1: new high-speed USB device number 2 using dwc2
+[    2.483361] random: init urandom read with 13 bits of entropy available
+[    2.548904] usb 1-1: New USB device found, idVendor=0424, idProduct=2512
+[    2.555595] usb 1-1: New USB device strings: Mfr=0, Product=0, SerialNumber=0
+[    2.563509] hub 1-1:1.0: USB hub found
+[    2.567430] hub 1-1:1.0: 2 ports detected
+[    2.689826] init: ureadahead main process (634) terminated with status 5
+[    3.138233] random: nonblocking pool is initialized
+
+Last login: Thu Jan  1 00:00:10 UTC 1970 on tty1
+root@de1soclinux:~# uname -ar
+Linux de1soclinux 3.18.0 #9 SMP Mon Aug 8 17:11:41 EDT 2016 armv7l armv7l armv7l GNU/Linux
+root@de1soclinux:~#
+</pre></div>
+</div>
+<p>Si vous ne voyez rien, tapez sur la touche <em>enter</em>.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Veuillez noter que le noyau par défaut de la DE1-SoC n’est pas tout neuf… on remédiera bientôt à cela !</p>
+</div>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Pour quitter Picocom, appuyez <strong>Ctrl+A</strong> suivi de <strong>Ctrl+X</strong>.</p>
+</div>
+</section>
+<section id="parametrage-reseau-sur-la-machine-hote">
+<h3>Paramétrage réseau sur la machine hôte<a class="headerlink" href="#parametrage-reseau-sur-la-machine-hote" title="Lien permanent vers ce titre">¶</a></h3>
+<p>La connexion réseau s’effectue en reliant le port RJ45 de la DE1-SoC à celui de la machine hôte via
+le câble réseau fourni. Cette connexion permettra de communiquer rapidement avec l’hôte via SSH ainsi
+que d’utiliser un système de fichier NFS distant et de télécharger le noyau à travers TFTP.</p>
+<p>Afin que la carte puisse bien se connecter à la machine hôte, il faut que
+l’interface réseau à laquelle la DE1-SoC est connectée ait l’adresse 192.168.0.1.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Comme marqué dans la section VM ci-dessus, si vous utilisez la VM
+alors cela s’applique uniquement à la VM, la machine hôte <strong>doit</strong>
+avoir une autre adresse.</p>
+</div>
+<p>Les machines de laboratoire possèdent deux cartes LAN : une reliée au réseau de l’école, l’autre, secondaire, restant disponible
+pour connecter un périphérique. Utilisez <code class="code bash docutils literal notranslate"><span class="pre">ifconfig</span></code> pour identifier laquelle est connectée à la DE1-SoC.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">HOST:~$ </span>ifconfig
+<span class="go">p1p1   Link encap:Ethernet  HWaddr 00:02:b3:9a:01:ef</span>
+<span class="go">       UP BROADCAST MULTICAST  MTU:1500  Metric:1</span>
+<span class="go">       ...</span>
+<span class="go">em1    Link encap:Ethernet  HWaddr 00:27:0e:28:c2:0d</span>
+<span class="go">       inet addr:10.192.22.161  Bcast:10.192.22.255  Mask:255.255.248.0</span>
+<span class="go">       ...</span>
+</pre></div>
+</div>
+<p>Dans ce cas, <em>em1</em> est connectée au réseau LAN de l’école (réseau <em>10.192.22.255/21</em>), la carte secondaire est donc <em>p1p1</em>.
+Par la suite, on configurera le bootloader de la DE1-SoC et le noyau Linux embarqué pour se connecter à l’adresse 192.168.0.1
+en utilisant les protocoles NFS et TFTP lors du boot.
+Si la carte secondaire n’est pas déjà initialisée à cette adresse une fois la DE1-SoC connectée,
+activez manuellement <em>p1p1</em> et assignez-lui cette adresse.</p>
+<div class="admonition warning">
+<p class="admonition-title">Avertissement</p>
+<p>Si vous utilisez une distribution Ubuntu-derived (comme c’est le
+cas pour la machine virtuelle et les machines de laboratoire),
+changer les paramètres du réseau depuis la ligne de commande n’est pas forcément
+une bonne idée, car l’outil <em>NetworkManager</em> veut avoir le contrôle absolu des cartes réseau.
+<strong>Vous devrez donc changer ces paramètres à l’aide de l’outil visuel.</strong>
+Si cela ne devait pas fonctionner, redémarrez l’outil avec la commande :</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">HOST:~$ </span>sudo service NetworkManager restart
+</pre></div>
+</div>
+</div>
+</section>
+<section id="configuration-et-utilisation-de-u-boot">
+<h3>Configuration et utilisation de U-Boot<a class="headerlink" href="#configuration-et-utilisation-de-u-boot" title="Lien permanent vers ce titre">¶</a></h3>
+<p>Dans cette section on verra comment configurer le système pour que le dispositif
+de boot utilise TFTP et NFS pour récupérer le noyau et le filesystem depuis
+l’ordinateur.</p>
+<p>Au démarrage, vous pouvez appuyer sur une touche (via <code class="code docutils literal notranslate"><span class="pre">picocom</span></code>) pour arrêter le démarrage automatique
+de U-Boot et jouer avec ses paramètres.
+À l’écran vous devriez avoir un message du type :</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>U-Boot <span class="m">2013</span>.01.01 <span class="o">(</span>Apr <span class="m">25</span> <span class="m">2014</span> - <span class="m">04</span>:59:35<span class="o">)</span>
+
+CPU   : Altera SOCFPGA Platform
+BOARD : Altera SOCFPGA Cyclone V Board
+I2C:   ready
+DRAM:  <span class="m">1</span> GiB
+MMC:   ALTERA DWMMC: <span class="m">0</span>
+In:    serial
+Out:   serial
+Err:   serial
+Net:   mii0
+Hit any key to stop autoboot:  <span class="m">0</span>
+Configuring PHY skew timing <span class="k">for</span> Micrel ksz9021
+Waiting <span class="k">for</span> PHY auto negotiation to complete.. <span class="k">done</span>
+ENET Speed is <span class="m">1000</span> Mbps - FULL duplex connection
+Using mii0 device
+TFTP from server <span class="m">192</span>.168.0.1<span class="p">;</span> our IP address is <span class="m">192</span>.168.0.2
+Filename <span class="s1">&#39;uImage&#39;</span>.
+Load address: 0x7fc0
+Loading: T T T T T T T T T T
+Retry count exceeded<span class="p">;</span> starting again
+Using mii0 device
+TFTP from server <span class="m">192</span>.168.0.1<span class="p">;</span> our IP address is <span class="m">192</span>.168.0.2
+Filename <span class="s1">&#39;uImage&#39;</span>.
+Load address: 0x7fc0
+Loading: T T
+U-Boot SPL <span class="m">2013</span>.01.01 <span class="o">(</span>Jan <span class="m">28</span> <span class="m">2015</span> - <span class="m">14</span>:28:04<span class="o">)</span>
+BOARD : Terasic DE1_SoC Board
+<span class="c1">################################################################################</span>
+<span class="c1">##################################=                                           =#</span>
+<span class="c1">########=-=#######################=                                     --    =#</span>
+<span class="c1">######-   =#######################=                        ####-    =######   =#</span>
+<span class="c1">######-   ###############- -=##=##=                        ####-   ########   =#</span>
+<span class="c1">####=       =##-     -###       ##=   -#######    ######   ####-  #####-  -   =#</span>
+<span class="c1">####        ##   ###   ##      -##=   -=--=###=  ####==#   ####-  ####        =#</span>
+<span class="c1">######-   ###-  ##-  -###    =####=   =====###=  ####-     ####   ####        =#</span>
+<span class="c1">######-   ###      =#####    #####=  ####-=###=    -=###-  ####-  #####       =#</span>
+<span class="c1">######-    -#=     -  =##    #####=  #### -###=  #=-=####  ####-   ########-  ##</span>
+<span class="c1">#######    =##=        ##    #####=  -########=  #######   ####-    =######   =#</span>
+<span class="c1">#########==######====####==#######=     -         ---      --          ----   =#</span>
+<span class="c1">##################################=                                           =#</span>
+<span class="c1">################################################################################</span>
+BOARD : Terasic  DE1_SoC Board
+CLOCK: EOSC1 clock <span class="m">25000</span> KHz
+CLOCK: EOSC2 clock <span class="m">25000</span> KHz
+CLOCK: F2S_SDR_REF clock <span class="m">0</span> KHz
+CLOCK: F2S_PER_REF clock <span class="m">0</span> KHz
+CLOCK: MPU clock <span class="m">800</span> MHz
+CLOCK: DDR clock <span class="m">400</span> MHz
+CLOCK: UART clock <span class="m">100000</span> KHz
+CLOCK: MMC clock <span class="m">50000</span> KHz
+CLOCK: QSPI clock <span class="m">400000</span> KHz
+INFO : Watchdog enabled
+SDRAM: Initializing MMR registers
+SDRAM: Calibrating PHY
+SEQ.C: Preparing to start memory calibration
+SEQ.C: CALIBRATION PASSED
+SDRAM: <span class="m">1024</span> MiB
+ALTERA DWMMC: <span class="m">0</span>
+
+
+U-Boot <span class="m">2013</span>.01.01 <span class="o">(</span>Apr <span class="m">25</span> <span class="m">2014</span> - <span class="m">04</span>:59:35<span class="o">)</span>
+
+CPU   : Altera SOCFPGA Platform
+BOARD : Altera SOCFPGA Cyclone V Board
+I2C:   ready
+DRAM:  <span class="m">1</span> GiB
+MMC:   ALTERA DWMMC: <span class="m">0</span>
+In:    serial
+Out:   serial
+Err:   serial
+Net:   mii0
+Hit any key to stop autoboot:
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Si vous l’avez raté, redémarrez simplement la carte avec la commande <code class="code console docutils literal notranslate"><span class="generic prompt"><span class="pre">root&#64;de1soclinux:~#</span> </span><span class="pre">reboot</span></code>.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Avertissement</p>
+<p>Pour le redémarrage, il y a un bouton <em>WARM_RST</em> sur la carte (à droite des gros boutons KEY 3-0), veuillez l’utiliser à la place
+du bouton <em>POWER ON/OFF</em>, votre carte sera bien plus heureuse !</p>
+</div>
+<p>Vous pouvez afficher la valeur actuelle des paramètres passés à U-Boot à l’aide de la commande :</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">SOCFPGA_CYCLONE5:~# </span>printenv
+</pre></div>
+</div>
+<p>U-Boot est un programme relativement complexe, mettant à la disposition de
+l’utilisateur une console interactive avec support des variables d’environnement
+et un jeu de commandes élaboré.
+De plus, U-Boot fournit un support matériel basique pour certains périphériques,
+comme les cartes réseau LAN et les périphériques flash, les cartes SD ou
+la flash embarquée.
+La commande <code class="code bash docutils literal notranslate"><span class="name builtin"><span class="pre">help</span></span></code> permet de visualiser les commandes disponibles.
+Pour un manuel complet, se référer à <a class="reference external" href="https://docs.u-boot.org/en/latest/">la documentation officielle</a>.</p>
+<p>En donnant la commande <code class="code bash docutils literal notranslate"><span class="pre">boot</span></code>, le système va continuer la procédure de démarrage
+établie par défaut.</p>
+<p>Vous pouvez le modifier pour qu’il fasse booter la carte depuis le noyau Linux
+stocké sur votre PC (dans le répertoire <code class="file docutils literal notranslate"><span class="pre">/home/reds/tftpboot</span></code>)
+en ajoutant les lignes qui suivent au prompt de U-Boot.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">SOCFPGA_CYCLONE5:~# </span>setenv ethaddr <span class="s2">&quot;12:34:56:78:90:12&quot;</span>
+<span class="gp">SOCFPGA_CYCLONE5:~# </span>setenv serverip <span class="s2">&quot;192.168.0.1&quot;</span>
+<span class="gp">SOCFPGA_CYCLONE5:~# </span>setenv ipaddr <span class="s2">&quot;192.168.0.2&quot;</span>
+<span class="gp">SOCFPGA_CYCLONE5:~# </span>setenv gatewayip <span class="s2">&quot;192.168.0.1&quot;</span>
+<span class="gp">SOCFPGA_CYCLONE5:~# </span>setenv bootdelay <span class="s2">&quot;2&quot;</span>
+<span class="gp">SOCFPGA_CYCLONE5:~# </span>setenv loadaddr <span class="s2">&quot;0xF000&quot;</span>
+<span class="gp">SOCFPGA_CYCLONE5:~# </span>setenv bootcmd <span class="s2">&quot;mmc rescan; tftpboot </span><span class="si">${</span><span class="nv">loadaddr</span><span class="si">}</span><span class="s2"> zImage; tftpboot </span><span class="si">${</span><span class="nv">fdtaddr</span><span class="si">}</span><span class="s2"> </span><span class="si">${</span><span class="nv">fdtimage</span><span class="si">}</span><span class="s2">; run fpgaload; run bridge_enable_handoff; run mmcboot&quot;</span>
+<span class="gp">SOCFPGA_CYCLONE5:~# </span>setenv mmcboot <span class="s2">&quot;setenv bootargs console=ttyS0,115200 root=</span><span class="si">${</span><span class="nv">mmcroot</span><span class="si">}</span><span class="s2"> rw rootwait ip=</span><span class="si">${</span><span class="nv">ipaddr</span><span class="si">}</span><span class="s2">:</span><span class="si">${</span><span class="nv">serverip</span><span class="si">}</span><span class="s2">:</span><span class="si">${</span><span class="nv">serverip</span><span class="si">}</span><span class="s2">:255.255.255.0:de1soclinux:eth0:on; bootz </span><span class="si">${</span><span class="nv">loadaddr</span><span class="si">}</span><span class="s2"> - </span><span class="si">${</span><span class="nv">fdtaddr</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="gp">SOCFPGA_CYCLONE5:~# </span>saveenv
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Pourriez-vous expliquer les lignes ci-dessus ?</p>
+<p>Le noyau Linux accepte une longue liste de paramètres, vous pouvez avoir
+plus d’informations en lisant le fichier <code class="file docutils literal notranslate"><span class="pre">Documentation/admin-guide/kernel-parameters.txt</span></code>
+dans les sources du noyau.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Est-ce que <code class="code bash docutils literal notranslate"><span class="literal string interpol"><span class="pre">${</span></span><span class="name variable"><span class="pre">loadaddr</span></span><span class="literal string interpol"><span class="pre">}</span></span> <span class="pre">-</span> <span class="literal string interpol"><span class="pre">${</span></span><span class="name variable"><span class="pre">fdtaddr</span></span><span class="literal string interpol"><span class="pre">}</span></span></code> est une soustraction de deux adresses dans la mémoire ?</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>La configuration de U-Boot sauvegardée dans la mémoire de la carte est
+assez complexe. Explorez les différentes valeurs et essayez
+d’effectuer le boot de la carte en changeant (de façon temporaire!! — c.-à-d., sans utiliser la commande <em>saveenv</em>)
+l’adresse du PC, le répertoire où le noyau est stocké, …</p>
+</div>
+<p>Maintenant, en démarrant la DE1-SoC, vous devriez pouvoir faire le boot du système en utilisant le
+noyau qui vous a été fourni (celui dans <code class="file docutils literal notranslate"><span class="pre">/home/reds/tftpboot</span></code>). Vous devriez donc avoir un
+output qui se termine par</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="o">[</span>    <span class="m">6</span>.121032<span class="o">]</span> IP-Config: Complete:
+<span class="o">[</span>    <span class="m">6</span>.124256<span class="o">]</span>      <span class="nv">device</span><span class="o">=</span>eth0, <span class="nv">hwaddr</span><span class="o">=</span><span class="m">12</span>:34:56:78:90:12, <span class="nv">ipaddr</span><span class="o">=</span><span class="m">192</span>.168.0.123, <span class="nv">mask</span><span class="o">=</span><span class="m">255</span>.255.255.0, <span class="nv">gw</span><span class="o">=</span><span class="m">192</span>.168.0.1
+<span class="o">[</span>    <span class="m">6</span>.134418<span class="o">]</span>      <span class="nv">host</span><span class="o">=</span>de1soclinux, <span class="nv">domain</span><span class="o">=</span>, nis-domain<span class="o">=(</span>none<span class="o">)</span>
+<span class="o">[</span>    <span class="m">6</span>.140145<span class="o">]</span>      <span class="nv">bootserver</span><span class="o">=</span><span class="m">192</span>.168.0.1, <span class="nv">rootserver</span><span class="o">=</span><span class="m">192</span>.168.0.1, <span class="nv">rootpath</span><span class="o">=</span>
+<span class="o">[</span>    <span class="m">6</span>.140630<span class="o">]</span> dw-apb-uart ffc02000.serial0: forbid DMA <span class="k">for</span> kernel console
+<span class="o">[</span>    <span class="m">6</span>.169671<span class="o">]</span> EXT4-fs <span class="o">(</span>mmcblk0p2<span class="o">)</span>: mounted filesystem with ordered data mode. Quota mode: disabled.
+<span class="o">[</span>    <span class="m">6</span>.178615<span class="o">]</span> VFS: Mounted root <span class="o">(</span>ext4 filesystem<span class="o">)</span> on device <span class="m">179</span>:2.
+<span class="o">[</span>    <span class="m">6</span>.195165<span class="o">]</span> devtmpfs: mounted
+<span class="o">[</span>    <span class="m">6</span>.200981<span class="o">]</span> Freeing unused kernel image <span class="o">(</span>initmem<span class="o">)</span> memory: 1024K
+<span class="o">[</span>    <span class="m">6</span>.207310<span class="o">]</span> Run /sbin/init as init process
+<span class="o">[</span>    <span class="m">9</span>.001028<span class="o">]</span> random: crng init <span class="k">done</span>
+<span class="o">[</span>    <span class="m">9</span>.170095<span class="o">]</span> init: hwclock main process <span class="o">(</span><span class="m">54</span><span class="o">)</span> terminated with status <span class="m">1</span>
+<span class="o">[</span>    <span class="m">9</span>.184453<span class="o">]</span> init: ureadahead main process <span class="o">(</span><span class="m">55</span><span class="o">)</span> terminated with status <span class="m">5</span>
+
+Last login: Thu Jan  <span class="m">1</span> <span class="m">00</span>:00:16 UTC <span class="m">1970</span> on tty1
+root@de1soclinux:~# uname -ar
+Linux de1soclinux <span class="m">6</span>.1.55+ <span class="c1">#4 SMP Wed Feb 21 11:30:34 CET 2024 armv7l armv7l armv7l GNU/Linux</span>
+root@de1soclinux:~#
+</pre></div>
+</div>
+</section>
+<section id="verification-des-toolchains">
+<h3>Vérification des toolchains<a class="headerlink" href="#verification-des-toolchains" title="Lien permanent vers ce titre">¶</a></h3>
+<p>Pendant les laboratoires, la toolchain <strong>arm-linux-gnueabifh</strong> (version <em>6.4.1</em>)
+sera utilisée pour la compilation d’exécutables Linux.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Pourriez-vous expliquer la signification des différents mots composant le nom de la toolchain?
+Pourquoi on a spécifié un numéro de version ?
+Qu’est-ce qui se passe si l’on prend tout simplement la toute dernière version de la toolchain?</p>
+</div>
+<p>Vérifiez la version de la toolchain par défaut :</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">HOST:~$ </span>arm-linux-gnueabihf-gcc --version
+</pre></div>
+</div>
+<p>S’il s’agit d’une version différente, vérifiez que la version <em>6.4.1</em> existe bien :</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">HOST:~$ </span>arm-linux-gnueabihf-gcc-6.4.1 --version
+</pre></div>
+</div>
+<p>Auquel cas, ajouter <code class="code bash docutils literal notranslate"><span class="pre">-6.4.1</span></code> lors des appels suivants à <code class="code bash docutils literal notranslate"><span class="pre">arm-linux-gnueabihf-gcc</span></code>.
+Pour utiliser les autres outils fournis avec le compilateur (comme <code class="code bash docutils literal notranslate"><span class="pre">objdump</span></code>), il faut mettre le chemin complet vers les exécutables qui se trouvent dans le dossier <code class="file docutils literal notranslate"><span class="pre">/opt/toolchains/arm-linux-gnueabihf_6.4.1/bin/</span></code> sur la VM.</p>
+<p>Finalement, vérifiez que la toolchain fonctionne correctement.
+Pour cela vous pouvez utiliser la commande suivante:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">HOST:~$ </span><span class="nb">echo</span> <span class="s2">&quot;int main(){}&quot;</span> <span class="p">|</span> arm-linux-gnueabihf-gcc -x c - -o /dev/stdout <span class="p">|</span> file -
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Pourriez-vous expliquer ce que la ligne ci-dessus fait?</p>
+</div>
+<p>Si tout marche bien, vous devriez avoir une réponse du type:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>/dev/stdin: ELF <span class="m">32</span>-bit LSB executable, ARM, EABI5 version <span class="m">1</span> <span class="o">(</span>SYSV<span class="o">)</span>, dynamically linked, interpreter /lib/ld-linux-armhf.so.3, <span class="k">for</span> GNU/Linux <span class="m">2</span>.6.32, BuildID<span class="o">[</span>sha1<span class="o">]=</span>b7a0db97fce5c152f9ae99800a40817aba3cfa1d, with debug_info, not stripped debug_info, not stripped
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Savez-vous interpréter ces réponses ?</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Que signifie <em>« not stripped »</em> ?</p>
+</div>
+</section>
+</section>
+<section id="compilation-sur-la-cible-native">
+<h2>Compilation sur la cible (native)<a class="headerlink" href="#compilation-sur-la-cible-native" title="Lien permanent vers ce titre">¶</a></h2>
+<p>Vos applications peuvent <strong>parfois</strong> être compilées directement sur la cible embarquée avec les mêmes commandes que vous
+utilisez sur votre PC de développement — pourvu que le compilateur et les
+bibliothèques nécessaires soient installées et que le
+processeur soit assez puissant, sinon vous allez attendre des siècles…
+Avec votre éditeur préféré (soit avec <strong>emacs</strong> ou <strong>vim</strong> dans le terminal directement sur la cible), créez un
+fichier <code class="file docutils literal notranslate"><span class="pre">hello_native.c</span></code> avec le contenu qui suit :</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
+
+<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Hello REDS!</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Ensuite, compilez-le avec la commande</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">root@de1soclinux:~# </span>gcc hello_native.c -o hello_native
+</pre></div>
+</div>
+<p>et testez-le avec</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">root@de1soclinux:~# </span>./hello_native
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Quelle version de GCC est installée sur la carte ?</p>
+</div>
+</section>
+<section id="compilation-croisee-sous-de1-soc">
+<h2>Compilation croisée sous DE1-SoC<a class="headerlink" href="#compilation-croisee-sous-de1-soc" title="Lien permanent vers ce titre">¶</a></h2>
+<p>La compilation croisée standard nécessite quelques précautions supplémentaires
+par rapport à une compilation native :</p>
+<ul class="simple">
+<li><p>La toolchain doit être compatible et paramétrée pour la cible choisie.
+Pour garantir une compatibilité entre le code généré par la toolchain et le
+système auquel il est destiné, il faut dans tous les cas que le compilateur
+utilisé pour compiler l’OS présent sur la cible et celui utilisé pour compiler
+l’application aient la même interface binaire (ABI).</p></li>
+<li><p>Le chemin des bibliothèques et des includes spécifiques à la carte cible
+doivent être précisés. Les bibliothèques présentes dans la machine hôte ayant
+été compilées pour une architecture différente, elles ne sont pas exécutables
+sur la carte cible.</p></li>
+<li><p>Les versions des bibliothèques et includes utilisés doivent être celles du
+système cible.
+Dans le cas de la compilation d’un driver Linux, les sources du noyau doivent
+être disponibles et leur version doit également correspondre.</p></li>
+</ul>
+<p>Pour répondre au premier point de la problématique précédente, nous utilisons
+ici la même toolchain qui a été utilisée pour générer la distribution Linux
+cible, c’est-à-dire <strong>arm-linux-gnueabihf</strong> — <strong>gnueabihf</strong> étant une ABI
+normalisée pour les systèmes ARM possédant une unité de calcul hardware pour les
+flottants (« hard float ») — et avec un numéro de version très proche.</p>
+<p>Il est simple de cross-compiler notre première application, un « Hello world » classique.</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span><span class="cp"></span>
+
+<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Hello, cross-compiled world!</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Le fichier <code class="file docutils literal notranslate"><span class="pre">stdio.h</span></code> inclus dans le code est celui de la libc spécifique à
+la toolchain installée. Pas besoin, pour les headers appartenant à des
+bibliothèques fournies avec la toolchain (<em>libc</em>, <em>libm</em>, <em>libcrypt</em>,
+<em>libpthread</em> et quelques autres) de préciser un dossier d’inclusion spécifique.
+L’invocation du compilateur s’effectue donc de la même manière que l’invocation
+d’un compilateur natif :</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">HOST:~$ </span>arm-linux-gnueabihf-gcc hello.c -o hello
+<span class="gp">HOST:~$ </span>ls -al hello
+<span class="go">-rwxrwxr-x 1 rob rob 10228 Sep  1 14:56 hello</span>
+<span class="gp">HOST:~$ </span>file hello
+<span class="go">hello: ELF 32-bit LSB executable, ARM, EABI5 version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux-armhf.so.3, for GNU/Linux 2.6.32, BuildID[sha1]=e295f4dc983156976c528d29073f98cade530ec8, with debug_info, not stripped</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Qu’est-ce qui se passerait si vous essayiez d’exécuter ce fichier sur votre PC ? Pourquoi ?</p>
+</div>
+<p>Le fichier résultant est un exécutable linké dynamiquement.
+Il est également possible de procéder à une compilation statique, si les
+bibliothèques utilisées ne sont pas disponibles sur la cible (ce qui n’est
+évidemment pas le cas ici, vu que seule la <em>libc</em> est utilisée).</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">HOST:~$ </span>arm-linux-gnueabihf-gcc hello.c -o hello_static -static
+<span class="gp">HOST:~$ </span>ls -al hello_static
+<span class="go">-rwxrwxr-x 1 rob rob 3972176 Sep  1 14:57 hello_static</span>
+<span class="gp">HOST:~$ </span>file hello_static
+<span class="go">hello_static: ELF 32-bit LSB executable, ARM, EABI5 version 1 (GNU/Linux), statically linked, for GNU/Linux 2.6.32, BuildID[sha1]=d2b9e57feaa2d0c24525a548f0cfdb7bf3d2f45a, with debug_info, not stripped</span>
+</pre></div>
+</div>
+<p>Comme la taille de l’exécutable s’en retrouve dramatiquement accrue, la
+compilation statique est réservée aux cas spéciaux.</p>
+<p>Pour tester, mettez l’exécutable dans le dossier <code class="file docutils literal notranslate"><span class="pre">/export/drv/</span></code> de la machine hôte et depuis la cible exécutez :</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">root@de1soclinux:~# </span>~/drv/hello
+</pre></div>
+</div>
+<p>Si l’erreur suivante apparaît, la mauvaise toolchain a été utilisée lors de la compilation, assurez-vous de bien utiliser la version <em>6.4.1</em>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>~/drv/hello: /lib/arm-linux-gnueabihf/libc.so.6: version <span class="s1">&#39;GLIBC_2.34&#39;</span> not found <span class="o">(</span>required by ~/drv/hello<span class="o">)</span>
+</pre></div>
+</div>
+</section>
+<section id="acces-aux-peripheriques-du-cyclonev-soc-depuis-u-boot">
+<h2>Accès aux périphériques du CycloneV-SoC depuis U-Boot<a class="headerlink" href="#acces-aux-peripheriques-du-cyclonev-soc-depuis-u-boot" title="Lien permanent vers ce titre">¶</a></h2>
+<p>La plupart des périphériques du CycloneV-SoC ne sont pas accessibles au core ARM
+qu’à travers la FPGA:</p>
+<figure class="align-center" id="id5">
+<a class="reference internal image-reference" href="../_images/schema_de1soc.png"><img alt="../_images/schema_de1soc.png" src="../_images/schema_de1soc.png" style="width: 600px;" /></a>
+<figcaption>
+<p><span class="caption-number">Fig. 5 </span><span class="caption-text">Diagramme du DE1-SoC computer (Figure 1 dans <em>« DE1-SoC Computer System with ARM Cortex-A9 »</em>).</span><a class="headerlink" href="#id5" title="Lien permanent vers cette image">¶</a></p>
+</figcaption>
+</figure>
+<p>En particulier, grâce au bitstream chargé au démarrage, les différents
+périphériques sont accessibles en <em>memory-map</em> en utilisant des accès mémoire.</p>
+<p>La liste des adresses mémoire est disponible dans le chapitre 7 du document
+<em>« DE1-SoC Computer System with ARM Cortex-A9 »</em> (page 29).
+La section 2.9 (page 7) de ce même document donne plus d’information sur les registres
+des périphériques qui seront utilisés (LEDs, switchs, …).</p>
+<div class="admonition warning">
+<p class="admonition-title">Avertissement</p>
+<p>Avant d’essayer les commandes ci-dessous, assurez-vous que le bon bitstream soit
+chargé en faisant un boot complète du système.
+A ce moment-là, dès que vous aurez le prompt Linux, tapez une commande</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">root@de1soclinux:~# </span>reboot
+</pre></div>
+</div>
+<p>et arrêtez le système au prompt U-Boot au redémarrage.</p>
+</div>
+<p>U-Boot possède un ensemble de commandes dédiées à la manipulation de données :</p>
+<ul>
+<li><p>la commande <em>memory display</em></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>md.<span class="o">{</span>b<span class="p">|</span>w<span class="p">|</span>l<span class="o">}</span> addr length
+</pre></div>
+</div>
+<p>permet d’afficher
+<code class="code bash docutils literal notranslate"><span class="pre">length</span></code> données depuis l’adresse <code class="code bash docutils literal notranslate"><span class="pre">addr</span></code>, sous un certain format :</p>
+<ul class="simple">
+<li><p><code class="code bash docutils literal notranslate"><span class="pre">md.b</span></code> affichant les données sous forme de mots de 8 bits</p></li>
+<li><p><code class="code bash docutils literal notranslate"><span class="pre">md.w</span></code> affichant les données sous forme de mots de 16 bits</p></li>
+<li><p><code class="code bash docutils literal notranslate"><span class="pre">md.l</span></code> affichant les données sous forme de mots de 32 bits</p></li>
+</ul>
+<p>Notez que si vous affichez 8 ou 16 bits d’un registre 32 bits,
+<strong>vous allez récupérer les bytes de poids faible</strong>,
+et non pas ceux de poids fort.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Est-ce que cela nous dit quelque chose sur l’endianness du MCU?</p>
+</div>
+</li>
+<li><p>la commande associée <em>memory write</em></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mw.<span class="o">{</span>b<span class="p">|</span>w<span class="p">|</span>l<span class="o">}</span> addr value <span class="o">(</span>n<span class="o">)</span>
+</pre></div>
+</div>
+<p>permet de
+modifier la valeur de <code class="code bash docutils literal notranslate"><span class="pre">n</span></code> données à partir de <code class="code bash docutils literal notranslate"><span class="pre">addr</span></code>, avec une
+taille d’élément de donnée de 1, 2 ou 4 bytes.</p>
+</li>
+</ul>
+<section id="exemple">
+<h3>Exemple<a class="headerlink" href="#exemple" title="Lien permanent vers ce titre">¶</a></h3>
+<p>Les commandes ci-dessous affichent le contenu de la mémoire à l’adresse de
+chargement de U-Boot sous chacun des trois formats disponibles.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">SOCFPGA_CYCLONE5:~# </span>md.b 0x80008000 0x1
+<span class="go">80008000: 46    F</span>
+<span class="gp">SOCFPGA_CYCLONE5:~# </span>md.w 0x80008000 0x1
+<span class="go">80008000: 4c46    FL</span>
+<span class="gp">SOCFPGA_CYCLONE5:~# </span>md.l 0x80008000 0x1
+<span class="go">80008000: eb004c46    FL..</span>
+<span class="gp">SOCFPGA_CYCLONE5:~# </span>md.b 0x80008000 0x4
+<span class="go">80008000: 46 4c 00 eb    FL..</span>
+<span class="gp">SOCFPGA_CYCLONE5:~# </span>md.w 0x80008000 0x4
+<span class="go">80008000: 4c46 eb00 9000 e10f    FL......</span>
+<span class="gp">SOCFPGA_CYCLONE5:~# </span>md.l 0x80008000 0x4
+<span class="go">80008000: eb004c46 e10f9000 e229901a e319001f    FL........).....</span>
+</pre></div>
+</div>
+<div class="admonition-exercice-1 admonition">
+<p class="admonition-title"><strong>Exercice 1</strong></p>
+<ul class="simple">
+<li><p>Expliquez les différences entre les lignes ci-dessus.</p></li>
+<li><p>Utilisez la commande <code class="code bash docutils literal notranslate"><span class="pre">md</span></code> pour lire la valeur binaire écrite avec les
+switches et écrivez-la sur les LEDs.</p></li>
+<li><p>Qu’est-ce qui se passe si vous essayez d’accéder à une adresse qui n’est pas alignée (par exemple <em>0x01010101</em>) et pourquoi ?</p></li>
+</ul>
+</div>
+<div class="admonition-exercice-2 admonition">
+<p class="admonition-title"><strong>Exercice 2</strong></p>
+<p>Ecrivez un script (à l’aide d’une variable d’environnement) U-Boot qui va alterner, chaque seconde, entre allumer les 3 affichages 7-segments à gauche et les 3 à droite.</p>
+<p>Vous trouverez plus d’information sur le shell d’U-Boot via les liens suivants :</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference external" href="https://docs.u-boot.org/en/latest/usage/cmdline.html">https://docs.u-boot.org/en/latest/usage/cmdline.html</a></p></li>
+<li><p><a class="reference external" href="https://mediawiki.compulab.com/w/index.php?title=U-Boot%3A_Quick_reference">https://mediawiki.compulab.com/w/index.php?title=U-Boot%3A_Quick_reference</a></p></li>
+</ul>
+</div></blockquote>
+</div>
+</section>
+</section>
+<section id="acces-aux-peripheriques-du-de1-soc-depuis-linux">
+<h2>Accès aux périphériques du DE1-SoC depuis Linux<a class="headerlink" href="#acces-aux-peripheriques-du-de1-soc-depuis-linux" title="Lien permanent vers ce titre">¶</a></h2>
+<p>Le même type d’accès aux ressources vu dans la section précédente est possible
+depuis Linux.
+En particulier, il est possible d’ouvrir un fichier spécial (<code class="file docutils literal notranslate"><span class="pre">/dev/mem</span></code>)
+et, après l’avoir mappé en mémoire avec la fonction <code class="code c docutils literal notranslate"><span class="name"><span class="pre">mmap</span></span><span class="punctuation"><span class="pre">()</span></span></code>, taper des
+valeurs directement dans la mémoire.</p>
+<p>Pour plus d’information sur <code class="code c docutils literal notranslate"><span class="name"><span class="pre">mmap</span></span></code>, regardez dans sa documentation <a class="reference external" href="https://www.man7.org/linux/man-pages/man2/mmap.2.html">man</a>
+ainsi que cet <a class="reference external" href="https://bakhi.github.io/devmem/">exemple</a>.
+Attention cette exemple utilise <code class="code c docutils literal notranslate"><span class="name"><span class="pre">PAGE_SIZE</span></span></code> comme adresse qui est défini à la compilation, or tous les systèmes n’ont pas la même taille de page. Regardez dans la description <code class="code c docutils literal notranslate"><span class="name"><span class="pre">man</span></span></code> de <code class="code c docutils literal notranslate"><span class="name"><span class="pre">mmap</span></span></code> pour trouver une alternative !</p>
+<div class="admonition warning">
+<p class="admonition-title">Avertissement</p>
+<p>En faisant ça, vous avez accès direct à <strong>toute</strong> la mémoire…
+Sans aucune supervision ni limitation !</p>
+</div>
+<p>Cette approche est très utile pour tester rapidement un dispositif — vous pouvez
+en effet accéder à ses registres et lire/écrire des valeurs, sans devoir écrire
+un driver.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Pouvez-vous identifier au moins deux gros problèmes de cette approche ?</p>
+</div>
+<div class="admonition-exercice-3 admonition">
+<p class="admonition-title"><strong>Exercice 3</strong></p>
+<p>Ecrivez un logiciel C qui commence par afficher 0 sur l’affichage HEX0.
+En suite, l’utilisateur peut contrôller le nombre affiché de la façon suivante :</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>En appuyant sur KEY0, le nombre est incrémenté</p></li>
+<li><p>En appuyant sur KEY1, le nombre est décrémenté</p></li>
+</ul>
+</div></blockquote>
+<p>Le nombre affiché est limité entre 0 et 99. Si les limites sont atteintes, il n’est alors plus possible de décrémenté (0 atteint) ou d’incrémenté (99 atteint).</p>
+<p>Egalement, la LED correspondant à l’unité du nombre affiché doit être allumée. Ex. avec 25, la LED5 est allumée.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Quel est le souci principal dans l’écriture de ce logiciel ?</p>
+</div>
+</section>
+<section id="travail-a-rendre-et-criteres-d-evaluation">
+<h2>Travail à rendre et critères d’évaluation<a class="headerlink" href="#travail-a-rendre-et-criteres-d-evaluation" title="Lien permanent vers ce titre">¶</a></h2>
+<p>Dans le cadre de ce laboratoire, vous devez rendre les deux exercices relatifs à U-Boot et les exercices sous Linux.</p>
+<p>S’il est demandé d’écrire du code, ce code doit se trouver dans un fichier <em>ex&lt;n&gt;.c</em>, où &lt;n&gt; correspond au numéro de l’exercice.
+Si un exercice contient plusieurs variantes, alors le fichier sera nommé <em>ex&lt;n&gt;_&lt;variante&gt;.c</em>, où &lt;variante&gt; correspond à la variante.
+Par exemple : <em>ex2.c</em>, <em>ex6_poll.c</em>.
+Il n’est pas nécessaire de renommer les fichiers déjà existants.
+Si un exercice réutilise un fichier précédent, celui-ci doit être dupliqué pour le nouvel exercice, sauf indication contraire.</p>
+<p>Si le code a pour but d’être exécuté sur la DE1-SoC, il doit être compilé en « compilation croisée »,
+c.-à-d. en utilisant la toolchain mentionnée dans le <a class="reference internal" href="#laboratoire1"><span class="std std-ref">Laboratoire 1 — Introduction</span></a>.</p>
+<p>N’oubliez pas de mettre votre prénom et nom !</p>
+<p>Les exercices sont à faire <strong>individuellement</strong>.
+Copier la solution d’un autre et changer le nom/l’ordre des variables n’est pas toléré.</p>
+<p>La date limite est celle communiquée dans l’annonce sur Moodle.
+Vous devez rendre une archive <code class="file docutils literal notranslate"><span class="pre">.tar.gz</span></code> contenant :</p>
+<ul class="simple">
+<li><p>le code source de vos solutions et tous les fichiers nécessaires,</p></li>
+<li><dl class="simple">
+<dt>un fichier <code class="file docutils literal notranslate"><span class="pre">README.md</span></code></dt><dd><ul>
+<li><p>contenant les réponses aux questions posées dans les exercices.</p></li>
+<li><p>les éventuels soucis rencontrés qui péjore le rendu</p></li>
+<li><p>les choix d’implémentation « spéciaux » (si trop long pour expliquer en commentaire)</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p>Les notes seront réparties comme suit :</p>
+<ul>
+<li><p>80% de la note si l’exercice est correct (c.-à-d., <em>« fonctionne »</em>).
+Il doit bien sûr « fonctionner » sur d’autres PCs que votre PC personnel, et de façon déterministe.
+Il est donc impératif que tout ce qui est nécessaire pour compiler et tester le fonctionnement de la solution soit rendu.</p></li>
+<li><p>20% de la note si l’exercice est « bien fait », c.-à-d. :</p>
+<ul>
+<li><p>Respect des <a class="reference external" href="https://www.kernel.org/doc/html/latest/process/coding-style.html">Linux kernel coding style</a>,
+particulièrement les points suivants :</p>
+<blockquote>
+<div><ul class="simple">
+<li><ol class="arabic simple">
+<li><p>Indentation</p></li>
+</ol>
+</li>
+<li><ol class="arabic simple" start="2">
+<li><p>Breaking long lines and strings</p></li>
+</ol>
+</li>
+<li><ol class="arabic simple" start="3">
+<li><p>Placing Braces and Spaces</p></li>
+</ol>
+</li>
+<li><ol class="arabic simple" start="4">
+<li><p>Naming</p></li>
+</ol>
+</li>
+<li><ol class="arabic simple" start="6">
+<li><p>Functions</p></li>
+</ol>
+</li>
+<li><ol class="arabic simple" start="8">
+<li><p>Commenting</p></li>
+</ol>
+</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p><strong>code lisible</strong></p></li>
+<li><p><strong>documenté/commenté</strong></p></li>
+<li><p><strong>bien structuré</strong></p></li>
+</ul>
+</li>
+</ul>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">DRV 2024</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../helper/helper.html">Helper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../helper/ssh.html">Mise en place SSH</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../helper/eval_criterion.html">Consigne de rendu</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lab_00/lab_00.html">Laboratoire 0</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Laboratoire 1</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tuto_01/tuto_01.html">Tuto 1</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="../lab_00/lab_00.html" title="Chapitre précédent">Laboratoire 0 — Consolidation du langage C</a></li>
+      <li>Next: <a href="../tuto_01/tuto_01.html" title="Chapitre suivant">Tutoriel 1 — Prise en main</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Recherche rapide</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2024, REDS institute.
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
