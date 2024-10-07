@@ -24,3 +24,6 @@ mw.l 0xFF200030 0x00000000;
 sleep 1;
 run toggle_hex'
 ```
+
+# Exercice 3
+Se référer au fichier ex3.c

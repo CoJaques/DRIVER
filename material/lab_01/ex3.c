@@ -99,7 +99,6 @@ int main(void)
 		} else if (button_state & KEY_2_MASK) {
 			counter = 0;
 		} else if (button_state & KEY_3_MASK) {
-			clear_7_segment(segment_register);
 			break;
 		}
 
@@ -110,6 +109,7 @@ int main(void)
 		}
 	}
 
+	clear_7_segment(segment_register);
 	munmap(mem_ptr, getpagesize());
 
 	return 0;
