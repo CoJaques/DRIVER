@@ -8,27 +8,36 @@
 
 #define BASE_ADDRESS 0xFF200000
 #define SEGMENT_OFFSET 0x20
-#define SEGMENT_SIZE 0x8
 #define BUTTON_OFFSET 0x50
+#define OFFSET 0x8
 #define KEY_0_MASK (1 << 0)
 #define KEY_1_MASK (1 << 1)
 #define KEY_2_MASK (1 << 2)
 #define KEY_3_MASK (1 << 3)
+#define MIN 0
+#define MAX 99
 
-static const uint8_t number_representation_7segment[] = {
+static const uint32_t number_representation_7segment[] = {
 	0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F
 };
 
-void set_7_segment(uint8_t *base_address, unsigned value_to_print, unsigned segment_number)
+void set_7_segment(uint32_t *base_address, unsigned value_to_print)
 {
-	int value = number_representation_7segment[value];
-	uint8_t adress = base_address + (OFFSET * segment_number);
-	*address = value;
+	uint8_t unit = value_to_print % 10;
+	uint8_t diz = value_to_print / 10;
+
+	uint32_t value = number_representation_7segment[unit] |
+			 (number_representation_7segment[diz] << OFFSET);
+
+	*base_address = value;
+
+	printf("Value: %d Setting 7-segment value to 0x%X address to %p\n",
+	       value_to_print, value, base_address);
 }
 
-void clear_7_segment(uint8_t *addr)
+void clear_7_segment(uint32_t *addr)
 {
-	memset((void *)addr, 0, 2);
+	*addr = 0x0;
 }
 
 // Return the state of the key if the value was changed since the last call (edge detection)
@@ -44,50 +53,49 @@ int get_key_state(uint8_t *addr)
 
 int main(void)
 {
-	int fd = open("/dev/uio0", O_RDWR);
+	int fd = open("/dev/mem", O_RDWR | O_SYNC);
 	if (fd < 0) {
 		printf("Error opening /dev/uio0\n");
 		return -1;
 	}
 
-	uint8_t *uio_ptr = mmap(NULL, getpagesize(), PROT_READ | PROT_WRITE,
+	uint8_t *mem_ptr = mmap(NULL, getpagesize(), PROT_READ | PROT_WRITE,
 				MAP_SHARED, fd, BASE_ADDRESS);
 
-	if (uio_ptr == MAP_FAILED) {
+	if (mem_ptr == MAP_FAILED) {
 		printf("Error mapping memory\n");
 		return -1;
 	}
 
 	close(fd);
 
-	uint8_t *const segment_register = uio_ptr + SEGMENT_OFFSET;
-	uint8_t *const button_register = uio_ptr + BUTTON_OFFSET;
-
-	clear_7_segment(segment_register);
+	uint32_t *const segment_register =
+		(uint32_t *)(mem_ptr + SEGMENT_OFFSET);
+	uint8_t *const button_register = mem_ptr + BUTTON_OFFSET;
 
 	int8_t counter = 0;
+
+	clear_7_segment(segment_register);
 
 	while (1) {
 		volatile int button_state = get_key_state(button_register);
 
 		if (button_state & KEY_0_MASK) {
-			counter++;
+			if (counter < MAX)
+				counter++;
 		} else if (button_state & KEY_1_MASK) {
-			counter--;
+			if (counter > MIN)
+				counter--;
 		} else if (button_state & KEY_2_MASK) {
 			counter = 0;
 		} else if (button_state & KEY_3_MASK) {
+			clear_7_segment(segment_register);
 			break;
 		}
 
-		unsigned unit = counter % 10;
-		unsigned diz = counter / 10;
-
 		if (button_state != 0) {
 			printf("Counter: %d\n", counter);
-			clear_7_segment(segment_register);
-			set_7_segment(segment_register, unit, 0);
-			set_7_segment(segment_register, diz, 1);
+			set_7_segment(segment_register, counter);
 		}
 	}
 
