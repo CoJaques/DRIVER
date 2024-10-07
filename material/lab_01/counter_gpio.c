@@ -6,16 +6,17 @@
 #include <fcntl.h>
 #include <sys/mman.h>
 
-#define BASE_ADDRESS 0xFF200000
+#define BASE_ADDRESS   0xFF200000
+#define LEDS_OFFSET    0x0
 #define SEGMENT_OFFSET 0x20
-#define BUTTON_OFFSET 0x50
-#define OFFSET 0x8
-#define KEY_0_MASK (1 << 0)
-#define KEY_1_MASK (1 << 1)
-#define KEY_2_MASK (1 << 2)
-#define KEY_3_MASK (1 << 3)
-#define MIN 0
-#define MAX 99
+#define BUTTON_OFFSET  0x50
+#define OFFSET	       0x8
+#define KEY_0_MASK     (1 << 0)
+#define KEY_1_MASK     (1 << 1)
+#define KEY_2_MASK     (1 << 2)
+#define KEY_3_MASK     (1 << 3)
+#define MIN	       0
+#define MAX	       99
 
 static const uint32_t number_representation_7segment[] = {
 	0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F
@@ -33,6 +34,13 @@ void set_7_segment(uint32_t *base_address, unsigned value_to_print)
 
 	printf("Value: %d Setting 7-segment value to 0x%X address to %p\n",
 	       value_to_print, value, base_address);
+}
+
+void set_leds(uint32_t *base_address, unsigned value_to_print)
+{
+	// turn on led 1 to 9 depending on the unit of the counter.
+	// 0 is off.
+	*base_address = value > 0 ? (1 << (value - 1)) : 0;
 }
 
 void clear_7_segment(uint32_t *addr)
@@ -71,11 +79,13 @@ int main(void)
 
 	uint32_t *const segment_register =
 		(uint32_t *)(mem_ptr + SEGMENT_OFFSET);
+
 	uint8_t *const button_register = mem_ptr + BUTTON_OFFSET;
 
-	int8_t counter = 0;
+	uint8_t *const led_register = mem_ptr + LEDS_OFFSET;
 
-	clear_7_segment(segment_register);
+	int8_t counter = 0;
+	set_7_segment(segment_register, counter);
 
 	while (1) {
 		volatile int button_state = get_key_state(button_register);
@@ -96,8 +106,11 @@ int main(void)
 		if (button_state != 0) {
 			printf("Counter: %d\n", counter);
 			set_7_segment(segment_register, counter);
+			set_leds(led_register, counter);
 		}
 	}
+
+	munmap(mem_ptr, getpagesize());
 
 	return 0;
 }
