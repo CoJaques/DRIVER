@@ -1,3 +1,9 @@
+/*      
+Title  : Lab 1 - Exercise 3
+Author : Colin Jaques
+Date   : 2023-07-10
+*/
+
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
