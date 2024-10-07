@@ -42,8 +42,8 @@ void set_7_segment(uint32_t *base_address, unsigned value_to_print)
 
 void set_leds(uint32_t *base_address, unsigned value_to_print)
 {
-	// Turn on LEDs 1 to 9 depending on the unit of the counter, turn off if 0.
-	*base_address = value_to_print > 0 ? (1 << (value_to_print - 1)) : 0;
+	value_to_print %= 10;
+	*base_address = 1 << value_to_print;
 }
 
 void clear_output(uint32_t *segment, uint32_t *led)
