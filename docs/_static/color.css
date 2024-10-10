@@ -14,6 +14,18 @@
     color: blue;
 }
 
+.admonition.note>.admonition-title, div.admonition.note>.admonition-title {
+    background-color: var(--pst-color-success-bg);
+}
+
+.admonition.note>.admonition-title:after, div.admonition.note>.admonition-title:after {
+    color: var(--pst-color-success);
+}
+
+.admonition.note, div.admonition.note {
+    border-color: var(--pst-color-success);
+}
+
 .boldred {
     color: white;
     background-color: red;

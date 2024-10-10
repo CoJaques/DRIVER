@@ -1,0 +1,834 @@
+
+<!DOCTYPE html>
+
+
+<html lang="fr" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Laboratoire 2 — User-space Drivers &#8212; Documentation DRV 2024 </title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/color.css?v=8770e769" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=72dce1d2"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script src="../_static/translations.js?v=041d0952"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'lab_02/lab_02';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Recherche" href="../search.html" />
+    <link rel="prev" title="Tutoriel 1 — Prise en main" href="../tuto_01/tuto_01.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="fr"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Passer au contenu principal</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Haut de page</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo_drv.png" class="logo__image only-light" alt="Documentation DRV 2024  - Home"/>
+    <script>document.write(`<img src="../_static/logo_drv.png" class="logo__image only-dark" alt="Documentation DRV 2024  - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Recherche" aria-label="Recherche" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Recherche</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../helper/helper.html">Helper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../helper/ssh.html">Mise en place SSH</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../helper/eval_criterion.html">Consigne de rendu</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lab_00/lab_00.html">Laboratoire 0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lab_01/lab_01.html">Laboratoire 1</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tuto_01/tuto_01.html">Tuto 1</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Laboratoire 2</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Téléchargez cette page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/lab_02/lab_02.rst" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Télécharger le fichier source"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.rst</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Imprimer au format PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Mode plein écran"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="clair/sombre" aria-label="clair/sombre" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Recherche" aria-label="Recherche" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Laboratoire 2 — User-space Drivers</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contenu </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#objectifs">Objectifs</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#materiel-necessaire">Matériel nécessaire</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#telechargement-du-noyau-linux-et-ajout-des-modules-pour-le-user-space-i-o-uio">Téléchargement du noyau Linux et ajout des modules pour le User-space I/O (UIO)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#acces-aux-peripheriques-en-utilisant-dev-mem">Accès aux périphériques en utilisant <code class="file docutils literal notranslate"><span class="pre">/dev/mem</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#acces-aux-peripheriques-en-utilisant-le-uio-framework">Accès aux périphériques en utilisant le UIO framework</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#uio-framework-et-interruptions">UIO framework et interruptions</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#travail-a-rendre-et-criteres-d-evaluation">Travail à rendre et critères d’évaluation</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="laboratoire-2-user-space-drivers">
+<span id="laboratoire2"></span><h1>Laboratoire 2 — User-space Drivers<a class="headerlink" href="#laboratoire-2-user-space-drivers" title="Lien vers cette rubrique">#</a></h1>
+<p>Le but de ce laboratoire est de vous présenter les drivers
+user-space. Il s’agit d’une étape intermédiaire entre le monde user-space (que vous avez
+exploré dans le <a class="reference internal" href="../lab_01/lab_01.html#laboratoire1"><span class="std std-ref">Laboratoire 1 — Introduction</span></a>) et le monde kernel-space
+(qui sera le sujet du reste du cours).</p>
+<p>Il n’est pas toujours nécessaire d’écrire un driver kernel-space, et opérer en
+user-space présente des avantages intéressants (mais aussi de fortes limitations).
+Dans ce laboratoire on explorera les deux.</p>
+<section id="objectifs">
+<h2>Objectifs<a class="headerlink" href="#objectifs" title="Lien vers cette rubrique">#</a></h2>
+<ul class="simple">
+<li><p>Apprendre à effectuer des changements simples dans la configuration du noyau.</p></li>
+<li><p>Comprendre les différentes approches relatives aux drivers user-space.</p></li>
+<li><p>Investiguer les avantages/désavantages par rapport aux drivers kernel-space.</p></li>
+</ul>
+</section>
+<section id="materiel-necessaire">
+<h2>Matériel nécessaire<a class="headerlink" href="#materiel-necessaire" title="Lien vers cette rubrique">#</a></h2>
+<p>Dans ce laboratoire on mettra les mains dans le noyau !
+Il nous faudra donc le télécharger.
+On utilisera la version 6.1.55-lts du noyau Linux, mais on choisira une version non-mainline (c.-à-d., pas celle « officielle »).
+Ci-dessous, vous verrez comment récupérer le noyau, le configurer, et le compiler.</p>
+</section>
+<section id="telechargement-du-noyau-linux-et-ajout-des-modules-pour-le-user-space-i-o-uio">
+<h2>Téléchargement du noyau Linux et ajout des modules pour le User-space I/O (UIO)<a class="headerlink" href="#telechargement-du-noyau-linux-et-ajout-des-modules-pour-le-user-space-i-o-uio" title="Lien vers cette rubrique">#</a></h2>
+<p>Avant tout chose, sur la machine virtuelle, commencez par exécuter la commande suivante (et à chaque fois que vous ouvrez un nouveau terminal pour compiler du code kernel « manuellement ») :</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nb">export</span><span class="w"> </span><span class="nv">TOOLCHAIN</span><span class="o">=</span>/opt/toolchains/arm-linux-gnueabihf_6.4.1/bin/arm-linux-gnueabihf-
+</pre></div>
+</div>
+<p>Comme mentionné ci-dessus, nous utiliserons une version du noyau non-mainline,
+c.-à-d., la version customisée par une entité tierce (dans notre cas, Altera).
+Vous aviez déjà cloné le dépôt git lors du <a class="reference internal" href="../lab_00/lab_00.html#laboratoire0"><span class="std std-ref">Laboratoire 0 — Consolidation du langage C</span></a>.
+Vérifiez que la branche de votre clone locale soit <code class="code highlight bash docutils literal highlight-bash">socfpga-6.1.55-lts</code> qui est la version du noyau que nous utiliserons :</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>git<span class="w"> </span>branch<span class="w"> </span>--show-current
+<span class="go">socfpga-6.1.55-lts</span>
+</pre></div>
+</div>
+<p>Si ce n’est pas la bonne branche et comme l’option <code class="code highlight bash docutils literal highlight-bash">--depth<span class="o">=</span><span class="m">1</span></code> avait été utilisée pour limiter la taille du clone,
+le changement de branche <em>classique</em> n’est pas possible.
+Le plus simple est de recloner le dépôt avec la bonne branche :</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>rm<span class="w"> </span>linux-socfpga<span class="w"> </span>-r
+<span class="gp">$ </span>git<span class="w"> </span>clone<span class="w"> </span>--depth<span class="o">=</span><span class="m">1</span><span class="w"> </span>-b<span class="w"> </span>socfpga-6.1.55-lts<span class="w"> </span>https://github.com/altera-opensource/linux-socfpga.git
+<span class="gp">$ </span><span class="nb">cd</span><span class="w"> </span>linux-socfpga
+</pre></div>
+</div>
+<p>Lorsqu’on doit configurer le noyau pour une nouvelle carte, ce n’est pas nécessaire de démarrer
+de zéro à chaque fois.
+En fait, des configurations de base ont été déjà préparées pour les cartes les plus connues.
+Vous pouvez donc importer directement cette configuration comme point de départ :</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>make<span class="w"> </span><span class="nv">ARCH</span><span class="o">=</span>arm<span class="w"> </span><span class="nv">CROSS_COMPILE</span><span class="o">=</span><span class="nv">$TOOLCHAIN</span><span class="w"> </span>socfpga_defconfig
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Pourquoi doit-on spécifier tous ces paramètres ?</p>
+</div>
+<p>Cette commande remplacera la configuration actuelle (contenue dans le fichier <code class="file docutils literal notranslate"><span class="pre">.config</span></code>) avec
+une configuration adaptée à la carte.</p>
+<div class="admonition warning">
+<p class="admonition-title">Avertissement</p>
+<p>Cela veut aussi dire que, lorsqu’on veut jouer un peu avec la configuration sans trop de
+risques, il est sage de faire une copie du fichier <code class="file docutils literal notranslate"><span class="pre">.config</span></code> <strong>avant</strong> de la bricoler…
+même si automatiquement le <em>menuconfig</em> (qu’on verra ci-dessous) fait une copie
+de l’ancienne configuration (fichier <code class="file docutils literal notranslate"><span class="pre">.config.old</span></code>) à la sauvegarde.</p>
+</div>
+<p>Toutefois, cette configuration ne contient pas les options qui pourraient nous intéresser,
+dans le cas spécifique de ce laboratoire les <em>userspace drivers</em> ne sont pas actifs.
+Vous pouvez le voir avec la commande :</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>grep<span class="w"> </span>UIO<span class="w"> </span>.config
+</pre></div>
+</div>
+<p>(<em>UIO = Userspace I/O</em>, vous trouvez l’howto officiel <a class="reference external" href="https://www.kernel.org/doc/html/latest/driver-api/uio-howto.html">ici</a>).</p>
+<p>Vous pouvez modifier la configuration avec :</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>make<span class="w"> </span><span class="nv">ARCH</span><span class="o">=</span>arm<span class="w"> </span><span class="nv">CROSS_COMPILE</span><span class="o">=</span><span class="nv">$TOOLCHAIN</span><span class="w"> </span>menuconfig
+</pre></div>
+</div>
+<p>Dans l’interface ncurses, vous pouvez chercher les éléments d’intérêt avec la touche <em>« / »</em>.
+Tapez <em>UIO</em> dans le champ de recherche, et avec les numéros sélectionnez le résultat qui vous
+intéresse. Dans le cas de <a class="reference internal" href="#menuconfig-search"><span class="std std-numref">Fig. 6</span></a>, il s’agit du numéro <em>« 1 »</em>.</p>
+<figure class="align-center" id="id1">
+<span id="menuconfig-search"></span><a class="reference internal image-reference" href="../_images/menuconfig_search.png"><img alt="../_images/menuconfig_search.png" src="../_images/menuconfig_search.png" style="width: 800px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 6 </span><span class="caption-text">Résultats de la recherche.</span><a class="headerlink" href="#id1" title="Lien vers cette image">#</a></p>
+</figcaption>
+</figure>
+<p>Avec la touche barre espace vous pouvez commuter entre <em>«  « </em> (désélectionné), <em>« M »</em> (module),
+et <em>« * »</em> (inclus dans le noyau).
+Choisissez de le compiler en tant que <strong>module</strong>.
+Avec la touche entrée vous pouvez voir le sous-menu (<a class="reference internal" href="#menuconfig-submenu"><span class="std std-numref">Fig. 7</span></a>).</p>
+<figure class="align-center" id="id2">
+<span id="menuconfig-submenu"></span><a class="reference internal image-reference" href="../_images/menuconfig_submenu.png"><img alt="../_images/menuconfig_submenu.png" src="../_images/menuconfig_submenu.png" style="width: 800px;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 7 </span><span class="caption-text">Sub-menu UIO.</span><a class="headerlink" href="#id2" title="Lien vers cette image">#</a></p>
+</figcaption>
+</figure>
+<p>Ici sélectionnez <em>Userspace I/O platform driver with generic IRQ handling</em> pour
+la compilation en tant que module.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Quelle est la différence entre ce driver et le <em>Userspace platform driver with generic irq and dynamic memory</em>?</p>
+</div>
+<p>Pour sortir du menu de configuration, avec les flèches et la touche entrée
+choisissez <em>Exit</em> dans la barre en bas jusqu’au moment où le système vous demande
+si vous voulez sauvegarder la nouvelle configuration.
+Appuyez sur entrée pour le faire, et vous devriez être au nouveau de retour à la
+ligne de commande.</p>
+<p>Vérifiez que la nouvelle configuration a bien été sauvegardée :</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>grep<span class="w"> </span>UIO<span class="w"> </span>.config
+<span class="go">CONFIG_UIO=m</span>
+<span class="gp"># </span>CONFIG_UIO_CIF<span class="w"> </span>is<span class="w"> </span>not<span class="w"> </span><span class="nb">set</span>
+<span class="go">CONFIG_UIO_PDRV_GENIRQ=m</span>
+<span class="gp"># </span>CONFIG_UIO_DMEM_GENIRQ<span class="w"> </span>is<span class="w"> </span>not<span class="w"> </span><span class="nb">set</span>
+<span class="go">[...]</span>
+</pre></div>
+</div>
+<p>Il faut ensuite modifier le device tree pour qu’on puisse gérer les boutons avec le UIO driver.
+Le device tree est une structure de donnée qui décrit les composants hardware (DRAM, UART, USB, bus I2C, …) d’une carte
+et permet au kernel de connaître et utiliser correctement ces différents composants,
+notamment sur les différentes adresses mémoires, numéros d’interruption ou encore le nombre de coeur CPU disponible.
+Ainsi, il n’y a pas besoin de hardcodé toutes ces informations !
+Plus d’information sur les devices trees sont disponibles dans
+<a class="reference external" href="https://bootlin.com/pub/conferences/2021/webinar/petazzoni-device-tree-101/petazzoni-device-tree-101.pdf">ces slides</a>.</p>
+<p>Ouvrez dans un éditeur de texte le fichier <code class="file docutils literal notranslate"><span class="pre">arch/arm/boot/dts/socfpga_cyclone5_sockit.dts</span></code>
+et ajoutez, juste après la ligne qui contient le <code class="code highlight c docutils literal highlight-c"><span class="cp">#include</span></code> (ligne 6) les deux lignes suivante, pour permettre l’utilisation de certain <code class="code highlight c docutils literal highlight-c"><span class="n">define</span></code> :</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;dt-bindings/interrupt-controller/irq.h&gt;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;dt-bindings/interrupt-controller/arm-gic.h&gt;</span>
+</pre></div>
+</div>
+<p>Ajoutez également, juste après la ligne qui contient le <em>compatible</em> (ligne 10-12), le bloc :</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">drv2024</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;drv2024&quot;</span><span class="p">;</span>
+<span class="w">    </span><span class="n">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0xFF200000</span><span class="w"> </span><span class="mh">0x1000</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">    </span><span class="n">interrupts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="n">GIC_SPI</span><span class="w"> </span><span class="mi">41</span><span class="w"> </span><span class="n">IRQ_TYPE_EDGE_RISING</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">    </span><span class="n">interrupt</span><span class="o">-</span><span class="n">parent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;&amp;</span><span class="n">intc</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Pouvez-vous expliquer les lignes ci-dessus ?</p>
+</div>
+<p>On peut maintenant compiler le noyau, les modules et le device tree.
+(vous pouvez démarrer la compilation et ensuite lire le reste du texte, cela va
+prendre un moment…)</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="c1"># Compilation du noyau</span>
+<span class="gp">$ </span>make<span class="w"> </span><span class="nv">ARCH</span><span class="o">=</span>arm<span class="w"> </span><span class="nv">CROSS_COMPILE</span><span class="o">=</span><span class="nv">$TOOLCHAIN</span><span class="w"> </span>-j6
+<span class="gp">$ </span><span class="c1"># Compilation des modules</span>
+<span class="gp">$ </span>make<span class="w"> </span><span class="nv">ARCH</span><span class="o">=</span>arm<span class="w"> </span><span class="nv">CROSS_COMPILE</span><span class="o">=</span><span class="nv">$TOOLCHAIN</span><span class="w"> </span>modules
+<span class="gp">$ </span><span class="c1"># Copie des modules dans le sous-répertoire tmp/</span>
+<span class="gp">$ </span>rm<span class="w"> </span>./tmp<span class="w"> </span>-rf
+<span class="gp">$ </span>make<span class="w"> </span><span class="nv">ARCH</span><span class="o">=</span>arm<span class="w"> </span><span class="nv">CROSS_COMPILE</span><span class="o">=</span><span class="nv">$TOOLCHAIN</span><span class="w"> </span><span class="nv">INSTALL_MOD_PATH</span><span class="o">=</span><span class="s2">&quot;./tmp&quot;</span><span class="w"> </span>modules_install
+<span class="gp">$ </span><span class="c1"># Compilation du DT</span>
+<span class="gp">$ </span>make<span class="w"> </span><span class="nv">ARCH</span><span class="o">=</span>arm<span class="w"> </span><span class="nv">CROSS_COMPILE</span><span class="o">=</span><span class="nv">$TOOLCHAIN</span><span class="w"> </span>socfpga_cyclone5_sockit.dtb
+
+<span class="gp">$ </span><span class="c1"># Backup de l&#39;ancien noyau/DT et copie des nouveaux fichiers</span>
+<span class="gp">$ </span>cp<span class="w"> </span><span class="nv">$HOME</span>/tftpboot/socfpga.dtb<span class="w"> </span><span class="nv">$HOME</span>/tftpboot/socfpga.dtb.old
+<span class="gp">$ </span>cp<span class="w"> </span><span class="nv">$HOME</span>/tftpboot/zImage<span class="w"> </span><span class="nv">$HOME</span>/tftpboot/zImage.old
+<span class="gp">$ </span>cp<span class="w"> </span>arch/arm/boot/dts/socfpga_cyclone5_sockit.dtb<span class="w"> </span><span class="nv">$HOME</span>/tftpboot/socfpga.dtb
+<span class="gp">$ </span>cp<span class="w"> </span>arch/arm/boot/zImage<span class="w"> </span><span class="nv">$HOME</span>/tftpboot/
+<span class="gp">$ </span>cp<span class="w"> </span>./tmp/lib/modules/6.1.55-g57cf7f3b7f73-dirty/<span class="w"> </span>/export/drv/<span class="w"> </span>-R
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Avertissement</p>
+<p>Le nom du répertoire source dans la dernière commande pourrait changer !!</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>En effet on aurait dû copier les modules déjà pour le <a class="reference internal" href="../lab_01/lab_01.html#laboratoire1"><span class="std std-ref">Laboratoire 1 — Introduction</span></a>,
+lorsqu’on a utilisé le nouveau noyau (qui se trouvait dans l’archive fournie),
+mais on ne les utilisait pas donc on a (sciemment) sauté une étape…</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Qu’est-ce que ces commandes font ? Est-il nécessaire de recompiler tout
+le noyau suite à nos changements ? Et si l’on modifie encore le Device Tree?</p>
+</div>
+<p>Sur la carte :</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">root@de1soclinux:~# </span><span class="nb">cd</span><span class="w"> </span>/lib/modules
+<span class="gp">root@de1soclinux:~# </span>mv<span class="w"> </span>/home/root/drv/6.1.55-g57cf7f3b7f73-dirty/<span class="w"> </span>.
+</pre></div>
+</div>
+<p>Redémarrez la carte.
+Maintenant le noyau devrait avoir les drivers user-space disponibles comme
+modules.
+Vérifiez que ce soit effectivement le cas en tapant :</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">root@de1soclinux:~# </span>zcat<span class="w"> </span>/proc/config.gz<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>UIO
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Le noyau Linux contient des millions d’options configurables.
+N’hésitez pas à explorer <code class="code highlight c docutils literal highlight-c"><span class="n">menuconfig</span></code> pour vous faire une idée de ce qui est disponible.</p>
+</div>
+</section>
+<section id="acces-aux-peripheriques-en-utilisant-dev-mem">
+<h2>Accès aux périphériques en utilisant <code class="file docutils literal notranslate"><span class="pre">/dev/mem</span></code><a class="headerlink" href="#acces-aux-peripheriques-en-utilisant-dev-mem" title="Lien vers cette rubrique">#</a></h2>
+<p>Dans le <a class="reference internal" href="../lab_01/lab_01.html#laboratoire1"><span class="std std-ref">Laboratoire 1 — Introduction</span></a> vous avez vu comment accéder à des
+dispositifs memory-mapped en utilisant <code class="file docutils literal notranslate"><span class="pre">/dev/mem</span></code>.</p>
+<div class="admonition-exercice-1 admonition">
+<p class="admonition-title"><strong>Exercice 1</strong></p>
+<p>Ecrivez un logiciel user-space qui permet de calculer une somme de nombre de la manière suivante :</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Le somme courante est affichée sur les 7-segments en décimal</p></li>
+<li><p>Les switches permettent de choisir un nombre en binaire</p></li>
+<li><p><strong>KEY0</strong> permet d’ajouter ce nombre à la somme courante</p></li>
+<li><p><strong>KEY1</strong> permet de remettre à zéro la somme</p></li>
+<li><p>Si la somme dépasse 999’999 (valeur maximale affichable) la <strong>LED0</strong> doit s’allumer</p></li>
+</ul>
+</div></blockquote>
+<p>Utiliser <code class="code highlight c docutils literal highlight-c"><span class="n">mmap</span></code> et <code class="file docutils literal notranslate"><span class="pre">/dev/mem</span></code> pour accéder aux périphériques.</p>
+</div>
+</section>
+<section id="acces-aux-peripheriques-en-utilisant-le-uio-framework">
+<h2>Accès aux périphériques en utilisant le UIO framework<a class="headerlink" href="#acces-aux-peripheriques-en-utilisant-le-uio-framework" title="Lien vers cette rubrique">#</a></h2>
+<p>L’approche utilisée au point précédent présente plusieurs soucis, notamment au
+niveau de la sécurité du système.
+Le Userspace I/O framework résout ce type de problème en permettant un accès
+plus restreint à la mémoire.
+En effet, il est possible de cibler (dans le device tree) exactement la région
+de mémoire qu’on veut exposer à l’utilisateur.</p>
+<p>Le device tree que vous avez bricolé fait cela – il offre
+au système l’accès à une région de 4096 bytes à partir de l’adresse
+<em>0xFF200000</em>.</p>
+<p>En effet, le comportement de <code class="code highlight c docutils literal highlight-c"><span class="n">mmap</span><span class="p">()</span></code>, dans le cas de UIO, est en partie
+différent (voir, par exemple,
+<a class="reference external" href="https://www.osadl.org/fileadmin/dam/rtlws/12/Koch.pdf">ici</a>).</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Pour pouvoir configurer le driver générique du UIO (uio_pdrv_genirq)
+correctement il faut qu’il soit chargé avec la bonne valeur du paramètre
+of_id.
+Il faut donc l’enlever de la mémoire et le charger à nouveau, en choisissant
+le dispositif qui doit être contrôlé.</p>
+<p>Cette commande doit être exécutée après chaque boot pour utiliser les UIO !</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">root@de1soclinux:~# </span>modprobe<span class="w"> </span>-r<span class="w"> </span>uio_pdrv_genirq<span class="p">;</span><span class="w"> </span>modprobe<span class="w"> </span>uio_pdrv_genirq<span class="w"> </span><span class="nv">of_id</span><span class="o">=</span><span class="s2">&quot;drv2024&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="admonition-exercice-2 admonition">
+<p class="admonition-title"><strong>Exercice 2</strong></p>
+<ul class="simple">
+<li><p>Pourquoi une région de 4096 bytes et non pas 5000 ou 10000 ? Et
+pourquoi on a spécifié cette adresse ?</p></li>
+<li><p>Quelles sont les différences dans le comportement de <code class="code highlight c docutils literal highlight-c"><span class="n">mmap</span><span class="p">()</span></code>
+susmentionnées ?</p></li>
+<li><p>Effectuez des recherches avec Google/StackOverflow/… et résumez par écrit les
+avantages et les inconvénients des drivers user-space par rapport aux drivers
+kernel-space.</p></li>
+</ul>
+</div>
+<div class="admonition-exercice-3 admonition">
+<p class="admonition-title"><strong>Exercice 3</strong></p>
+<p>À l’aide du UIO HOW-TO (disponible
+<a class="reference external" href="https://www.kernel.org/doc/html/latest/driver-api/uio-howto.html">ici</a>) et
+du tutoriel disponible
+<a class="reference external" href="https://yurovsky.github.io/2014/10/10/linux-uio-gpio-interrupt.html">ici</a>,
+écrivez un driver user-space pour réaliser la même tâche que
+l’exercice 1. (garder une copie de l’exercice 1)</p>
+<p>Pas besoin de gérer les interruptions pour cet exercice.</p>
+</div>
+</section>
+<section id="uio-framework-et-interruptions">
+<h2>UIO framework et interruptions<a class="headerlink" href="#uio-framework-et-interruptions" title="Lien vers cette rubrique">#</a></h2>
+<p>Un autre très grand avantage du UIO framework par rapport à l’accès à travers
+<code class="file docutils literal notranslate"><span class="pre">/dev/mem</span></code> est la possibilité de gérer les interruptions (bien que d’une
+façon un peu « primitive »).</p>
+<div class="admonition-exercice-4 admonition">
+<p class="admonition-title"><strong>Exercice 4</strong></p>
+<p>À l’aide du tutoriel disponible
+<a class="reference external" href="https://yurovsky.github.io/2014/10/10/linux-uio-gpio-interrupt.html">ici</a>,
+améliorer le programme des exercices précédents (en gardant une copie de ceux-ci)
+de la façon suivante :</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Utiliser les interruptions UIO pour la gestion des boutons</p></li>
+<li><p>Ajouter la possibilité de faire les autres opérations mathématiques :</p>
+<ul>
+<li><p><strong>KEY0</strong> permet d’additionner</p></li>
+<li><p><strong>KEY1</strong> permet de soustraire</p></li>
+<li><p><strong>KEY2</strong> permet de multiplier</p></li>
+<li><p><strong>KEY3</strong> permet de diviser</p></li>
+</ul>
+</li>
+<li><p>La valeur des switches est interprétée comme un entier signé en suivant la représentation du complément à deux (<strong>SW9</strong> étant le bit de signe)</p></li>
+<li><p>La <strong>LED9</strong> affiche le signe (éteinte pour positif et allumée pour négatif)</p></li>
+<li><p>Le résultat est limité à l’intervalle affichable (de -999’999 à 999’999).</p>
+<ul>
+<li><p>Si le résultat obtenu sort de cet intervalle, la <strong>LED0</strong> s’allume</p></li>
+<li><p>Par exemple : <code class="code highlight c docutils literal highlight-c"><span class="p">(</span><span class="mi">999&#39;990</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">22</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">22</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mi">999&#39;999</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">22</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="mi">999&#39;977</span></code></p></li>
+</ul>
+</li>
+</ul>
+</div></blockquote>
+<div class="admonition warning">
+<p class="admonition-title">Avertissement</p>
+<p>Les interruptions <strong>doivent</strong> être activées et le registre
+<strong>doit</strong> être nettoyé après chaque interruption…
+Voir section 3.4 du document <em>DE1-SoC Computer System with ARM Cortex-A9</em> !!</p>
+</div>
+<div class="admonition hint">
+<p class="admonition-title">Indication</p>
+<p>Il faut d’abord être sûrs que les interruptions soient bien reçues.
+Le fichier <code class="file docutils literal notranslate"><span class="pre">/proc/interrupts</span></code> pourra vous aider.
+Vous pouvez par exemple utiliser la commande</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">root@de1soclinux:~# </span>cat<span class="w"> </span>/proc/interrupts
+</pre></div>
+</div>
+<p>pour observer les interruptions reçues par le système.
+Utilisez cette commande juste avant et juste après avoir lancer votre programme
+(ou un plus simple de test) et avoir appuyé sur des boutons.
+(le programme doit au moins activer les interruptions correctement pour qu’une interruption
+soit levée)</p>
+<p>Il est également possible d’utiliser <code class="code highlight bash docutils literal highlight-bash">watch</code> pour voir les interruptions en direct,
+mais cette commande fonctionne mieux en <em>SSH</em>, qui permet d’avoir plusieurs terminaux
+et d’ajuster correctement la taille de ceux-ci (voir <a class="reference internal" href="../helper/ssh.html#ssh"><span class="std std-ref">Mise en place de SSH sur la carte</span></a>) :</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">root@de1soclinux:~# </span>watch<span class="w"> </span>-n1<span class="w"> </span><span class="s2">&quot;cat /proc/interrupts&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="admonition-exercice-5 admonition">
+<p class="admonition-title"><strong>Exercice 5</strong></p>
+<p>Il y a au moins 3 façons pour attendre une interruption au moyen de <code class="file docutils literal notranslate"><span class="pre">/dev/uio0</span></code> (voir dans le tutoriel). Lesquelles ?</p>
+<p>Écrivez une version du logiciel user-space de l’exercice 5 pour
+chacune de ces façons et détaillez par écrit leurs
+différences/avantages/inconvénients.</p>
+</div>
+</section>
+<section id="travail-a-rendre-et-criteres-d-evaluation">
+<h2>Travail à rendre et critères d’évaluation<a class="headerlink" href="#travail-a-rendre-et-criteres-d-evaluation" title="Lien vers cette rubrique">#</a></h2>
+<p>Dans le cadre de ce laboratoire, vous devez rendre les 5 exercices ci-dessus.</p>
+<p>S’il est demandé d’écrire du code, ce code doit se trouver dans un fichier <em>ex&lt;n&gt;.c</em>, où &lt;n&gt; correspond au numéro de l’exercice.
+Si un exercice contient plusieurs variantes, alors le fichier sera nommé <em>ex&lt;n&gt;_&lt;variante&gt;.c</em>, où &lt;variante&gt; correspond à la variante.
+Par exemple : <em>ex2.c</em>, <em>ex6_poll.c</em>.
+Il n’est pas nécessaire de renommer les fichiers déjà existants.
+Si un exercice réutilise un fichier précédent, celui-ci doit être dupliqué pour le nouvel exercice, sauf indication contraire.</p>
+<p>Si le code a pour but d’être exécuté sur la DE1-SoC, il doit être compilé en « compilation croisée »,
+c.-à-d. en utilisant la toolchain mentionnée dans le <a class="reference internal" href="../lab_01/lab_01.html#laboratoire1"><span class="std std-ref">Laboratoire 1 — Introduction</span></a>.</p>
+<p>N’oubliez pas de mettre votre prénom et nom !</p>
+<p>Les exercices sont à faire <strong>individuellement</strong>.
+Copier la solution d’un autre et changer le nom/l’ordre des variables n’est pas toléré.</p>
+<p>La date limite est celle communiquée dans l’annonce sur Moodle.
+Vous devez rendre une archive <code class="file docutils literal notranslate"><span class="pre">.tar.gz</span></code> contenant :</p>
+<ul class="simple">
+<li><p>le code source de vos solutions et tous les fichiers nécessaires,</p></li>
+<li><dl class="simple">
+<dt>un fichier <code class="file docutils literal notranslate"><span class="pre">README.md</span></code></dt><dd><ul>
+<li><p>contenant les réponses aux questions posées dans les exercices.</p></li>
+<li><p>les éventuels soucis rencontrés qui péjore le rendu</p></li>
+<li><p>les choix d’implémentation « spéciaux » (si trop long pour expliquer en commentaire)</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p>Les notes seront réparties comme suit :</p>
+<ul class="simple">
+<li><p>80% de la note si l’exercice est correct (c.-à-d., <em>« fonctionne »</em>).
+Il doit bien sûr « fonctionner » sur d’autres PCs que votre PC personnel, et de façon déterministe.
+Il est donc impératif que tout ce qui est nécessaire pour compiler et tester le fonctionnement de la solution soit rendu.</p></li>
+<li><p>20% de la note si l’exercice est « bien fait », c.-à-d. :</p>
+<ul>
+<li><p>Respect des <a class="reference external" href="https://www.kernel.org/doc/html/latest/process/coding-style.html">Linux kernel coding style</a>,
+particulièrement les points suivants :</p>
+<ul>
+<li><ol class="arabic simple">
+<li><p>Indentation</p></li>
+</ol>
+</li>
+<li><ol class="arabic simple" start="2">
+<li><p>Breaking long lines and strings</p></li>
+</ol>
+</li>
+<li><ol class="arabic simple" start="3">
+<li><p>Placing Braces and Spaces</p></li>
+</ol>
+</li>
+<li><ol class="arabic simple" start="4">
+<li><p>Naming</p></li>
+</ol>
+</li>
+<li><ol class="arabic simple" start="6">
+<li><p>Functions</p></li>
+</ol>
+</li>
+<li><ol class="arabic simple" start="8">
+<li><p>Commenting</p></li>
+</ol>
+</li>
+</ul>
+</li>
+<li><p><strong>code lisible</strong></p></li>
+<li><p><strong>documenté/commenté</strong></p></li>
+<li><p><strong>bien structuré</strong></p></li>
+</ul>
+</li>
+</ul>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../tuto_01/tuto_01.html"
+       title="page précédente">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">précédent</p>
+        <p class="prev-next-title">Tutoriel 1 — Prise en main</p>
+      </div>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contenu
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#objectifs">Objectifs</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#materiel-necessaire">Matériel nécessaire</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#telechargement-du-noyau-linux-et-ajout-des-modules-pour-le-user-space-i-o-uio">Téléchargement du noyau Linux et ajout des modules pour le User-space I/O (UIO)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#acces-aux-peripheriques-en-utilisant-dev-mem">Accès aux périphériques en utilisant <code class="file docutils literal notranslate"><span class="pre">/dev/mem</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#acces-aux-peripheriques-en-utilisant-le-uio-framework">Accès aux périphériques en utilisant le UIO framework</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#uio-framework-et-interruptions">UIO framework et interruptions</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#travail-a-rendre-et-criteres-d-evaluation">Travail à rendre et critères d’évaluation</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+Par REDS institute
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024, REDS institute.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
