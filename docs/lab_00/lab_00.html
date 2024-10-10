@@ -1,45 +1,359 @@
 
 <!DOCTYPE html>
 
-<html lang="fr">
+
+<html lang="fr" data-content_root="../" >
+
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Laboratoire 0 — Consolidation du langage C &#8212; Documentation DRV 2024 </title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/color.css" />
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/translations.js"></script>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/color.css?v=8770e769" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=72dce1d2"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script src="../_static/translations.js?v=041d0952"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'lab_00/lab_00';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Recherche" href="../search.html" />
     <link rel="next" title="Laboratoire 1 — Introduction" href="../lab_01/lab_01.html" />
     <link rel="prev" title="Critère d’évaluation" href="../helper/eval_criterion.html" />
-   
-  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="fr"/>
+  </head>
   
   
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
 
-  </head><body>
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Passer au contenu principal</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Haut de page</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
   
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
 
-          <div class="body" role="main">
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo_drv.png" class="logo__image only-light" alt="Documentation DRV 2024  - Home"/>
+    <script>document.write(`<img src="../_static/logo_drv.png" class="logo__image only-dark" alt="Documentation DRV 2024  - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Recherche" aria-label="Recherche" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Recherche</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../helper/helper.html">Helper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../helper/ssh.html">Mise en place SSH</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../helper/eval_criterion.html">Consigne de rendu</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Laboratoire 0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lab_01/lab_01.html">Laboratoire 1</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tuto_01/tuto_01.html">Tuto 1</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lab_02/lab_02.html">Laboratoire 2</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Téléchargez cette page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/lab_00/lab_00.rst" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Télécharger le fichier source"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.rst</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Imprimer au format PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Mode plein écran"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="clair/sombre" aria-label="clair/sombre" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Recherche" aria-label="Recherche" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Laboratoire 0 — Consolidation du langage C</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
             
+            <div>
+                <h2> Contenu </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#materiel-necessaire">Matériel nécessaire</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#style-de-programmation">Style de programmation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#include-guards">Include guards</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#types-de-variables">Types de variables</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sizeof">sizeof()</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#endianness">Endianness</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pointeurs">Pointeurs</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pointeurs-vers-fonction">Pointeurs vers fonction</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pointeurs-vers-void">Pointeurs vers void*</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#programmation-oop-avec-les-pointeurs">Programmation OOP (avec les pointeurs)</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#struct">struct</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pointeurs-vers-structure">Pointeurs vers structure</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#initialisation-des-structures">Initialisation des structures</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#forward-declarations">Forward declarations</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compiler-attributes">Compiler attributes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#offsetof-container-of">offsetof / container_of</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#union">union</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#bit-fields">Bit fields</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#volatile">volatile</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#undefined-behavior">Undefined behavior</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#travail-a-rendre-et-criteres-d-evaluation">Travail à rendre et critères d’évaluation</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
   <section id="laboratoire-0-consolidation-du-langage-c">
-<span id="laboratoire0"></span><h1>Laboratoire 0 — Consolidation du langage C<a class="headerlink" href="#laboratoire-0-consolidation-du-langage-c" title="Lien permanent vers ce titre">¶</a></h1>
-<figure class="align-right">
-<a class="reference internal image-reference" href="../_images/logo_drv.png"><img alt="../_images/logo_drv.png" src="../_images/logo_drv.png" style="width: 6cm;" /></a>
-</figure>
+<span id="laboratoire0"></span><h1>Laboratoire 0 — Consolidation du langage C<a class="headerlink" href="#laboratoire-0-consolidation-du-langage-c" title="Lien vers cette rubrique">#</a></h1>
 <p>Ces pages vous donneront un aperçu des concepts de programmation C avancés (ou
 pas ??) qui sont couramment utilisés dans le noyau Linux.
 Les connaître vous aidera à :</p>
@@ -50,19 +364,19 @@ Les connaître vous aidera à :</p>
 <p>On discutera aussi du style de programmation à adopter et des différents outils
 qui pourraient vous faciliter la vie…</p>
 <section id="materiel-necessaire">
-<h2>Matériel nécessaire<a class="headerlink" href="#materiel-necessaire" title="Lien permanent vers ce titre">¶</a></h2>
+<h2>Matériel nécessaire<a class="headerlink" href="#materiel-necessaire" title="Lien vers cette rubrique">#</a></h2>
 <p>Dans ce laboratoire on fouille dans les sources du noyau Linux.
 Vous devez donc le cloner avec les commandes :</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>git clone --depth<span class="o">=</span><span class="m">1</span> -b socfpga-6.1.55-lts https://github.com/altera-opensource/linux-socfpga.git
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>git<span class="w"> </span>clone<span class="w"> </span>--depth<span class="o">=</span><span class="m">1</span><span class="w"> </span>-b<span class="w"> </span>socfpga-6.1.55-lts<span class="w"> </span>https://github.com/altera-opensource/linux-socfpga.git
 </pre></div>
 </div>
-<p>L’option <code class="code bash docutils literal notranslate"><span class="pre">--depth</span></code> limite la profondeur, c’est-à-dire qu’uniquement les n derniers commits sont récupérés.
+<p>L’option <code class="code highlight bash docutils literal highlight-bash">--depth</code> limite la profondeur, c’est-à-dire qu’uniquement les n derniers commits sont récupérés.
 L’historique est tronqué, mais on évite de gaspiller du temps et de l’espace disque.</p>
 <p>Ce dépôt n’est pas le dépôt Linux principal, mais comme nous utilisons du matériel Altera, ce dépôt offre un support matériel maximum.</p>
 <p>Il y a aussi un répertoire contenant de petits exercices que vous trouvez dans (<code class="file docutils literal notranslate"><span class="pre">material/lab_00/</span></code>).</p>
 </section>
 <section id="style-de-programmation">
-<h2>Style de programmation<a class="headerlink" href="#style-de-programmation" title="Lien permanent vers ce titre">¶</a></h2>
+<h2>Style de programmation<a class="headerlink" href="#style-de-programmation" title="Lien vers cette rubrique">#</a></h2>
 <p>Le noyau Linux étant le travail de milliers de personnes (et ayant une taille
 avoisinant les 20 millions de lignes de code), il a été rapidement clair qu’il
 fallait imposer un style de programmation assez strictes.</p>
@@ -90,12 +404,12 @@ deviendront bientôt assez clairs !).</p>
 <p>if another thread can find data structure and no reference count -&gt; almost always bug!</p>
 </li>
 <li><p>use inline functions instead of macros when possible</p></li>
-<li><p>enclose macros in <code class="code c docutils literal notranslate"><span class="keyword"><span class="pre">do</span></span><span class="whitespace"> </span><span class="punctuation"><span class="pre">{</span></span><span class="whitespace"> </span><span class="punctuation"><span class="pre">}</span></span><span class="whitespace"> </span><span class="keyword"><span class="pre">while</span></span><span class="whitespace"> </span><span class="punctuation"><span class="pre">(</span></span><span class="literal number integer"><span class="pre">0</span></span><span class="punctuation"><span class="pre">)</span></span></code></p></li>
-<li><p>when printing messages associated to a device -&gt; use <code class="code c docutils literal notranslate"><span class="name"><span class="pre">dev_X</span></span><span class="punctuation"><span class="pre">()</span></span></code> instead of <code class="code c docutils literal notranslate"><span class="name"><span class="pre">pr_X</span></span><span class="punctuation"><span class="pre">()</span></span></code></p></li>
-<li><p>when allocating the memory, use <code class="code c docutils literal notranslate"><span class="name"><span class="pre">p</span></span><span class="whitespace"> </span><span class="operator"><span class="pre">=</span></span><span class="whitespace"> </span><span class="name"><span class="pre">kmalloc</span></span><span class="punctuation"><span class="pre">(</span></span><span class="keyword"><span class="pre">sizeof</span></span><span class="punctuation"><span class="pre">(</span></span><span class="operator"><span class="pre">*</span></span><span class="name"><span class="pre">p</span></span><span class="punctuation"><span class="pre">),</span></span><span class="whitespace"> </span><span class="punctuation"><span class="pre">...);</span></span></code></p></li>
-<li><p>when allocating an array, use <code class="code c docutils literal notranslate"><span class="name"><span class="pre">p</span></span><span class="whitespace"> </span><span class="operator"><span class="pre">=</span></span><span class="whitespace"> </span><span class="name"><span class="pre">kmalloc_array</span></span><span class="punctuation"><span class="pre">(</span></span><span class="name"><span class="pre">n</span></span><span class="punctuation"><span class="pre">,</span></span><span class="whitespace"> </span><span class="keyword"><span class="pre">sizeof</span></span><span class="punctuation"><span class="pre">(...),</span></span><span class="whitespace"> </span><span class="punctuation"><span class="pre">...);</span></span></code></p></li>
+<li><p>enclose macros in <code class="code highlight c docutils literal highlight-c"><span class="k">do</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="mi">0</span><span class="p">)</span></code></p></li>
+<li><p>when printing messages associated to a device -&gt; use <code class="code highlight c docutils literal highlight-c"><span class="n">dev_X</span><span class="p">()</span></code> instead of <code class="code highlight c docutils literal highlight-c"><span class="n">pr_X</span><span class="p">()</span></code></p></li>
+<li><p>when allocating the memory, use <code class="code highlight c docutils literal highlight-c"><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">kmalloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="o">*</span><span class="n">p</span><span class="p">),</span><span class="w"> </span><span class="p">...);</span></code></p></li>
+<li><p>when allocating an array, use <code class="code highlight c docutils literal highlight-c"><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">kmalloc_array</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="k">sizeof</span><span class="p">(...),</span><span class="w"> </span><span class="p">...);</span></code></p></li>
 <li><p>allocation functions all emit a stack dump on failure -&gt; there is no use in
-emitting an additional failure message when <code class="code c docutils literal notranslate"><span class="name builtin"><span class="pre">NULL</span></span></code> is returned</p></li>
+emitting an additional failure message when <code class="code highlight c docutils literal highlight-c"><span class="nb">NULL</span></code> is returned</p></li>
 <li><p>if the name of a function is an action or an imperative command -&gt; function should return an error-code integer</p></li>
 <li><p>if the name is a predicate -&gt; function should return a « succeeded » boolean</p></li>
 <li><p>in structures do not use bool if cache line layout or size of the value matters (its size and
@@ -116,9 +430,9 @@ Exemple :</p>
 <p>Une partie de ces conventions peuvent être vérifiées à l’aide de l’outil présenté dans <a class="reference internal" href="../helper/helper.html#helper"><span class="std std-ref">Helper</span></a></p>
 </section>
 <section id="include-guards">
-<h2>Include guards<a class="headerlink" href="#include-guards" title="Lien permanent vers ce titre">¶</a></h2>
+<h2>Include guards<a class="headerlink" href="#include-guards" title="Lien vers cette rubrique">#</a></h2>
 <p>Pour éviter d’inclure plusieurs fois un fichier d’entête lors de la compilation,
-on utilise des <code class="code c docutils literal notranslate"><span class="comment preproc"><span class="pre">#include</span></span></code> guards.</p>
+on utilise des <code class="code highlight c docutils literal highlight-c"><span class="cp">#include</span></code> guards.</p>
 <p>Par exemple, dans le fichier <code class="file docutils literal notranslate"><span class="pre">my_head.h</span></code> on écrit :</p>
 <div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="cp">#ifndef MY_HEAD_H</span>
 <span class="cp">#define MY_HEAD_H</span>
@@ -129,7 +443,7 @@ on utilise des <code class="code c docutils literal notranslate"><span class="co
 </pre></div>
 </div>
 <p><a class="reference external" href="https://en.wikipedia.org/wiki/Include_guard">https://en.wikipedia.org/wiki/Include_guard</a></p>
-<p>GCC permet aussi d’utiliser <code class="code c docutils literal notranslate"><span class="comment preproc"><span class="pre">#pragma</span> <span class="pre">once</span></span></code> (qui, par contre, n’est pas standard) à la place
+<p>GCC permet aussi d’utiliser <code class="code highlight c docutils literal highlight-c"><span class="cp">#pragma once</span></code> (qui, par contre, n’est pas standard) à la place
 de tout cela (plus d’info <a class="reference external" href="https://en.wikipedia.org/wiki/Pragma_once">ici</a>),
 mais il n’est pas utilisé dans le kernel (il y a en effet quelques problèmes
 dans son utilisation — c’est assez compliqué de déterminer de manière portable
@@ -138,7 +452,7 @@ si deux fichiers sont « physiquement » le même fichier ou pas).</p>
 <p class="admonition-title"><strong>Exercice 1</strong></p>
 <p>Essayez de compiler le logiciel dans le répertoire
 <code class="file docutils literal notranslate"><span class="pre">multiple_files</span></code> (qui est dans l’archive du labo) avec la commande
-<code class="code bash docutils literal notranslate"><span class="pre">gcc</span> <span class="pre">main.c</span> <span class="pre">-o</span> <span class="pre">main</span> <span class="pre">-Wall</span></code>
+<code class="code highlight bash docutils literal highlight-bash">gcc<span class="w"> </span>main.c<span class="w"> </span>-o<span class="w"> </span>main<span class="w"> </span>-Wall</code>
 Qu’est-ce qui se passe ? Corrigez les problèmes qui empêchent la
 compilation. Il y a en effet deux problèmes différents
 qui sont « magiquement » résolus en utilisant « la bonne technique »…
@@ -146,51 +460,52 @@ lesquels ?</p>
 </div>
 </section>
 <section id="types-de-variables">
-<h2>Types de variables<a class="headerlink" href="#types-de-variables" title="Lien permanent vers ce titre">¶</a></h2>
+<h2>Types de variables<a class="headerlink" href="#types-de-variables" title="Lien vers cette rubrique">#</a></h2>
 <p>La norme du langage C définit la taille minimale pour les types de base, mais
 un compilateur peut augmenter cette valeur (p. ex., on pourrait
 avoir des variables entières sur 12 bytes, cela n’est pas interdit…)</p>
 <p>Puisque nous allons travailler à très bas niveau, il est nécessaire de savoir le
 nombre de bits qu’on utilise. Pour cela le fichier d’entête <code class="file docutils literal notranslate"><span class="pre">stdint.h</span></code>
-définit des types comme <code class="code c docutils literal notranslate"><span class="keyword type"><span class="pre">uint32_t</span></span></code>, <code class="code c docutils literal notranslate"><span class="keyword type"><span class="pre">uint8_t</span></span></code>, …
+définit des types comme <code class="code highlight c docutils literal highlight-c"><span class="kt">uint32_t</span></code>, <code class="code highlight c docutils literal highlight-c"><span class="kt">uint8_t</span></code>, …
 Comme le noyau Linux date d’avant cet entête (bien qu’elle soit supportée dans les
-noyaux modernes) vous pouvez aussi utiliser des types comme <code class="code c docutils literal notranslate"><span class="name"><span class="pre">u32</span></span></code>, <code class="code c docutils literal notranslate"><span class="name"><span class="pre">u8</span></span></code>, …</p>
+noyaux modernes) vous pouvez aussi utiliser des types comme <code class="code highlight c docutils literal highlight-c"><span class="n">u32</span></code>, <code class="code highlight c docutils literal highlight-c"><span class="n">u8</span></code>, …</p>
 <p>Lorsque le nombre de bits n’est pas important (p. ex., si vous avez un compteur
 qui boucle un nombre bien défini de fois), vous pouvez utiliser les types de base
-(p. ex., <code class="code c docutils literal notranslate"><span class="keyword type"><span class="pre">unsigned</span></span><span class="whitespace"> </span><span class="keyword type"><span class="pre">int</span></span></code>).</p>
+(p. ex., <code class="code highlight c docutils literal highlight-c"><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span></code>).</p>
 <section id="sizeof">
-<h3>sizeof()<a class="headerlink" href="#sizeof" title="Lien permanent vers ce titre">¶</a></h3>
+<h3>sizeof()<a class="headerlink" href="#sizeof" title="Lien vers cette rubrique">#</a></h3>
 <p>On doit parfois travailler avec des types dont on ne connaît pas forcément la
 taille — ou, encore pire, on pense la connaître, mais pour ce compilateur /
 architecture elle est différente…</p>
-<p>Pour nous aider dans cette situation, on peut utiliser la fonction <code class="code c docutils literal notranslate"><span class="keyword"><span class="pre">sizeof</span></span><span class="punctuation"><span class="pre">()</span></span></code>
+<p>Pour nous aider dans cette situation, on peut utiliser la fonction <code class="code highlight c docutils literal highlight-c"><span class="k">sizeof</span><span class="p">()</span></code>
 qui nous fournit, pour un type ou une variable donnée, sa taille en bytes.</p>
 <div class="admonition-exercice-2 admonition">
 <p class="admonition-title"><strong>Exercice 2</strong></p>
 <p>Compilez le logiciel dans le répertoire
 <code class="file docutils literal notranslate"><span class="pre">sizeof</span></code> avec la commande
-<code class="code bash docutils literal notranslate"><span class="pre">gcc</span> <span class="pre">sizeof_test.c</span> <span class="pre">-o</span> <span class="pre">sizeof_test</span> <span class="pre">-Wall</span></code> (un warning devrait apparaître) et exécuter le.</p>
+<code class="code highlight bash docutils literal highlight-bash">gcc<span class="w"> </span>sizeof_test.c<span class="w"> </span>-o<span class="w"> </span>sizeof_test<span class="w"> </span>-Wall</code> (un warning devrait apparaître) et exécuter le.</p>
 <ul class="simple">
 <li><p>Quel est le résultat de l’exécution ?</p></li>
-<li><p>Pourquoi les tailles des tableaux <code class="code c docutils literal notranslate"><span class="name"><span class="pre">str_array</span></span></code> et <code class="code c docutils literal notranslate"><span class="name"><span class="pre">str_out</span></span></code> sont différentes ? Faites le lien avec le warning lors de la compilation.</p></li>
-<li><p>Comment pourrais-je savoir la taille du vecteur <code class="code c docutils literal notranslate"><span class="name"><span class="pre">my_array</span></span></code> ? Et s’il s’agissait d’un tableau statique ?</p></li>
+<li><p>Pourquoi les tailles des tableaux <code class="code highlight c docutils literal highlight-c"><span class="n">str_array</span></code> et <code class="code highlight c docutils literal highlight-c"><span class="n">str_out</span></code> sont différentes ? Faites le lien avec le warning lors de la compilation.</p></li>
+<li><p>Comment pourrais-je savoir la taille du vecteur <code class="code highlight c docutils literal highlight-c"><span class="n">my_array</span></code> ? Et s’il s’agissait d’un tableau statique ?</p></li>
 </ul>
 <p>Corriger le code pour que la compilation ne fasse plus de warning, sans changer son résultat final.</p>
 <p>Maintenant forcez la compilation à 32-bit avec la commande
-<code class="code bash docutils literal notranslate"><span class="pre">gcc</span> <span class="pre">-m32</span> <span class="pre">sizeof_test.c</span> <span class="pre">-o</span> <span class="pre">sizeof_test</span> <span class="pre">-Wall</span></code>.
+<code class="code highlight bash docutils literal highlight-bash">gcc<span class="w"> </span>-m32<span class="w"> </span>sizeof_test.c<span class="w"> </span>-o<span class="w"> </span>sizeof_test<span class="w"> </span>-Wall</code>.
 Ignorez les avertissements et exécutez à nouveau le binaire.</p>
 <p>(si le compilateur vous donne un <em>« fatal error »</em>, essayez d’installer
-<em>gcc-multilib</em> avec <code class="code bash docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt</span> <span class="pre">install</span> <span class="pre">gcc-multilib</span></code>).</p>
+<em>gcc-multilib</em> avec <code class="code highlight bash docutils literal highlight-bash">sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>gcc-multilib</code>).</p>
 <p>Quelles sont les différences sur le résultat et pourquoi ?</p>
 </div>
 </section>
 </section>
 <section id="endianness">
-<h2>Endianness<a class="headerlink" href="#endianness" title="Lien permanent vers ce titre">¶</a></h2>
+<h2>Endianness<a class="headerlink" href="#endianness" title="Lien vers cette rubrique">#</a></h2>
 <p>Lorsqu’on travaille à bas niveau, il est impératif de savoir comment les données
 sont représentées en mémoire : le fameux problème de « l’endianness ».</p>
 <figure class="align-center">
-<a class="reference internal image-reference" href="../_images/endianness.jpg"><img alt="../_images/endianness.jpg" src="../_images/endianness.jpg" style="width: 20cm;" /></a>
+<a class="reference internal image-reference" href="../_images/endianness.jpg"><img alt="../_images/endianness.jpg" src="../_images/endianness.jpg" style="width: 20cm;" />
+</a>
 </figure>
 <p>Il n’est pas évident de prévoir quelle représentation est utilisée, car cela
 dépend de l’architecture :</p>
@@ -207,7 +522,7 @@ Dans la vie réelle, on affiche (en hex) une valeur lue depuis la mémoire et on
 ce qui est affiché… ;)</p>
 </section>
 <section id="pointeurs">
-<h2>Pointeurs<a class="headerlink" href="#pointeurs" title="Lien permanent vers ce titre">¶</a></h2>
+<h2>Pointeurs<a class="headerlink" href="#pointeurs" title="Lien vers cette rubrique">#</a></h2>
 <p>Le langage C permet d’avoir des pointeurs vers des variables et vers des fonctions.
 De plus, il utilise des pointeurs pour se référer à des vecteurs (c.-à-d.., le
 nom du vecteur n’est rien d’autre qu’un pointeur sur la région de mémoire que —
@@ -220,14 +535,14 @@ Cela est dû au fait qu’il y a une arithmétique des pointeurs : lorsque j’a
 pointeur sur une variable entière et que je l’incrémente (pour passer à l’entier suivant
 du vecteur), je fais juste « +1 » mais en interne cela se traduit par un
 « +4 bytes », alors que dans le cas des caractères, c’est juste « +1 byte ».
-En effet, si vous vous souvenez de <code class="code c docutils literal notranslate"><span class="keyword"><span class="pre">sizeof</span></span><span class="punctuation"><span class="pre">()</span></span></code>, cela est exactement la quantité
+En effet, si vous vous souvenez de <code class="code highlight c docutils literal highlight-c"><span class="k">sizeof</span><span class="p">()</span></code>, cela est exactement la quantité
 qui est utilisée pour l’incrément.</p>
 <p>Le compilateur va essayer de nous aider : si on utilise un pointeur vers un
 caractère pour se référer à une variable entière, il va émettre un avertissement.
 Le langage C étant bas-niveau, il est possible de faire disparaître ces
 avertissements en faisant des cast, p. ex. :</p>
-<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span><span class="w"> </span><span class="n">myint</span><span class="p">;</span><span class="w"></span>
-<span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">cptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">myint</span><span class="p">;</span><span class="w"></span>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="kt">int</span><span class="w"> </span><span class="n">myint</span><span class="p">;</span>
+<span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">cptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">myint</span><span class="p">;</span>
 </pre></div>
 </div>
 <p>Il faut, par contre, être sûr de ce qu’on fait…</p>
@@ -235,14 +550,14 @@ avertissements en faisant des cast, p. ex. :</p>
 <p class="admonition-title"><strong>Exercice 3</strong></p>
 <p>Écrivez un petit logiciel qui affecte 0xBEEFCAFE à une variable entière,
 et ensuite allez relire cette valeur en la regardant un byte à la fois
-dans une boucle for (bien sûr, oubliez l’utilisation des <code class="code c docutils literal notranslate"><span class="punctuation"><span class="pre">[]</span></span></code> !! —
+dans une boucle for (bien sûr, oubliez l’utilisation des <code class="code highlight c docutils literal highlight-c"><span class="p">[]</span></code> !! —
 tout doit être fait avec les pointeurs).
 Vous ne remarquez rien dans l’affichage ?
 Comment pouvez-vous résoudre le/les problèmes ?
 Que pouvez-vous en conclure sur l’endianness de votre système ?</p>
 </div>
 <section id="pointeurs-vers-fonction">
-<h3>Pointeurs vers fonction<a class="headerlink" href="#pointeurs-vers-fonction" title="Lien permanent vers ce titre">¶</a></h3>
+<h3>Pointeurs vers fonction<a class="headerlink" href="#pointeurs-vers-fonction" title="Lien vers cette rubrique">#</a></h3>
 <p>Dans le langage C, on a la possibilité de déclarer des pointeurs vers des fonctions.
 Cela s’avère utile lorsqu’on veut changer au run-time le comportement — émulant
 ce qui est fait dans le langage C++.
@@ -250,22 +565,22 @@ Vous trouvez davantage d’informations concernant les pointeurs vers des foncti
 <a class="reference external" href="https://www.cprogramming.com/tutorial/function-pointers.html">ici</a>.</p>
 </section>
 <section id="pointeurs-vers-void">
-<h3>Pointeurs vers void*<a class="headerlink" href="#pointeurs-vers-void" title="Lien permanent vers ce titre">¶</a></h3>
-<p>Un pointeur de type <code class="code c docutils literal notranslate"><span class="keyword type"><span class="pre">void</span></span></code> n’a pas de type associé. Il est donc impossible de
+<h3>Pointeurs vers void*<a class="headerlink" href="#pointeurs-vers-void" title="Lien vers cette rubrique">#</a></h3>
+<p>Un pointeur de type <code class="code highlight c docutils literal highlight-c"><span class="kt">void</span></code> n’a pas de type associé. Il est donc impossible de
 l’incrémenter / décrémenter (même si le GCC a arbitrairement attribué à
-<code class="code c docutils literal notranslate"><span class="keyword type"><span class="pre">void</span></span></code> une taille de 1), et aussi de les déréférencer…
+<code class="code highlight c docutils literal highlight-c"><span class="kt">void</span></code> une taille de 1), et aussi de les déréférencer…
 À quoi sert-il donc ???</p>
 <p>Lorsque vous ne savez pas quel type de pointeur va être retourné, par exemple si
-vous créez votre propre version de <code class="code c docutils literal notranslate"><span class="name"><span class="pre">malloc</span></span><span class="punctuation"><span class="pre">()</span></span></code>, vous pouvez retourner un
-pointeur vers <code class="code c docutils literal notranslate"><span class="keyword type"><span class="pre">void</span></span></code> et il sera implicitement casté dans le type souhaité — et,
+vous créez votre propre version de <code class="code highlight c docutils literal highlight-c"><span class="n">malloc</span><span class="p">()</span></code>, vous pouvez retourner un
+pointeur vers <code class="code highlight c docutils literal highlight-c"><span class="kt">void</span></code> et il sera implicitement casté dans le type souhaité — et,
 à l’inverse, si une fonction a comme paramètre un pointeur vers
-<code class="code c docutils literal notranslate"><span class="keyword type"><span class="pre">void</span></span></code> (p. ex., <code class="code c docutils literal notranslate"><span class="name"><span class="pre">memcpy</span></span><span class="punctuation"><span class="pre">()</span></span></code>), vous pouvez lui passer votre pointeur sans cast
-(mais veuillez noter que, dans l’exemple de <code class="code c docutils literal notranslate"><span class="name"><span class="pre">memcpy</span></span><span class="punctuation"><span class="pre">()</span></span></code>, vous devez
+<code class="code highlight c docutils literal highlight-c"><span class="kt">void</span></code> (p. ex., <code class="code highlight c docutils literal highlight-c"><span class="n">memcpy</span><span class="p">()</span></code>), vous pouvez lui passer votre pointeur sans cast
+(mais veuillez noter que, dans l’exemple de <code class="code highlight c docutils literal highlight-c"><span class="n">memcpy</span><span class="p">()</span></code>, vous devez
 lui dire combien de bytes sont à copier, car il perd la notion d’élément et donc
 de taille de chaque élément).</p>
 </section>
 <section id="programmation-oop-avec-les-pointeurs">
-<h3>Programmation OOP (avec les pointeurs)<a class="headerlink" href="#programmation-oop-avec-les-pointeurs" title="Lien permanent vers ce titre">¶</a></h3>
+<h3>Programmation OOP (avec les pointeurs)<a class="headerlink" href="#programmation-oop-avec-les-pointeurs" title="Lien vers cette rubrique">#</a></h3>
 <p>Le noyau Linux, malgré le fait que le langage C ne soit pas orienté-objet, est écrit en
 utilisant des techniques OOP.
 Cela est fait grâce aux pointeurs vers fonction :
@@ -281,12 +596,12 @@ fait en langage C.
 Ajoutez à cet exemple le parallélépipède rectangle, avec une fonction pour en
 calculer le volume. On part du principe qu’on ne peut pas changer la
 position le long de l’axe <em>z</em> (sinon on serait un peu embêtés avec la
-fonction <code class="code c docutils literal notranslate"><span class="name"><span class="pre">_moveTo</span></span><span class="punctuation"><span class="pre">()</span></span></code>) (pourquoi ???).</p>
+fonction <code class="code highlight c docutils literal highlight-c"><span class="n">_moveTo</span><span class="p">()</span></code>) (pourquoi ???).</p>
 </div>
 </section>
 </section>
 <section id="struct">
-<h2>struct<a class="headerlink" href="#struct" title="Lien permanent vers ce titre">¶</a></h2>
+<h2>struct<a class="headerlink" href="#struct" title="Lien vers cette rubrique">#</a></h2>
 <p>Une « struct » est une structure de données regroupant plusieurs variables de type
 hétérogène. L’exemple typique d’utilisation est pour une entrée dans
 votre carnet d’adresses :
@@ -294,7 +609,7 @@ c’est sûrement plus pratique d’avoir prénom, nom, date de naissance, … d
 personne « groupés » dans une entité, au
 lieu d’avoir des vecteurs séparés (un avec tous les noms, un avec tous les
 prénoms, …) dont on doit garder trace (et donc la personne <em>N</em> aura son prénom
-dans <code class="code c docutils literal notranslate"><span class="name"><span class="pre">prenoms</span></span><span class="punctuation"><span class="pre">[</span></span><span class="name"><span class="pre">N</span></span><span class="punctuation"><span class="pre">]</span></span></code>, son nom dans <code class="code c docutils literal notranslate"><span class="name"><span class="pre">noms</span></span><span class="punctuation"><span class="pre">[</span></span><span class="name"><span class="pre">N</span></span><span class="punctuation"><span class="pre">]</span></span></code>, …) — cette dernière solution
+dans <code class="code highlight c docutils literal highlight-c"><span class="n">prenoms</span><span class="p">[</span><span class="n">N</span><span class="p">]</span></code>, son nom dans <code class="code highlight c docutils literal highlight-c"><span class="n">noms</span><span class="p">[</span><span class="n">N</span><span class="p">]</span></code>, …) — cette dernière solution
 serait l’équivalent informatique d’avoir un carnet avec juste les prénoms,
 un autre avec juste les noms, …</p>
 <p>Description formelle d’une struct
@@ -302,17 +617,17 @@ un autre avec juste les noms, …</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Y a-t-il une différence entre</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span><span class="w"> </span><span class="nc">a</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">b</span><span class="p">;</span><span class="w"></span>
-<span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">c</span><span class="p">;</span><span class="w"></span>
-<span class="p">};</span><span class="w"></span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span><span class="w"> </span><span class="nc">a</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">b</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">c</span><span class="p">;</span>
+<span class="p">};</span>
 </pre></div>
 </div>
 <p>et</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">b</span><span class="p">;</span><span class="w"></span>
-<span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">c</span><span class="p">;</span><span class="w"></span>
-<span class="p">}</span><span class="w"> </span><span class="n">a</span><span class="p">;</span><span class="w"></span>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">b</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">c</span><span class="p">;</span>
+<span class="p">}</span><span class="w"> </span><span class="n">a</span><span class="p">;</span>
 </pre></div>
 </div>
 <p>???</p>
@@ -326,81 +641,81 @@ choix dans les deux cas ci-dessus, et qui les affiche ensuite à
 l’écran.</p>
 </div>
 <section id="pointeurs-vers-structure">
-<h3>Pointeurs vers structure<a class="headerlink" href="#pointeurs-vers-structure" title="Lien permanent vers ce titre">¶</a></h3>
+<h3>Pointeurs vers structure<a class="headerlink" href="#pointeurs-vers-structure" title="Lien vers cette rubrique">#</a></h3>
 <p>Vous pouvez bien sûr avoir un pointeur vers une structure.
 Dans ce cas, vous pouvez vous référer aux champs de la structure de deux façons
-équivalentes (bien que la deuxième — avec <code class="code c docutils literal notranslate"><span class="operator"><span class="pre">-&gt;</span></span></code> — soit à préférer) :</p>
-<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span><span class="w"> </span><span class="nc">S</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">b</span><span class="p">;</span><span class="w"></span>
-<span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">c</span><span class="p">;</span><span class="w"></span>
-<span class="p">};</span><span class="w"></span>
+équivalentes (bien que la deuxième — avec <code class="code highlight c docutils literal highlight-c"><span class="o">-&gt;</span></code> — soit à préférer) :</p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span><span class="w"> </span><span class="nc">S</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">b</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="n">c</span><span class="p">;</span>
+<span class="p">};</span>
 
-<span class="k">struct</span><span class="w"> </span><span class="nc">S</span><span class="w"> </span><span class="n">my_struct</span><span class="p">;</span><span class="w"></span>
-<span class="k">struct</span><span class="w"> </span><span class="nc">S</span><span class="w"> </span><span class="o">*</span><span class="n">my_struct_ptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">my_struct</span><span class="p">;</span><span class="w"></span>
+<span class="k">struct</span><span class="w"> </span><span class="nc">S</span><span class="w"> </span><span class="n">my_struct</span><span class="p">;</span>
+<span class="k">struct</span><span class="w"> </span><span class="nc">S</span><span class="w"> </span><span class="o">*</span><span class="n">my_struct_ptr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&amp;</span><span class="n">my_struct</span><span class="p">;</span>
 
-<span class="n">my_struct</span><span class="p">.</span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">123</span><span class="p">;</span><span class="w"></span>
-<span class="n">my_struct</span><span class="p">.</span><span class="n">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sc">&#39;c&#39;</span><span class="p">;</span><span class="w"></span>
+<span class="n">my_struct</span><span class="p">.</span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">123</span><span class="p">;</span>
+<span class="n">my_struct</span><span class="p">.</span><span class="n">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sc">&#39;c&#39;</span><span class="p">;</span>
 
-<span class="p">(</span><span class="o">*</span><span class="n">my_struct_ptr</span><span class="p">).</span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">123</span><span class="p">;</span><span class="w"></span>
-<span class="p">(</span><span class="o">*</span><span class="n">my_struct_ptr</span><span class="p">).</span><span class="n">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sc">&#39;c&#39;</span><span class="p">;</span><span class="w"></span>
+<span class="p">(</span><span class="o">*</span><span class="n">my_struct_ptr</span><span class="p">).</span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">123</span><span class="p">;</span>
+<span class="p">(</span><span class="o">*</span><span class="n">my_struct_ptr</span><span class="p">).</span><span class="n">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sc">&#39;c&#39;</span><span class="p">;</span>
 
-<span class="n">my_struct_ptr</span><span class="o">-&gt;</span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">123</span><span class="p">;</span><span class="w"></span>
-<span class="n">my_struct_ptr</span><span class="o">-&gt;</span><span class="n">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sc">&#39;c&#39;</span><span class="p">;</span><span class="w"></span>
+<span class="n">my_struct_ptr</span><span class="o">-&gt;</span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">123</span><span class="p">;</span>
+<span class="n">my_struct_ptr</span><span class="o">-&gt;</span><span class="n">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sc">&#39;c&#39;</span><span class="p">;</span>
 </pre></div>
 </div>
-<p>Dans le cas <code class="code c docutils literal notranslate"><span class="punctuation"><span class="pre">(</span></span><span class="operator"><span class="pre">*</span></span><span class="name"><span class="pre">x</span></span><span class="punctuation"><span class="pre">).</span></span><span class="name"><span class="pre">b</span></span></code>, l’utilisation des parenthèses est impératif, car l’opérateur
-<code class="code c docutils literal notranslate"><span class="punctuation"><span class="pre">.</span></span></code> a la
-précédence sur <code class="code c docutils literal notranslate"><span class="operator"><span class="pre">*</span></span></code> (et donc on essayerait de déréférencer une valeur
+<p>Dans le cas <code class="code highlight c docutils literal highlight-c"><span class="p">(</span><span class="o">*</span><span class="n">x</span><span class="p">).</span><span class="n">b</span></code>, l’utilisation des parenthèses est impératif, car l’opérateur
+<code class="code highlight c docutils literal highlight-c"><span class="p">.</span></code> a la
+précédence sur <code class="code highlight c docutils literal highlight-c"><span class="o">*</span></code> (et donc on essayerait de déréférencer une valeur
 entière).</p>
 </section>
 <section id="initialisation-des-structures">
-<h3>Initialisation des structures<a class="headerlink" href="#initialisation-des-structures" title="Lien permanent vers ce titre">¶</a></h3>
+<h3>Initialisation des structures<a class="headerlink" href="#initialisation-des-structures" title="Lien vers cette rubrique">#</a></h3>
 <p>Vous pouvez initialiser des structures lors de la déclaration.
 Il y a plusieurs façons de le faire, mais celle recommandée utilise les
 <em>designated initializers</em>, c.-à-d. :</p>
-<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span><span class="w"> </span><span class="nc">S</span><span class="w"> </span><span class="n">my_struct</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="p">.</span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="p">.</span><span class="n">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sc">&#39;r&#39;</span><span class="p">,</span><span class="w"></span>
-<span class="p">};</span><span class="w"></span>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span><span class="w"> </span><span class="nc">S</span><span class="w"> </span><span class="n">my_struct</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="p">.</span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span>
+<span class="w">    </span><span class="p">.</span><span class="n">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sc">&#39;r&#39;</span><span class="p">,</span>
+<span class="p">};</span>
 </pre></div>
 </div>
 <p>De la même manière, vous pouvez initialiser des structures dans un vecteur, ce qui
 est très souvent fait dans le noyau Linux, par exemple :</p>
-<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="cm">/* From drivers/media/i2c/adv7180.c */</span><span class="w"></span>
-<span class="k">static</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">of_device_id</span><span class="w"> </span><span class="n">adv7180_of_id</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="p">.</span><span class="n">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;adi,adv7180&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
-<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="p">.</span><span class="n">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;adi,adv7180cp&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
-<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="p">.</span><span class="n">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;adi,adv7180st&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
-<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="p">.</span><span class="n">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;adi,adv7182&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
-<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="p">.</span><span class="n">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;adi,adv7280&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
-<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="p">.</span><span class="n">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;adi,adv7280-m&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
-<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="p">.</span><span class="n">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;adi,adv7281&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
-<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="p">.</span><span class="n">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;adi,adv7281-m&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
-<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="p">.</span><span class="n">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;adi,adv7281-ma&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
-<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="p">.</span><span class="n">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;adi,adv7282&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
-<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="p">.</span><span class="n">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;adi,adv7282-m&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
-<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="p">},</span><span class="w"></span>
-<span class="p">};</span><span class="w"></span>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="cm">/* From drivers/media/i2c/adv7180.c */</span>
+<span class="k">static</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">of_device_id</span><span class="w"> </span><span class="n">adv7180_of_id</span><span class="p">[]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="p">.</span><span class="n">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;adi,adv7180&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="p">.</span><span class="n">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;adi,adv7180cp&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="p">.</span><span class="n">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;adi,adv7180st&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="p">.</span><span class="n">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;adi,adv7182&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="p">.</span><span class="n">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;adi,adv7280&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="p">.</span><span class="n">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;adi,adv7280-m&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="p">.</span><span class="n">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;adi,adv7281&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="p">.</span><span class="n">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;adi,adv7281-m&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="p">.</span><span class="n">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;adi,adv7281-ma&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="p">.</span><span class="n">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;adi,adv7282&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="p">.</span><span class="n">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;adi,adv7282-m&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="p">},</span>
+<span class="p">};</span>
 </pre></div>
 </div>
 <p>Si vous avez des structures imbriquées, le mécanisme reste le même :</p>
-<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="cm">/* From drivers/media/i2c/adv7180.c */</span><span class="w"></span>
-<span class="k">static</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">i2c_driver</span><span class="w"> </span><span class="n">adv7180_driver</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="p">.</span><span class="n">driver</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">        </span><span class="p">.</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">KBUILD_MODNAME</span><span class="p">,</span><span class="w"></span>
-<span class="w">        </span><span class="p">.</span><span class="n">pm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ADV7180_PM_OPS</span><span class="p">,</span><span class="w"></span>
-<span class="w">        </span><span class="p">.</span><span class="n">of_match_table</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">of_match_ptr</span><span class="p">(</span><span class="n">adv7180_of_id</span><span class="p">),</span><span class="w"></span>
-<span class="w">    </span><span class="p">},</span><span class="w"></span>
-<span class="w">    </span><span class="p">.</span><span class="n">probe</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">adv7180_probe</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="p">.</span><span class="n">remove</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">adv7180_remove</span><span class="p">,</span><span class="w"></span>
-<span class="w">    </span><span class="p">.</span><span class="n">id_table</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">adv7180_id</span><span class="p">,</span><span class="w"></span>
-<span class="p">};</span><span class="w"></span>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="cm">/* From drivers/media/i2c/adv7180.c */</span>
+<span class="k">static</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">i2c_driver</span><span class="w"> </span><span class="n">adv7180_driver</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="p">.</span><span class="n">driver</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="p">.</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">KBUILD_MODNAME</span><span class="p">,</span>
+<span class="w">        </span><span class="p">.</span><span class="n">pm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ADV7180_PM_OPS</span><span class="p">,</span>
+<span class="w">        </span><span class="p">.</span><span class="n">of_match_table</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">of_match_ptr</span><span class="p">(</span><span class="n">adv7180_of_id</span><span class="p">),</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">.</span><span class="n">probe</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">adv7180_probe</span><span class="p">,</span>
+<span class="w">    </span><span class="p">.</span><span class="n">remove</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">adv7180_remove</span><span class="p">,</span>
+<span class="w">    </span><span class="p">.</span><span class="n">id_table</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">adv7180_id</span><span class="p">,</span>
+<span class="p">};</span>
 </pre></div>
 </div>
-<p>(dans l’exemple ci-dessus, <code class="code c docutils literal notranslate"><span class="name"><span class="pre">adv7180_probe</span></span></code> et <code class="code c docutils literal notranslate"><span class="name"><span class="pre">adv7180_remove</span></span></code> sont des
+<p>(dans l’exemple ci-dessus, <code class="code highlight c docutils literal highlight-c"><span class="n">adv7180_probe</span></code> et <code class="code highlight c docutils literal highlight-c"><span class="n">adv7180_remove</span></code> sont des
 pointeurs vers fonctions !)</p>
 <section id="forward-declarations">
-<h4>Forward declarations<a class="headerlink" href="#forward-declarations" title="Lien permanent vers ce titre">¶</a></h4>
+<h4>Forward declarations<a class="headerlink" href="#forward-declarations" title="Lien vers cette rubrique">#</a></h4>
 <p>Le compilateur lit chaque fichier du début à la fin, et s’il rencontre quelque
 chose (fonction, variable, constante, …) qu’il ne connaît pas, il s’énerve et va
 se plaindre.
@@ -409,27 +724,27 @@ poule : on aimerait dire qu’une poule est sortie d’un oeuf, donc il faudrait
 d’abord l’oeuf et ensuite la poule. Par contre, on aimerait aussi dire que l’oeuf
 va devenir une poule…</p>
 <p>Pour résoudre ce problème, on utilise ce qu’on appelle une <em>forward declaration</em>:</p>
-<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span><span class="w"> </span><span class="nc">oeuf</span><span class="p">;</span><span class="w"></span>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="k">struct</span><span class="w"> </span><span class="nc">oeuf</span><span class="p">;</span>
 
-<span class="k">struct</span><span class="w"> </span><span class="nc">poule</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">oeuf</span><span class="w"> </span><span class="o">*</span><span class="n">nee_de</span><span class="p">;</span><span class="w"></span>
+<span class="k">struct</span><span class="w"> </span><span class="nc">poule</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">oeuf</span><span class="w"> </span><span class="o">*</span><span class="n">nee_de</span><span class="p">;</span>
 <span class="w">    </span><span class="c1">// [ ... ]</span>
-<span class="p">}</span><span class="w"></span>
-<span class="k">struct</span><span class="w"> </span><span class="nc">oeuf</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">poule</span><span class="w"> </span><span class="o">*</span><span class="n">pondu_par</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span>
+<span class="k">struct</span><span class="w"> </span><span class="nc">oeuf</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">poule</span><span class="w"> </span><span class="o">*</span><span class="n">pondu_par</span><span class="p">;</span>
 <span class="w">    </span><span class="c1">// [ ... ]</span>
-<span class="p">}</span><span class="w"></span>
+<span class="p">}</span>
 </pre></div>
 </div>
 </section>
 </section>
 <section id="compiler-attributes">
-<h3>Compiler attributes<a class="headerlink" href="#compiler-attributes" title="Lien permanent vers ce titre">¶</a></h3>
+<h3>Compiler attributes<a class="headerlink" href="#compiler-attributes" title="Lien vers cette rubrique">#</a></h3>
 <p>Il est parfois utile de « guider » le compilateur dans ses choix.
 Par exemple, par défaut le compilateur essaye de créer des structures bien
 alignées, mais parfois on souhaite qu’elles soient bien « denses », sans padding.
-Pour cela, on peut utiliser (avec GCC) l’attribut <code class="code c docutils literal notranslate"><span class="name"><span class="pre">packed</span></span></code>:</p>
-<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="n">__attribute__</span><span class="p">((</span><span class="n">__packed__</span><span class="p">))</span><span class="w"></span>
+Pour cela, on peut utiliser (avec GCC) l’attribut <code class="code highlight c docutils literal highlight-c"><span class="n">packed</span></code>:</p>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="n">__attribute__</span><span class="p">((</span><span class="n">__packed__</span><span class="p">))</span>
 </pre></div>
 </div>
 <p>Pour davantage d’info, regardez le manuel de GCC (
@@ -438,24 +753,24 @@ Pour cela, on peut utiliser (avec GCC) l’attribut <code class="code c docutils
 <div class="admonition-exercice-6 admonition">
 <p class="admonition-title"><strong>Exercice 6</strong></p>
 <p>Regardez dans les entêtes du noyau Linux (ce ne serait pas mal de
-pré-filtrer la recherche avec <code class="code bash docutils literal notranslate"><span class="pre">git-grep</span></code> en utilisant la bonne
+pré-filtrer la recherche avec <code class="code highlight bash docutils literal highlight-bash">git-grep</code> en utilisant la bonne
 option… à vous de trouver laquelle… ;)) quels attributs sont
 utilisés et leur signification dans le manuel GCC. Résumez ensuite par écrit
 ce que vous avez observé.</p>
 </div>
 </section>
 <section id="offsetof-container-of">
-<h3>offsetof / container_of<a class="headerlink" href="#offsetof-container-of" title="Lien permanent vers ce titre">¶</a></h3>
-<p><code class="code c docutils literal notranslate"><span class="name"><span class="pre">offsetof</span></span></code> est une macro qui permet d’avoir l’offset (en bytes) d’un champ
+<h3>offsetof / container_of<a class="headerlink" href="#offsetof-container-of" title="Lien vers cette rubrique">#</a></h3>
+<p><code class="code highlight c docutils literal highlight-c"><span class="n">offsetof</span></code> est une macro qui permet d’avoir l’offset (en bytes) d’un champ
 dans une struct.</p>
 <p>Description formelle <a class="reference external" href="https://en.cppreference.com/w/c/types/offsetof">ici</a>.</p>
-<p>Le noyau Linux l’utilise dans une macro, <code class="code c docutils literal notranslate"><span class="name"><span class="pre">container_of</span></span></code>, qui est très utilisée
+<p>Le noyau Linux l’utilise dans une macro, <code class="code highlight c docutils literal highlight-c"><span class="n">container_of</span></code>, qui est très utilisée
 par récupérer le pointeur vers une structure en n’ayant que d’un pointeur sur un champ
 de la structure. Vous avez un exemple d’utilisation
 <a class="reference external" href="http://www.kroah.com/log/linux/container_of.html">ici</a>.</p>
 <div class="admonition-exercice-7 admonition">
 <p class="admonition-title"><strong>Exercice 7</strong></p>
-<p>Définissez la macro <code class="code c docutils literal notranslate"><span class="name"><span class="pre">container_of</span></span></code> (ci-dessous) et une structure
+<p>Définissez la macro <code class="code highlight c docutils literal highlight-c"><span class="n">container_of</span></code> (ci-dessous) et une structure
 contenant trois variables de type différent.</p>
 <div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="cp">#define container_of(ptr, type, member) \</span>
 <span class="cp">    (type*)(void*)((char*)ptr - offsetof(type, member))</span>
@@ -474,7 +789,7 @@ adresses ont « plus de sens » ?</p>
 </section>
 </section>
 <section id="union">
-<h2>union<a class="headerlink" href="#union" title="Lien permanent vers ce titre">¶</a></h2>
+<h2>union<a class="headerlink" href="#union" title="Lien vers cette rubrique">#</a></h2>
 <p>Une union est similaire à une struct dans sa déclaration, mais son comportement
 est très différent : au lieu de regrouper tous ses champs, il n’alloue que la
 mémoire nécessaire pour le plus grand d’entre eux (evt. avec du padding).
@@ -489,27 +804,27 @@ des entiers) en C (en C++ on utiliserait p. ex., des templates)</p></li>
 </ul>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Observez la déclaration de <code class="code c docutils literal notranslate"><span class="keyword"><span class="pre">union</span></span><span class="whitespace"> </span><span class="name class"><span class="pre">i2c_smbus_data</span></span></code>.</p>
-<p>Cherchez-la dans les sources du kernel à l’aide p. ex. de <code class="code bash docutils literal notranslate"><span class="pre">git-grep</span></code>;
+<p>Observez la déclaration de <code class="code highlight c docutils literal highlight-c"><span class="k">union</span><span class="w"> </span><span class="nc">i2c_smbus_data</span></code>.</p>
+<p>Cherchez-la dans les sources du kernel à l’aide p. ex. de <code class="code highlight bash docutils literal highlight-bash">git-grep</code>;
 ensuite, regardez comment elle est utilisée par les fonctions de
 lecture/écriture
 décrites <a class="reference external" href="https://www.kernel.org/doc/html/latest/i2c/writing-clients.html#smbus-communication">ici</a>.
-Quelle est l’utilité des <code class="code c docutils literal notranslate"><span class="keyword"><span class="pre">union</span></span></code> dans ce cas ?</p>
+Quelle est l’utilité des <code class="code highlight c docutils literal highlight-c"><span class="k">union</span></code> dans ce cas ?</p>
 </div>
-<p>Les unions sont aussi utiles pour avoir <em>« des jolis noms »</em>, p. ex. (dans la structure <code class="code c docutils literal notranslate"><span class="keyword"><span class="pre">struct</span></span><span class="whitespace"> </span><span class="name class"><span class="pre">snd_soc_dapm_path</span></span></code> contenue dans le fichier
+<p>Les unions sont aussi utiles pour avoir <em>« des jolis noms »</em>, p. ex. (dans la structure <code class="code highlight c docutils literal highlight-c"><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dapm_path</span></code> contenue dans le fichier
 <code class="file docutils literal notranslate"><span class="pre">include/sound/soc-dapm.h</span></code>) :</p>
 <div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="cm">/*</span>
 <span class="cm"> * source (input) and sink (output) widgets</span>
 <span class="cm"> * The union is for convience, since it is a lot nicer to type</span>
 <span class="cm"> * p-&gt;source, rather than p-&gt;node[SND_SOC_DAPM_DIR_IN]</span>
-<span class="cm"> */</span><span class="w"></span>
-<span class="k">union</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">        </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dapm_widget</span><span class="w"> </span><span class="o">*</span><span class="n">source</span><span class="p">;</span><span class="w"></span>
-<span class="w">        </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dapm_widget</span><span class="w"> </span><span class="o">*</span><span class="n">sink</span><span class="p">;</span><span class="w"></span>
-<span class="w">    </span><span class="p">};</span><span class="w"></span>
-<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dapm_widget</span><span class="w"> </span><span class="o">*</span><span class="n">node</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span><span class="w"></span>
-<span class="p">};</span><span class="w"></span>
+<span class="cm"> */</span>
+<span class="k">union</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dapm_widget</span><span class="w"> </span><span class="o">*</span><span class="n">source</span><span class="p">;</span>
+<span class="w">        </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dapm_widget</span><span class="w"> </span><span class="o">*</span><span class="n">sink</span><span class="p">;</span>
+<span class="w">    </span><span class="p">};</span>
+<span class="w">    </span><span class="k">struct</span><span class="w"> </span><span class="nc">snd_soc_dapm_widget</span><span class="w"> </span><span class="o">*</span><span class="n">node</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
+<span class="p">};</span>
 </pre></div>
 </div>
 <p>Ce dernier est un exemple d’une technique qui s’appelle
@@ -523,7 +838,7 @@ ensuite, relisez la valeur byte par byte. Utiliser une union pour cela.</p>
 </div>
 </section>
 <section id="bit-fields">
-<h2>Bit fields<a class="headerlink" href="#bit-fields" title="Lien permanent vers ce titre">¶</a></h2>
+<h2>Bit fields<a class="headerlink" href="#bit-fields" title="Lien vers cette rubrique">#</a></h2>
 <p>Il est parfois utile de limiter le nombre de bits d’une variable, par exemple à
 1. Cela est possible grâce aux bit fields.
 Vous trouverez la description formelle <a class="reference external" href="https://en.cppreference.com/w/c/language/bit_field">ici</a>
@@ -546,24 +861,24 @@ et <a class="reference external" href="https://lwn.net/Articles/478657/">cela a 
 </div>
 <p>si l’on est bien paresseux ;)</p>
 <p>Exemple :</p>
-<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
-<span class="kt">uint32_t</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w"></span>
-<span class="kt">uint32_t</span><span class="w"> </span><span class="n">b</span><span class="p">;</span><span class="w"></span>
+<div class="highlight-C notranslate"><div class="highlight"><pre><span></span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="kt">uint32_t</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
+<span class="kt">uint32_t</span><span class="w"> </span><span class="n">b</span><span class="p">;</span>
 <span class="c1">// test bit n value</span>
-<span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mh">0x1</span><span class="p">;</span><span class="w"></span>
+<span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="mh">0x1</span><span class="p">;</span>
 <span class="c1">// set bit n</span>
-<span class="n">x</span><span class="w"> </span><span class="o">|=</span><span class="w"> </span><span class="n">BIT</span><span class="p">(</span><span class="n">n</span><span class="p">);</span><span class="w"></span>
+<span class="n">x</span><span class="w"> </span><span class="o">|=</span><span class="w"> </span><span class="n">BIT</span><span class="p">(</span><span class="n">n</span><span class="p">);</span>
 <span class="c1">// clear bit n</span>
-<span class="n">x</span><span class="w"> </span><span class="o">&amp;=</span><span class="w"> </span><span class="o">~</span><span class="n">BIT</span><span class="p">(</span><span class="n">n</span><span class="p">);</span><span class="w"></span>
+<span class="n">x</span><span class="w"> </span><span class="o">&amp;=</span><span class="w"> </span><span class="o">~</span><span class="n">BIT</span><span class="p">(</span><span class="n">n</span><span class="p">);</span>
 <span class="c1">// toggle bit n</span>
-<span class="n">x</span><span class="w"> </span><span class="o">^=</span><span class="w"> </span><span class="n">BIT</span><span class="p">(</span><span class="n">n</span><span class="p">);</span><span class="w"></span>
+<span class="n">x</span><span class="w"> </span><span class="o">^=</span><span class="w"> </span><span class="n">BIT</span><span class="p">(</span><span class="n">n</span><span class="p">);</span>
 </pre></div>
 </div>
 <p>Vous trouverez des jolis « Bit Twiddling Hacks »
 <a class="reference external" href="https://graphics.stanford.edu/~seander/bithacks.html">ici</a>.</p>
 </section>
 <section id="volatile">
-<h2>volatile<a class="headerlink" href="#volatile" title="Lien permanent vers ce titre">¶</a></h2>
+<h2>volatile<a class="headerlink" href="#volatile" title="Lien vers cette rubrique">#</a></h2>
 <p>Le compilateur, selon les options de compilation, pourrait faire des choses
 bizarres avec votre code…</p>
 <p>Exemple : vous avez une variable qui correspond à un registre dans votre
@@ -575,20 +890,20 @@ personne a touché cette variable, donc elle va avoir la même valeur que tout �
 l’heure, et donc … »</em>. Mais, dans la réalité, votre périphérique pourrait bien
 avoir changé la valeur de la variable, et ce changement ne sera pas pris en
 compte à cause du compilateur !</p>
-<p>Pour éviter cela, le keyword <code class="code c docutils literal notranslate"><span class="keyword"><span class="pre">volatile</span></span></code> a été introduit en C. Il signifie <em>« ne fais
+<p>Pour éviter cela, le keyword <code class="code highlight c docutils literal highlight-c"><span class="k">volatile</span></code> a été introduit en C. Il signifie <em>« ne fais
 pas d’hypothèse stp, il faut qu’à chaque fois, tu relises la valeur de cette variable »</em>.</p>
 <div class="admonition-exercice-9 admonition">
 <p class="admonition-title"><strong>Exercice 9</strong></p>
 <p>Écrivez une fonction dans <a class="reference external" href="https://godbolt.org/">GodBolt</a> pour voir par vous-mêmes
 ce que cela veut dire en termes de code assembleur — c.-à-d.,
 écrivez une fonction qui fait le test susmentionné avec et sans le keyword
-<code class="code c docutils literal notranslate"><span class="keyword"><span class="pre">volatile</span></span></code>, et avec différents niveaux d’optimisation (essayez p. ex., avec
-<code class="code bash docutils literal notranslate"><span class="pre">-O0</span></code> et <code class="code bash docutils literal notranslate"><span class="pre">-O3</span></code>).
+<code class="code highlight c docutils literal highlight-c"><span class="k">volatile</span></code>, et avec différents niveaux d’optimisation (essayez p. ex., avec
+<code class="code highlight bash docutils literal highlight-bash">-O0</code> et <code class="code highlight bash docutils literal highlight-bash">-O3</code>).
 Commentez par écrit les résultats.</p>
 </div>
 </section>
 <section id="undefined-behavior">
-<h2>Undefined behavior<a class="headerlink" href="#undefined-behavior" title="Lien permanent vers ce titre">¶</a></h2>
+<h2>Undefined behavior<a class="headerlink" href="#undefined-behavior" title="Lien vers cette rubrique">#</a></h2>
 <p>Afin de donner aux développeurs en charge de la création des compilateurs
 un peu de marge de manoeuvre, le standard C ne spécifie pas quoi faire dans certaines
 situations « limite », p. ex., lorsque vous déréférencez un pointeur à NULL.
@@ -612,11 +927,11 @@ et commencer à vous frapper</p></li>
 <p>Heureusement, face à ce danger, des outils ont été crées pour détecter ces
 situations.
 En particulier, il est possible d’utiliser le <strong>Undefined Behavior Sanitizer (UBSAN)</strong>.
-Il suffit, lors de la compilation, d’ajouter le flag <code class="code bash docutils literal notranslate"><span class="pre">-fsanitize</span><span class="operator"><span class="pre">=</span></span><span class="pre">undefined</span></code>.
+Il suffit, lors de la compilation, d’ajouter le flag <code class="code highlight bash docutils literal highlight-bash">-fsanitize<span class="o">=</span>undefined</code>.
 Si vous voulez aussi un stack trace il faut d’abord faire
-<code class="code bash docutils literal notranslate"><span class="name builtin"><span class="pre">export</span></span> <span class="name variable"><span class="pre">UBSAN_OPTIONS</span></span><span class="operator"><span class="pre">=</span></span><span class="literal string double"><span class="pre">&quot;print_stacktrace=1&quot;</span></span></code>.
+<code class="code highlight bash docutils literal highlight-bash"><span class="nb">export</span><span class="w"> </span><span class="nv">UBSAN_OPTIONS</span><span class="o">=</span><span class="s2">&quot;print_stacktrace=1&quot;</span></code>.
 Faites gaffe que parfois les erreurs ne sont pas détectées si vous compilez avec
-<code class="code bash docutils literal notranslate"><span class="pre">-O0</span></code> (il faut au moins -O1).
+<code class="code highlight bash docutils literal highlight-bash">-O0</code> (il faut au moins -O1).
 Vous avez plus de détails sur les options possibles
 <a class="reference external" href="https://blogs.oracle.com/linux/post/improving-application-security-with-undefinedbehaviorsanitizer-ubsan-and-gcc">ici</a>.
 Bien sûr, ces tests sont au run-time et non pas à compile-time (pourquoi ???).</p>
@@ -639,7 +954,7 @@ système et commentez-le.</p>
 </div>
 </section>
 <section id="travail-a-rendre-et-criteres-d-evaluation">
-<h2>Travail à rendre et critères d’évaluation<a class="headerlink" href="#travail-a-rendre-et-criteres-d-evaluation" title="Lien permanent vers ce titre">¶</a></h2>
+<h2>Travail à rendre et critères d’évaluation<a class="headerlink" href="#travail-a-rendre-et-criteres-d-evaluation" title="Lien vers cette rubrique">#</a></h2>
 <p>Dans le cadre de ce laboratoire, vous devez rendre les 10 exercices ci-dessus.</p>
 <p>S’il est demandé d’écrire du code, ce code doit se trouver dans un fichier <em>ex&lt;n&gt;.c</em>, où &lt;n&gt; correspond au numéro de l’exercice.
 Si un exercice contient plusieurs variantes, alors le fichier sera nommé <em>ex&lt;n&gt;_&lt;variante&gt;.c</em>, où &lt;variante&gt; correspond à la variante.
@@ -666,7 +981,7 @@ Vous devez rendre une archive <code class="file docutils literal notranslate"><s
 </li>
 </ul>
 <p>Les notes seront réparties comme suit :</p>
-<ul>
+<ul class="simple">
 <li><p>80% de la note si l’exercice est correct (c.-à-d., <em>« fonctionne »</em>).
 Il doit bien sûr « fonctionner » sur d’autres PCs que votre PC personnel, et de façon déterministe.
 Il est donc impératif que tout ce qui est nécessaire pour compiler et tester le fonctionnement de la solution soit rendu.</p></li>
@@ -674,8 +989,7 @@ Il est donc impératif que tout ce qui est nécessaire pour compiler et tester l
 <ul>
 <li><p>Respect des <a class="reference external" href="https://www.kernel.org/doc/html/latest/process/coding-style.html">Linux kernel coding style</a>,
 particulièrement les points suivants :</p>
-<blockquote>
-<div><ul class="simple">
+<ul>
 <li><ol class="arabic simple">
 <li><p>Indentation</p></li>
 </ol>
@@ -701,7 +1015,6 @@ particulièrement les points suivants :</p>
 </ol>
 </li>
 </ul>
-</div></blockquote>
 </li>
 <li><p><strong>code lisible</strong></p></li>
 <li><p><strong>documenté/commenté</strong></p></li>
@@ -713,69 +1026,131 @@ particulièrement les points suivants :</p>
 </section>
 
 
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../helper/eval_criterion.html"
+       title="page précédente">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">précédent</p>
+        <p class="prev-next-title">Critère d’évaluation</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../lab_01/lab_01.html"
+       title="page suivante">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">suivant</p>
+        <p class="prev-next-title">Laboratoire 1 — Introduction</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contenu
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#materiel-necessaire">Matériel nécessaire</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#style-de-programmation">Style de programmation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#include-guards">Include guards</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#types-de-variables">Types de variables</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#sizeof">sizeof()</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#endianness">Endianness</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pointeurs">Pointeurs</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pointeurs-vers-fonction">Pointeurs vers fonction</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pointeurs-vers-void">Pointeurs vers void*</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#programmation-oop-avec-les-pointeurs">Programmation OOP (avec les pointeurs)</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#struct">struct</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pointeurs-vers-structure">Pointeurs vers structure</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#initialisation-des-structures">Initialisation des structures</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#forward-declarations">Forward declarations</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#compiler-attributes">Compiler attributes</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#offsetof-container-of">offsetof / container_of</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#union">union</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#bit-fields">Bit fields</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#volatile">volatile</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#undefined-behavior">Undefined behavior</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#travail-a-rendre-et-criteres-d-evaluation">Travail à rendre et critères d’évaluation</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
           </div>
-          
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="../index.html">DRV 2024</a></h1>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+Par REDS institute
+</p>
 
-
-
-
-
-
-
-
-<h3>Navigation</h3>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../helper/helper.html">Helper</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../helper/ssh.html">Mise en place SSH</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../helper/eval_criterion.html">Consigne de rendu</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Laboratoire 0</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../lab_01/lab_01.html">Laboratoire 1</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tuto_01/tuto_01.html">Tuto 1</a></li>
-</ul>
-
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="../index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="../helper/eval_criterion.html" title="Chapitre précédent">Critère d’évaluation</a></li>
-      <li>Next: <a href="../lab_01/lab_01.html" title="Chapitre suivant">Laboratoire 1 — Introduction</a></li>
-  </ul></li>
-</ul>
-</div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Recherche rapide</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</div>
-<script>$('#searchbox').show(0);</script>
-
-
-
-
-
-
-
-
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="footer">
-      &copy;2024, REDS institute.
-      
-    </div>
-
+  </div>
+  
+  <div class="footer-item">
     
 
+  <p class="copyright">
     
+      © Copyright 2024, REDS institute.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
   </body>
 </html>
