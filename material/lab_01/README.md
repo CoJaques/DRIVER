@@ -1,4 +1,4 @@
-Colin Jaques 
+#### Colin Jaques - Labo 1 DRV
 
 # Exercice 1
 la commande md permet de lire une valeur en mémoire, le b,w,l permet de définir le type d'affichage, b pour byte, w pour word et l pour long. le dernier paramètre permet de définir le nombre d'élément à lire.
