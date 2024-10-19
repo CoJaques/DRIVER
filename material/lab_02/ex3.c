@@ -19,8 +19,8 @@ Date   : 2023-10-10
 #define SEGMENT2_OFFSET 0x30
 #define BUTTON_OFFSET	0x50
 #define OFFSET		0x8
-#define MAX		99999999
-#define SWITCHES_MASK	0xF
+#define MAX		999999
+#define SWITCHES_MASK	0x3FF
 
 #define UIO_NAME	"/sys/class/uio/uio0/name"
 #define UIO_MEM_SIZE	"/sys/class/uio/uio0/maps/map0/size"

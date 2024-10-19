@@ -19,7 +19,7 @@ Date   : 2023-10-10
 #define SEGMENT2_OFFSET 0x30
 #define BUTTON_OFFSET	0x50
 #define OFFSET		0x8
-#define MAX		99999999
+#define MAX		999999
 #define SWITCHES_MASK	0x3FF
 
 // Enumeration for button masks to improve readability
