@@ -12,7 +12,7 @@ Date   : 2023-10-10
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/mman.h>
-#include <linux/uio.h>
+#include <sys/select.h>
 #include "device.h"
 
 #define SWITCHES_OFFSET	      0x40
@@ -44,6 +44,29 @@ typedef enum {
 	KEY_2 = 1 << 2,
 	KEY_3 = 1 << 3
 } Button;
+
+static int running = 1;
+
+void handle_sigint(int sig)
+{
+	printf("\nCaught signal %d (SIGINT), exiting cleanly...\n", sig);
+	running = 0;
+}
+
+void init_signal(struct sigaction *sig)
+{
+	sig->sa_handler =
+		handle_sigint; // Définir la fonction de gestion du signal
+	sigemptyset(
+		&sig->sa_mask); // Aucune autre signal n'est bloqué pendant l'exécution
+	sig->sa_flags = 0; // Pas d'options spéciales
+
+	// Installer le gestionnaire de SIGINT
+	if (sigaction(SIGINT, sig, NULL) == -1) {
+		perror("Error: cannot handle SIGINT"); // Gérer l'erreur si sigaction échoue
+		exit(EXIT_FAILURE);
+	}
+}
 
 // Lookup table for 7-segment display numbers
 static const uint32_t number_representation_7segment[] = {
@@ -98,7 +121,7 @@ int16_t read_switches(uint32_t *switches)
 	// Extract the value (bits [8:0])
 	int16_t value = data & SWITCHES_MASK_VALUE;
 
-	// If the sign bit is set, return the negative value using two's complementi
+	// If the sign bit is set, return the negative value using two's complement
 	return (data & SWITCHES_MASK_SIGN) ? (~value + 1) : value;
 }
 
@@ -143,6 +166,9 @@ int process_counter(int counter, int16_t button_value, uint8_t button_state)
 
 int main(void)
 {
+	struct sigaction sa;
+	init_signal(&sa);
+
 	if (check_device_name(UIO_NAME, EXPECTED_NAME) != 0) {
 		return EXIT_FAILURE;
 	}
@@ -181,18 +207,18 @@ int main(void)
 	set_7_segment(segment1_register, segment2_register, 0);
 	set_leds(led_register, 0);
 
-	// enbable interupt and clear it
+	// Enable interrupt and clear it
 	*(mem_ptr + INTERRUPT_CTRL_BUTTON) = 0xF;
 	*(mem_ptr + INTERRUPT_EDGE_BUTTON) = 0xF;
 
 	int32_t counter = 0;
-	while (1) {
+	while (running) {
 		volatile uint8_t button_state = 0;
 		uint32_t info = 1;
 
 		ssize_t nb = write(fd, &info, sizeof(info));
 		if (nb != (ssize_t)sizeof(info)) {
-			perror("write interupt mask error");
+			perror("write interrupt mask error");
 			clear_output(segment1_register, segment2_register,
 				     led_register);
 			close(fd);
@@ -200,17 +226,30 @@ int main(void)
 			break;
 		}
 
-		nb = read(fd, &info, sizeof(info));
-		if (nb == (ssize_t)sizeof(info)) {
-			button_state = *(mem_ptr + INTERRUPT_EDGE_BUTTON);
-			int16_t value = read_switches(switch_register);
-			counter = process_counter(counter, value, button_state);
-			set_7_segment(segment1_register, segment2_register,
-				      abs(counter));
-			set_leds(led_register, counter < 0);
+		fd_set read_fds;
+		FD_ZERO(&read_fds);
+		FD_SET(fd, &read_fds);
 
-			// clear interupt
-			*(mem_ptr + INTERRUPT_EDGE_BUTTON) = 0xF;
+		int select_result = select(fd + 1, &read_fds, NULL, NULL, NULL);
+		if (select_result > 0) {
+			nb = read(fd, &info, sizeof(info));
+			if (nb == (ssize_t)sizeof(info)) {
+				button_state =
+					*(mem_ptr + INTERRUPT_EDGE_BUTTON);
+				int16_t value = read_switches(switch_register);
+				counter = process_counter(counter, value,
+							  button_state);
+				set_7_segment(segment1_register,
+					      segment2_register, abs(counter));
+				set_leds(led_register, counter < 0);
+
+				// Clear interrupt
+				*(mem_ptr + INTERRUPT_EDGE_BUTTON) = 0xF;
+			}
+		} else {
+			perror("select() failed");
+			close(fd);
+			exit(EXIT_FAILURE);
 		}
 	}
 	clear_output(segment1_register, segment2_register, led_register);

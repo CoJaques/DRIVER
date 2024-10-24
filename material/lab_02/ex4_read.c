@@ -1,9 +1,10 @@
 /*      
-Title  : Lab 2 - Exercise 3
+Title  : Lab 2 - Exercise 4
 Author : Colin Jaques
 Date   : 2023-10-10
 */
 
+#include <stddef.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,22 +13,29 @@ Date   : 2023-10-10
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <linux/uio.h>
-#include <signal.h>
 #include "device.h"
 
-#define SWITCHES_OFFSET 0x40
-#define LEDS_OFFSET	0x0
-#define SEGMENT1_OFFSET 0x20
-#define SEGMENT2_OFFSET 0x30
-#define BUTTON_OFFSET	0x50
-#define OFFSET		0x8
-#define MAX		999999
-#define SWITCHES_MASK	0x3FF
+#define SWITCHES_OFFSET	      0x40
+#define LEDS_OFFSET	      0x0
+#define SEGMENT1_OFFSET	      0x20
+#define SEGMENT2_OFFSET	      0x30
+#define BUTTON_OFFSET	      0x50
+#define OFFSET		      0x8
+#define MAX		      999999
+#define MIN		      (-999999)
+#define SWITCHES_MASK_VALUE   0x1FF
+#define SWITCHES_MASK_SIGN    0x200
+#define SIGN_LEDS	      0x9
 
-#define UIO_NAME	"/sys/class/uio/uio0/name"
-#define UIO_MEM_SIZE	"/sys/class/uio/uio0/maps/map0/size"
-#define DEVICE		"/dev/uio0"
-#define EXPECTED_NAME	"drv2024"
+#define UIO_NAME	      "/sys/class/uio/uio0/name"
+#define UIO_MEM_SIZE	      "/sys/class/uio/uio0/maps/map0/size"
+#define DEVICE		      "/dev/uio0"
+#define EXPECTED_NAME	      "drv2024"
+
+#define INTERRUPT_MASK_OFFSET 0x08
+#define INTERRUPT_EDGE_OFFSET 0x0C
+#define INTERRUPT_CTRL_BUTTON INTERRUPT_MASK_OFFSET + BUTTON_OFFSET
+#define INTERRUPT_EDGE_BUTTON INTERRUPT_EDGE_OFFSET + BUTTON_OFFSET
 
 // Enumeration for button masks to improve readability
 typedef enum {
@@ -69,10 +77,6 @@ static const uint32_t number_representation_7segment[] = {
 void set_7_segment(uint32_t *segment1_register, uint32_t *segment2_register,
 		   unsigned value_to_print)
 {
-	if (value_to_print > 999999) {
-		value_to_print = 999999; // Cap value at 999999
-	}
-
 	// Extract digits from the value
 	uint8_t unit = value_to_print % 10;
 	uint8_t ten = (value_to_print / 10) % 10;
@@ -96,10 +100,9 @@ void set_7_segment(uint32_t *segment1_register, uint32_t *segment2_register,
 	*segment2_register = segment2_value;
 }
 
-// Set LEDs based on value
-void set_leds(uint32_t *base_address, unsigned value_to_print)
+void set_leds(uint32_t *base_address, uint8_t on)
 {
-	*base_address = value_to_print > MAX;
+	*base_address = on ? 1 << SIGN_LEDS : 0;
 }
 
 // Clear all outputs (7-segment and LEDs)
@@ -110,22 +113,55 @@ void clear_output(uint32_t *segment1, uint32_t *segment2, uint32_t *led)
 	*led = 0x0;
 }
 
-// Return button state with edge detection
-int get_key_state(uint8_t *addr)
+int16_t read_switches(uint32_t *switches)
 {
-	static uint8_t last_state = 0;
-	uint8_t current_state = *addr;
+	// Read the switch state (9 bits value + 1 sign bit)
+	int16_t data = *switches;
 
-	int key_pressed = (last_state ^ current_state) & current_state;
-	last_state = current_state;
-	return key_pressed;
+	// Extract the value (bits [8:0])
+	int16_t value = data & SWITCHES_MASK_VALUE;
+
+	// If the sign bit is set, return the negative value using two's complementi
+	return (data & SWITCHES_MASK_SIGN) ? (~value + 1) : value;
 }
 
-// Read and mask switch states
-uint32_t read_switches(uint32_t *switches)
+int process_counter(int counter, int16_t button_value, uint8_t button_state)
 {
-	uint32_t value = *switches & SWITCHES_MASK;
-	return value;
+	switch (button_state) {
+	case KEY_0:
+		printf("%d + %d\n", counter, button_value);
+		counter += button_value;
+		break;
+	case KEY_1:
+		printf("%d - %d\n", counter, button_value);
+		counter -= button_value;
+		break;
+	case KEY_2:
+		printf("%d * %d\n", counter, button_value);
+		counter *= button_value;
+		break;
+	case KEY_3:
+		if (button_value != 0) {
+			printf("%d / %d\n", counter, button_value);
+			counter /= button_value;
+		} else {
+			printf("it's impossible to divide by 0. \n");
+		}
+		break;
+	default:
+		break;
+	}
+
+	if (counter > MAX) {
+		printf("counter > max : %d %d \n", counter, MAX);
+		counter = MAX;
+	} else if (counter < MIN) {
+		printf("counter < min : %d %d \n", counter, MIN);
+		counter = MIN;
+	}
+
+	printf("Counter: %d\n", counter);
+	return counter;
 }
 
 int main(void)
@@ -157,49 +193,54 @@ int main(void)
 		return EXIT_FAILURE;
 	}
 
-	close(fd); // Close the file descriptor after mapping
-
 	uint32_t *const segment1_register =
 		(uint32_t *)(mem_ptr + SEGMENT1_OFFSET);
 
 	uint32_t *const segment2_register =
 		(uint32_t *)(mem_ptr + SEGMENT2_OFFSET);
 
-	uint8_t *const button_register = mem_ptr + BUTTON_OFFSET;
 	uint32_t *const led_register = (uint32_t *)(mem_ptr + LEDS_OFFSET);
 
 	uint32_t *const switch_register =
 		(uint32_t *)(mem_ptr + SWITCHES_OFFSET);
 
-	unsigned counter = 0;
+	set_7_segment(segment1_register, segment2_register, 0);
+	set_leds(led_register, 0);
 
-	set_7_segment(segment1_register, segment2_register, counter);
-	set_leds(led_register, counter);
+	// enbable interupt and clear it
+	*(mem_ptr + INTERRUPT_CTRL_BUTTON) = 0xF;
+	*(mem_ptr + INTERRUPT_EDGE_BUTTON) = 0xF;
 
+	int32_t counter = 0;
 	while (running) {
-		volatile int button_state = get_key_state(button_register);
+		volatile uint8_t button_state = 0;
+		uint32_t info = 1;
 
-		if (button_state & KEY_0) {
-			if (counter < MAX)
-				counter += read_switches(switch_register);
-		} else if (button_state & KEY_1) {
-			counter = 0;
-		} else if (button_state & KEY_3) {
-			break; // Exit loop on KEY_3 press
+		ssize_t nb = write(fd, &info, sizeof(info));
+		if (nb != (ssize_t)sizeof(info)) {
+			perror("write interupt mask error");
+			clear_output(segment1_register, segment2_register,
+				     led_register);
+			close(fd);
+			munmap(mem_ptr, getpagesize());
+			break;
 		}
 
-		// Update display and LEDs only if a button was pressed
-		if (button_state != 0) {
-			printf("Counter: %d\n", counter);
+		nb = read(fd, &info, sizeof(info));
+		if (nb == (ssize_t)sizeof(info)) {
+			button_state = *(mem_ptr + INTERRUPT_EDGE_BUTTON);
+			int16_t value = read_switches(switch_register);
+			counter = process_counter(counter, value, button_state);
 			set_7_segment(segment1_register, segment2_register,
-				      counter);
-			set_leds(led_register, counter);
+				      abs(counter));
+			set_leds(led_register, counter < 0);
+
+			// clear interupt
+			*(mem_ptr + INTERRUPT_EDGE_BUTTON) = 0xF;
 		}
 	}
-
-	// Unmap memory before exiting
 	clear_output(segment1_register, segment2_register, led_register);
 	munmap(mem_ptr, getpagesize());
-
+	close(fd);
 	return EXIT_SUCCESS;
 }

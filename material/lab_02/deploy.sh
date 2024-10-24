@@ -1,1 +1,1 @@
-arm-linux-gnueabihf-gcc-6.4.1 ex4.c device.c -o ex4 -Wall && cp ex4 /export/drv
+arm-linux-gnueabihf-gcc-6.4.1 ex4_read.c device.c -o ex4_read -Wall && cp ex4_read /export/drv
