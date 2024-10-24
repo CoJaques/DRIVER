@@ -13,6 +13,7 @@ Date   : 2023-10-10
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <linux/uio.h>
+#include <signal.h>
 #include "device.h"
 
 #define SWITCHES_OFFSET	      0x40

@@ -10,9 +10,10 @@ Date   : 2023-10-10
 #include <stdlib.h>
 #include <stdint.h>
 #include <unistd.h>
-#include <poll.h>
 #include <fcntl.h>
 #include <sys/mman.h>
+#include <sys/select.h>
+#include <signal.h>
 #include "device.h"
 
 #define SWITCHES_OFFSET	      0x40
@@ -121,7 +122,7 @@ int16_t read_switches(uint32_t *switches)
 	// Extract the value (bits [8:0])
 	int16_t value = data & SWITCHES_MASK_VALUE;
 
-	// If the sign bit is set, return the negative value using two's complementi
+	// If the sign bit is set, return the negative value using two's complement
 	return (data & SWITCHES_MASK_SIGN) ? (~value + 1) : value;
 }
 
@@ -207,7 +208,7 @@ int main(void)
 	set_7_segment(segment1_register, segment2_register, 0);
 	set_leds(led_register, 0);
 
-	// enbable interupt and clear it
+	// Enable interrupt and clear it
 	*(mem_ptr + INTERRUPT_CTRL_BUTTON) = 0xF;
 	*(mem_ptr + INTERRUPT_EDGE_BUTTON) = 0xF;
 
@@ -218,7 +219,7 @@ int main(void)
 
 		ssize_t nb = write(fd, &info, sizeof(info));
 		if (nb != (ssize_t)sizeof(info)) {
-			perror("write interupt mask error");
+			perror("write interrupt mask error");
 			clear_output(segment1_register, segment2_register,
 				     led_register);
 			close(fd);
@@ -226,13 +227,12 @@ int main(void)
 			break;
 		}
 
-		struct pollfd fds = {
-			.fd = fd,
-			.events = POLLIN,
-		};
+		fd_set read_fds;
+		FD_ZERO(&read_fds);
+		FD_SET(fd, &read_fds);
 
-		int poll_result = poll(&fds, 1, -1);
-		if (poll_result > 0) {
+		int select_result = select(fd + 1, &read_fds, NULL, NULL, NULL);
+		if (select_result > 0) {
 			nb = read(fd, &info, sizeof(info));
 			if (nb == (ssize_t)sizeof(info)) {
 				button_state =
@@ -244,13 +244,12 @@ int main(void)
 					      segment2_register, abs(counter));
 				set_leds(led_register, counter < 0);
 
-				// clear interupt
+				// Clear interrupt
 				*(mem_ptr + INTERRUPT_EDGE_BUTTON) = 0xF;
 			}
 		} else {
-			perror("poll() failed");
-			close(fd);
-			exit(EXIT_FAILURE);
+			perror("select() failed");
+			break;
 		}
 	}
 	clear_output(segment1_register, segment2_register, led_register);
