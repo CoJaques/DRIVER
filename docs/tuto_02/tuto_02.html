@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Tutoriel 1 — Prise en main &#8212; Documentation DRV 2024 </title>
+    <title>Tutoriel 2 — REDS-adder driver v0.1 et v1.1 &#8212; Documentation DRV 2024 </title>
   
   
   
@@ -44,11 +44,11 @@
     <script src="../_static/doctools.js"></script>
     <script src="../_static/scripts/sphinx-book-theme.js"></script>
     <script src="../_static/translations.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'tuto_01/tuto_01';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'tuto_02/tuto_02';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Recherche" href="../search.html" />
-    <link rel="next" title="Laboratoire 2 — User-space Drivers" href="../lab_02/lab_02.html" />
-    <link rel="prev" title="Laboratoire 1 — Introduction" href="../lab_01/lab_01.html" />
+    <link rel="next" title="Laboratoire 3 — Introduction aux drivers kernel-space" href="../lab_03/lab_03.html" />
+    <link rel="prev" title="Laboratoire 2 — User-space Drivers" href="../lab_02/lab_02.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="fr"/>
   </head>
@@ -164,9 +164,9 @@
 <li class="toctree-l1"><a class="reference internal" href="../helper/eval_criterion.html">Consigne de rendu</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../lab_00/lab_00.html">Laboratoire 0</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../lab_01/lab_01.html">Laboratoire 1</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Tuto 1</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tuto_01/tuto_01.html">Tuto 1</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../lab_02/lab_02.html">Laboratoire 2</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tuto_02/tuto_02.html">Tuto 2</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Tuto 2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../lab_03/lab_03.html">Laboratoire 3</a></li>
 </ul>
 
@@ -222,7 +222,7 @@
       
       
       
-      <li><a href="../_sources/tuto_01/tuto_01.rst" target="_blank"
+      <li><a href="../_sources/tuto_02/tuto_02.rst" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Télécharger le fichier source"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -293,9 +293,7 @@ document.write(`
   </button>
 `);
 </script>
-<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="fa-solid fa-list"></span>
-</button>
+
 </div></div>
       
     </div>
@@ -306,19 +304,11 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Tutoriel 1 — Prise en main</h1>
+    <h1>Tutoriel 2 —  REDS-adder driver v0.1 et v1.1</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
             
-            <div>
-                <h2> Contenu </h2>
-            </div>
-            <nav aria-label="Page">
-                <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#drv-adder">DRV-adder</a></li>
-</ul>
-            </nav>
         </div>
     </div>
 </div>
@@ -328,206 +318,51 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="tutoriel-1-prise-en-main">
-<span id="tutoriel1"></span><h1>Tutoriel 1 — Prise en main<a class="headerlink" href="#tutoriel-1-prise-en-main" title="Lien permanent vers ce titre">#</a></h1>
-<p>Cette série de tutoriels a été développé afin de vous accompagner dans la création de drivers Linux.
-On commencera par créer un driver pour un périphérique très simple (présenté ci-dessous), et on
-évoluera vers des designs plus réalistes.
-L’idée est de vous donner une méthodologie et du code « qui marche » (trop souvent le code que vous
-trouvez sur Internet est bogué ou mal écrit), afin que vous puissiez être « inspirés » par ces codes.</p>
-<div class="admonition warning">
-<p class="admonition-title">Avertissement</p>
-<p><strong>Vous êtes invités à les bricoler jusqu’à ce qu’ils se cassent ! (les logiciels, pas les
-cartes !)</strong>
-Rien n’est plus éducatif que bricoler quelque chose pour l’améliorer ou, tout
-simplement, essayer de comprendre comment ça fonctionne ;-)</p>
-</div>
-<section id="drv-adder">
-<h2>DRV-adder<a class="headerlink" href="#drv-adder" title="Lien permanent vers ce titre">#</a></h2>
-<p>Le périphérique qu’on va vous décrire ne fait vraiment rien d’utile. Par contre, il représente un
-bon exemple d’un périphérique mappé en mémoire — son utilisation ne diffère pas beaucoup d’un
-« vrai » dispositif sans avoir toute la complexité liée à un vrai dispositif, d’où son intérêt pour
-nous.</p>
-<p>Le développeur du périphérique nous a gentiment donné les adresses de registres :</p>
-<div class="pst-scrollable-table-container"><table class="table">
-<colgroup>
-<col style="width: 21%" />
-<col style="width: 66%" />
-<col style="width: 13%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><div class="line-block">
-<div class="line">Adresse</div>
-</div>
-</th>
-<th class="head"><div class="line-block">
-<div class="line">Registre</div>
-</div>
-</th>
-<th class="head"><p>Type</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><div class="line-block">
-<div class="line">0x0000</div>
-</div>
-</td>
-<td><div class="line-block">
-<div class="line">ID device (0xCAFECAFE)</div>
-</div>
-</td>
-<td><p>RO</p></td>
-</tr>
-<tr class="row-odd"><td><div class="line-block">
-<div class="line">0x0004</div>
-</div>
-</td>
-<td><div class="line-block">
-<div class="line">increment</div>
-</div>
-</td>
-<td><p>RW</p></td>
-</tr>
-<tr class="row-even"><td><div class="line-block">
-<div class="line">0x0008</div>
-</div>
-</td>
-<td><div class="line-block">
-<div class="line">value</div>
-</div>
-</td>
-<td><p>RW</p></td>
-</tr>
-<tr class="row-odd"><td><div class="line-block">
-<div class="line">0x000C</div>
-</div>
-</td>
-<td><div class="line-block">
-<div class="line">initialization</div>
-</div>
-</td>
-<td><p>WO</p></td>
-</tr>
-<tr class="row-even"><td><div class="line-block">
-<div class="line">0x0010</div>
-</div>
-</td>
-<td><div class="line-block">
-<div class="line">threshold</div>
-</div>
-</td>
-<td><p>RW</p></td>
-</tr>
-<tr class="row-odd"><td><div class="line-block">
-<div class="line">0x0080</div>
-</div>
-</td>
-<td><div class="line-block">
-<div class="line">irq mask</div>
-</div>
-</td>
-<td><p>RW</p></td>
-</tr>
-<tr class="row-even"><td><div class="line-block">
-<div class="line">0x0084</div>
-</div>
-</td>
-<td><div class="line-block">
-<div class="line">irq capture</div>
-</div>
-</td>
-<td><p>RW</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<p>(RO = Read Only, WO = Write Only, RW = Read-Write).</p>
-<p>Il nous a aussi dit qu’il est parti du <em>DE1-SoC Computer System</em> fourni par
-Altera.
-Ci-dessous une capture d’écran qui montre les connexions dans QSys pour le Altera Computer,
-avec tout au fond notre bloc (<strong>reds_custom_0</strong>) :</p>
-<figure class="align-center">
-<a class="reference internal image-reference" href="../_images/qsys.png"><img alt="../_images/qsys.png" src="../_images/qsys.png" style="width: 22cm;" /></a>
-</figure>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Explorez les connexions de notre bloc et essayez de découvrir pourquoi il a été ainsi câblé.</p>
-</div>
-<p>Depuis cette image, on peut s’imaginer que le dispositif aura un offset de 0xFF205000 dans la
-mémoire (car les « lightweight FPGA slaves » sont mappés à partir de l’adresse 0xFF200000).
-Le développeur du reds-adder nous a dit que le numéro d’interruption est 75.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Comment ai-je pu parvenir à cette valeur ? Pourquoi le designer n’a pas choisi 0xFF200000 ?
-Ou, encore mieux, 0x00000000 ?</p>
-</div>
-<p>Pour le vérifier, on peut essayer de lire l’ID du dispositif.</p>
-<div class="admonition warning">
-<p class="admonition-title">Avertissement</p>
-<p>Le développement d’un dispositif demande souvent l’étroite collaboration de personnes
-du côté HW et du côté SW de la force.
-Avoir un simple registre avec une constante facilement identifiable (non, zéro n’est pas
-une bonne valeur…) permet à l’ingénieur SW de vérifier que :</p>
+  <section id="tutoriel-2-reds-adder-driver-v0-1-et-v1-1">
+<span id="tutoriel2"></span><h1>Tutoriel 2 —  REDS-adder driver v0.1 et v1.1<a class="headerlink" href="#tutoriel-2-reds-adder-driver-v0-1-et-v1-1" title="Lien permanent vers ce titre">#</a></h1>
+<p>Dans ce tutoriel on explorera le développement de drivers Linux plus en détail.
+En particulier, deux exemples de driver Linux ont été écrits pour notre dispositif
+REDS-adder (voir <a class="reference internal" href="../tuto_01/tuto_01.html#tutoriel1"><span class="std std-ref">Tutoriel 1 — Prise en main</span></a>), et un logiciel de test a également été développé.</p>
+<p>Vous pouvez trouver ces fichiers dans le dépôt git.</p>
+<p>Avec un peu d’imagination, on peut s’imaginer que notre dispositif REDS-adder soit
+en réalité un puissant système de chiffrement, qui est censé fonctionner de la
+façon suivante :</p>
 <ul class="simple">
-<li><p>le dispositif est sous tension</p></li>
-<li><p>le dispositif a une horloge active</p></li>
-<li><p>il est en train de parler avec le bon dispositif</p></li>
-<li><p>il sait correctement lire depuis le dispositif</p></li>
-<li><p>l’endianness est celle qu’il pensait (ou pas) — au moins, s’il a
-été malin lors du choix de la constante, donc peut-être 0xAAAAAAAA
-n’est pas la meilleure valeur non plus</p></li>
-<li><p>…</p></li>
+<li><p>l’utilisateur rentre la chaîne de caractères à chiffrer avec un appel à <code class="code c docutils literal notranslate"><span class="name"><span class="pre">write</span></span><span class="punctuation"><span class="pre">()</span></span></code> sur le dispositif dans <code class="file docutils literal notranslate"><span class="pre">/dev</span></code>. Mais attention ! Notre dispositif de chiffrement n’opère qu’avec des entiers, il faudra donc bien soigner la conversion entre caractères et valeurs entières</p></li>
+<li><p>l’algorithme en effectue le chiffrement en rajoutant à la valeur ASCII de chaque caractère la valeur actuelle du registre <code class="code c docutils literal notranslate"><span class="name"><span class="pre">VALUE</span></span></code>. La valeur du seuil ramène cette valeur à 1 grâce à l’intervention d’un interrupt</p></li>
+<li><p>en lisant depuis le fichier du dispositif dans <code class="file docutils literal notranslate"><span class="pre">/dev</span></code>, l’utilisateur obtient une chaîne d’entiers en format binaire, qui doit être convertie en chaîne de caractères pour qu’on puisse avoir notre message chiffré.</p></li>
 </ul>
-<p>Avoir en plus un registre avec le numéro de version du bitstream
-c’est top :)</p>
-<p>Votre assistant a bêtement passé des décennies de sa vie en essayant de communiquer avec
-des dispositifs en power-down, ou bien avec le dispositif à la mauvaise adresse, ou avec l”
-horloge désactivée, ou …</p>
-<p>Vous êtes donc autorisés à frapper votre ingénieur HW jusqu’à ce qu’il accepte d’ajouter
-ces registres dans son design !!! ;-)</p>
+<p>Afin que le dispositif soit détecté par le noyau, il est impératif de modifier le
+device tree en rajoutant dans le fichier <code class="file docutils literal notranslate"><span class="pre">arch/arm/boot/dts/socfpga_cyclone5_sockit.dts</span></code>
+(juste après le noeud de <code class="code c docutils literal notranslate"><span class="name"><span class="pre">drv2024</span></span></code>) le noeud :</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">reds</span><span class="o">-</span><span class="n">adder</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;reds,reds-adder&quot;</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0xFF205000</span><span class="w"> </span><span class="mh">0x1000</span><span class="o">&gt;</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">interrupts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="n">GIC_SPI</span><span class="w"> </span><span class="mi">43</span><span class="w"> </span><span class="n">IRQ_TYPE_EDGE_RISING</span><span class="o">&gt;</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">interrupt</span><span class="o">-</span><span class="n">parent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;&amp;</span><span class="n">intc</span><span class="o">&gt;</span><span class="p">;</span><span class="w"></span>
+<span class="p">};</span><span class="w"></span>
+</pre></div>
 </div>
-<figure class="align-center">
-<a class="reference internal image-reference" href="../_images/reset.png"><img alt="../_images/reset.png" src="../_images/reset.png" style="width: 22cm;" /></a>
-</figure>
-<p>Oups….. mais oui, c’est normal ! Il faut d’abord booter une fois la carte pour que l’image du
-bitstream soit chargée dans la mémoire (faudrait vraiment faire ce qu’on demande dans le texte… non !?!?).</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Est-il vraiment nécessaire ? Pourrait-on le faire depuis U-Boot sans
-booter Linux ? (regardez les commandes U-Boot utilisées pour booter le
-système avec la commande <code class="code console docutils literal notranslate"><span class="generic prompt"><span class="pre">#</span> </span><span class="pre">printenv</span></code>)</p>
+<p>Pourquoi 43 alors que l’interrupt que l’ingénieur HW nous a donné était 75 ?
+Car il est shared, donc il faut soustraire 32 au numéro de l’interrupt, voir
+<a class="reference external" href="http://billauer.co.il/blog/2012/08/irq-zynq-dts-cortex-a9/">ici</a>.
+(vous pouvez vérifier qu’il est correct en regardant la sortie de <code class="code bash docutils literal notranslate"><span class="pre">cat</span> <span class="pre">/proc/interrupts</span></code> une fois
+le driver inséré).</p>
+<p>N’oubliez pas de compiler et copier le nouveau DT avec :</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nb">export</span> <span class="nv">TOOLCHAIN</span><span class="o">=</span>/opt/toolchains/arm-linux-gnueabihf_6.4.1/bin/arm-linux-gnueabihf-
+<span class="gp">$ </span>make <span class="nv">ARCH</span><span class="o">=</span>arm <span class="nv">CROSS_COMPILE</span><span class="o">=</span><span class="nv">$TOOLCHAIN</span> socfpga_cyclone5_sockit.dtb
+<span class="gp">$ </span>cp <span class="nv">$HOME</span>/tftpboot/socfpga.dtb <span class="nv">$HOME</span>/tftpboot/socfpga.dtb.old
+<span class="gp">$ </span>cp arch/arm/boot/dts/socfpga_cyclone5_sockit.dtb <span class="nv">$HOME</span>/tftpboot/socfpga.dtb
+</pre></div>
 </div>
-<p>Donc reboot, et notre hypothèse semble être confirmée :</p>
-<figure class="align-center">
-<a class="reference internal image-reference" href="../_images/uboot_01.png"><img alt="../_images/uboot_01.png" src="../_images/uboot_01.png" style="width: 12cm;" /></a>
-</figure>
-<p>On peut maintenant voir ce qu’il nous a communiqué au sujet du fonctionnement du dispositif :</p>
-<ul class="simple">
-<li><p><strong>value</strong> et <strong>threshold</strong> sont initialisés à 0, <strong>increment</strong> à 1, les interrupts sont désactivés
-(<strong>irq mask</strong> à 0) et (bien sûr) il n’y a pas encore de interrupt capturés (donc <strong>irq capture</strong> est
-à 0)</p></li>
-<li><p>lorsque <strong>increment</strong> est à 1, une lecture de <strong>value</strong> en augmente la valeur de 1 et la retourne</p></li>
-<li><p>si <strong>increment</strong> est à 0 alors les lectures n’affectent pas <strong>value</strong></p></li>
-<li><p>écrire 1 dans <strong>initialization</strong> remet la valeur de <strong>value</strong> à 0</p></li>
-<li><p>si <strong>irq mask</strong> est à 1, alors dès que <strong>value</strong> dépasse <strong>threshold</strong> un interrupt est levé (c.a.d,
-<strong>irq capture</strong> devient 1)</p></li>
-<li><p>pour nettoyer un interrupt, il faut écrire 1 dans <strong>irq capture</strong>.</p></li>
-</ul>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Imaginons la situation suivante :</p>
-<ul class="simple">
-<li><p><strong>value</strong>       = 0x1a</p></li>
-<li><p><strong>threshold</strong>   = 0x1c</p></li>
-<li><p><strong>increment</strong>   = 0x01</p></li>
-<li><p><strong>irq capture</strong> = 0x01</p></li>
-</ul>
-<p>Qu’est-ce qui se passe avec 4 lectures consécutives ? Détaillez les valeurs de tous les
-registres. Ensuite, vérifiez vos réponses sur la carte.</p>
-</div>
-<p>Dans le prochain tutoriel on verra comment interagir avec ce dispositif depuis Linux, et ensuite on
-en développera le driver.</p>
-</section>
+<p>Les deux drivers d’exemples se situent dans les dossiers <code class="file docutils literal notranslate"><span class="pre">material/reds_adder__x.1</span></code> (<cite>x</cite> étant <cite>0</cite> et <cite>1</cite>).
+Un fichier <code class="code bash docutils literal notranslate"><span class="pre">Makefile</span></code> se trouve dans ces dossiers pour la compilation. Modifiez les valeurs des variables <code class="code bash docutils literal notranslate"><span class="pre">KERNELDIR</span></code> (chemin vers la racine de votre copie local du kernel Linux cloné dans les précédents labos) et <code class="code bash docutils literal notranslate"><span class="pre">TOOLCHAIN</span></code>.</p>
+<p>Une fois une version du driver compilé à l’aide de <code class="code bash docutils literal notranslate"><span class="pre">make</span></code>, un module (fichier <code class="file docutils literal notranslate"><span class="pre">.ko</span></code>) est créé, ainsi qu’un exécutable du programme de test.
+Ces deux fichiers peuvent être copiés dans le dossier partagé avec la carte (<code class="file docutils literal notranslate"><span class="pre">/export/drv</span></code>).
+Le module peut être inséré à l’aide de <code class="code bash docutils literal notranslate"><span class="pre">insmod</span></code>. Attention à bien enlever le module avant d’insérer une nouvelle version à l’aide de <code class="code bash docutils literal notranslate"><span class="pre">rmmod</span></code>.</p>
+<p>Plus de détails sur les drivers sont donnés en tant que commentaires dans le code.
+Explorer le code pour comprendre son fonctionnement et n’hésitez pas à vous en inspirer pour vos futurs drivers !
+N’hésitez pas non plus à bricoler le logiciel de test ainsi que le driver !</p>
 </section>
 
 
@@ -542,20 +377,20 @@ en développera le driver.</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="../lab_01/lab_01.html"
+       href="../lab_02/lab_02.html"
        title="page précédente">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">précédent</p>
-        <p class="prev-next-title">Laboratoire 1 — Introduction</p>
+        <p class="prev-next-title">Laboratoire 2 — User-space Drivers</p>
       </div>
     </a>
     <a class="right-next"
-       href="../lab_02/lab_02.html"
+       href="../lab_03/lab_03.html"
        title="page suivante">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">suivant</p>
-        <p class="prev-next-title">Laboratoire 2 — User-space Drivers</p>
+        <p class="prev-next-title">Laboratoire 3 — Introduction aux drivers kernel-space</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -565,21 +400,6 @@ en développera le driver.</p>
             </div>
             
             
-              
-                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
-
-
-  <div class="sidebar-secondary-item">
-  <div class="page-toc tocsection onthispage">
-    <i class="fa-solid fa-list"></i> Contenu
-  </div>
-  <nav class="bd-toc-nav page-toc">
-    <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#drv-adder">DRV-adder</a></li>
-</ul>
-  </nav></div>
-
-</div></div>
               
             
           </div>

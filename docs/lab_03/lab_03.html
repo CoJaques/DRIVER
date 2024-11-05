@@ -1,0 +1,812 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="fr" data-content_root="" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Laboratoire 3 — Introduction aux drivers kernel-space &#8212; Documentation DRV 2024 </title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/color.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js"></script>
+    <script src="../_static/translations.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'lab_03/lab_03';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Recherche" href="../search.html" />
+    <link rel="prev" title="Tutoriel 2 — REDS-adder driver v0.1 et v1.1" href="../tuto_02/tuto_02.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="fr"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Passer au contenu principal</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Haut de page</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo_drv.png" class="logo__image only-light" alt="Documentation DRV 2024  - Home"/>
+    <script>document.write(`<img src="../_static/logo_drv.png" class="logo__image only-dark" alt="Documentation DRV 2024  - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Recherche" aria-label="Recherche" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Recherche</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../helper/helper.html">Helper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../helper/ssh.html">Mise en place SSH</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../helper/eval_criterion.html">Consigne de rendu</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lab_00/lab_00.html">Laboratoire 0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lab_01/lab_01.html">Laboratoire 1</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tuto_01/tuto_01.html">Tuto 1</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lab_02/lab_02.html">Laboratoire 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tuto_02/tuto_02.html">Tuto 2</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Laboratoire 3</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Téléchargez cette page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/lab_03/lab_03.rst" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Télécharger le fichier source"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.rst</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Imprimer au format PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Mode plein écran"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="clair/sombre" aria-label="clair/sombre" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Recherche" aria-label="Recherche" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Laboratoire 3 — Introduction aux drivers kernel-space</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contenu </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#objectifs">Objectifs</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#consignes">Consignes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#materiel-necessaire">Matériel nécessaire</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#introductions-aux-peripheriques-sous-linux">Introductions aux périphériques sous Linux</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#exemple">Exemple</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#compilation-de-modules">Compilation de modules</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#travail-a-rendre-et-criteres-d-evaluation">Travail à rendre et critères d’évaluation</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="laboratoire-3-introduction-aux-drivers-kernel-space">
+<span id="laboratoire3"></span><h1>Laboratoire 3 — Introduction aux drivers kernel-space<a class="headerlink" href="#laboratoire-3-introduction-aux-drivers-kernel-space" title="Lien permanent vers ce titre">#</a></h1>
+<figure class="align-right">
+<a class="reference internal image-reference" href="../_images/logo_drv.png"><img alt="../_images/logo_drv.png" src="../_images/logo_drv.png" style="width: 6cm;" /></a>
+</figure>
+<section id="objectifs">
+<h2>Objectifs<a class="headerlink" href="#objectifs" title="Lien permanent vers ce titre">#</a></h2>
+<ul class="simple">
+<li><p>Connaître les interfaces disponibles sous Linux pour communiquer avec un driver</p></li>
+<li><p>Connaître l’API de programmation des drivers</p></li>
+<li><p>Savoir créer des drivers simples</p></li>
+</ul>
+</section>
+<section id="consignes">
+<h2>Consignes<a class="headerlink" href="#consignes" title="Lien permanent vers ce titre">#</a></h2>
+<p>Ce laboratoire consiste en une marche à suivre illustrée d’exemples.
+À la fin de chaque section, un travail pratique sous forme de questions à
+répondre ou de code à écrire doit être réalisé. Notez bien toutes vos étapes et
+constatations dans votre rapport final.</p>
+</section>
+<section id="materiel-necessaire">
+<h2>Matériel nécessaire<a class="headerlink" href="#materiel-necessaire" title="Lien permanent vers ce titre">#</a></h2>
+<p>Pour ce laboratoire vous avez besoin de la même configuration que pour le laboratoire 2 (tout
+simplement on ne chargera pas le module pour les drivers user-space).</p>
+</section>
+<section id="introductions-aux-peripheriques-sous-linux">
+<h2>Introductions aux périphériques sous Linux<a class="headerlink" href="#introductions-aux-peripheriques-sous-linux" title="Lien permanent vers ce titre">#</a></h2>
+<p>Linux définit plusieurs classes de périphériques :</p>
+<ul class="simple">
+<li><p>Les périphériques de type <strong>char</strong>, dans lesquels on lit et/ou
+écrit séquentiellement des données les unes après les autres, sans tampon,
+p.ex USB, cartes sons, claviers, touchscreen, RTC, etc,</p></li>
+<li><p>Les périphériques de type <strong>block</strong>, dans lesquels on peut lire ou écrire de
+manière adressée et aléatoire, avec des blocs de taille arbitraire :
+p.ex mémoire, disque, etc,</p></li>
+<li><p>Les périphériques réseau, qui n’obéissent pas aux interfaces des deux types
+précédents.</p></li>
+</ul>
+<div class="admonition warning">
+<p class="admonition-title">Avertissement</p>
+<p>Même pour des périphériques de type <strong>char</strong> les entrées/sorties
+peuvent être (et normalement sont) binaires ! Cette taxinomie concerne <strong>uniquement</strong>
+la façon dont ces dispositifs opèrent, et <strong>non pas</strong> les types de données
+qu’ils traitent !</p>
+</div>
+<p>Le support matériel pour ces périphériques est fourni par un driver sous forme
+de module noyau. Un module peut être intégré au noyau à la compilation, mais il
+est aussi possible de le compiler séparément en module insérable à la demande.
+Ceci apporte comme avantage d’économiser la mémoire du noyau en libérant le
+module lorsque le périphérique n’est pas utilisé. Notons que la compilation d’un
+module séparé ne dispense pas de posséder une partie du code source du noyau
+(les fichiers d’en-tête dans tous les cas).</p>
+<p>Un périphérique sous Linux est considéré comme un fichier (voir
+<a class="reference external" href="https://en.wikipedia.org/wiki/Everything_is_a_file">Everything is a file</a>).</p>
+<p>Le système offre la possibilité d’interagir avec lui via les mêmes appels
+systèmes que ceux utilisés avec les fichiers conventionnels : <code class="code c docutils literal notranslate"><span class="name"><span class="pre">read</span></span><span class="punctuation"><span class="pre">()</span></span></code>,
+<code class="code c docutils literal notranslate"><span class="name"><span class="pre">write</span></span><span class="punctuation"><span class="pre">()</span></span></code>.
+Les périphériques de type char possèdent également certains appels
+spéciaux, comme <code class="code c docutils literal notranslate"><span class="name"><span class="pre">ioctl</span></span><span class="punctuation"><span class="pre">()</span></span></code> (<em>In-Out ConTroL</em>) qui permet de configurer le
+périphérique.
+Ces fonctionnalités, pour les drivers char et block, sont exposées sous forme de
+fichier virtuel, appelé <em>device node</em> (ou <em>device file</em>), situé dans
+<code class="file docutils literal notranslate"><span class="pre">/dev/</span></code>, Qui reçoit ces appels et les transmet au driver.
+Pour identifier à quel driver est associé quel fichier virtuel, deux numéros
+sont attribués à chacun de ces fichiers.
+Ces numéros d’identification sont visibles dans la cinquième et sixième
+colonne de la sortie de la commande <code class="code bash docutils literal notranslate"><span class="pre">ls</span> <span class="pre">-la</span></code>.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">HOST:~$ </span>ls -la /dev
+<span class="go">total 4</span>
+<span class="go">drwxr-xr-x  17 root     root          4440 Nov  1 07:13 .</span>
+<span class="go">drwxr-xr-x  26 redsuser redsuser      4096 Sep 14 11:30 ..</span>
+<span class="go">crw-------   1 root     root       10, 235 Nov  1 07:13 autofs</span>
+<span class="go">...</span>
+<span class="go">crw-r-----   1 root     kmem        1,   1 Nov  1 07:13 mem</span>
+<span class="go">...</span>
+<span class="go">crw-rw-rw-   1 root     root        1,   8 Nov  1 07:13 random</span>
+<span class="go">...</span>
+<span class="go">crw-rw----   1 root     dialout   188,   0 Nov  1 07:13 ttyUSB0</span>
+<span class="go">...</span>
+<span class="go">crw-rw-rw-   1 root     root        1,   9 Nov  1 07:13 urandom</span>
+<span class="go">...</span>
+<span class="go">crw-rw-rw-   1 root     root        1,   5 Nov  1 07:13 zero</span>
+</pre></div>
+</div>
+<p>Le premier numéro (<strong>majeur</strong>) identifie de manière unique le driver, le
+deuxième (<strong>mineur</strong>) identifie de manière unique le type de périphérique au
+sein du driver. Par exemple, le majeur <em>1</em> correspond ici aux <em>memory devices</em> du
+noyau : les périphériques <code class="file docutils literal notranslate"><span class="pre">kmem</span></code>, <code class="file docutils literal notranslate"><span class="pre">random</span></code>, <code class="file docutils literal notranslate"><span class="pre">urandom</span></code> et
+<code class="file docutils literal notranslate"><span class="pre">zero</span></code> sont des périphériques virtuels intégrés au noyau.
+Ces fichiers sont créés au démarrage par le gestionnaire de périphérique
+(<code class="file docutils literal notranslate"><span class="pre">udev</span></code>, <code class="file docutils literal notranslate"><span class="pre">mdev</span></code>, …) après l’énumération des bus, ou lors de
+l’insertion d’un périphérique (hot-plug).
+Il est également possible de créer manuellement des device nodes en
+précisant le type et le numéro majeur et mineur via la commande <code class="code bash docutils literal notranslate"><span class="pre">mknod</span></code>.</p>
+<div class="admonition-exercice-1-mknod admonition">
+<p class="admonition-title"><strong>Exercice 1 : mknod</strong></p>
+<p>Utilisez la page de manuel de la commande <code class="code bash docutils literal notranslate"><span class="pre">mknod</span></code> pour en comprendre le
+fonctionnement.
+Créez ensuite un fichier virtuel de type caractère avec le même couple
+majeur/mineur que le fichier <code class="file docutils literal notranslate"><span class="pre">/dev/random</span></code>.
+Qu’est-ce qui se passe lorsque vous lisez son contenu avec la commande
+<code class="code bash docutils literal notranslate"><span class="pre">cat</span></code> ?</p>
+</div>
+<section id="exemple">
+<h3>Exemple<a class="headerlink" href="#exemple" title="Lien permanent vers ce titre">#</a></h3>
+<p>Le périphérique <code class="file docutils literal notranslate"><span class="pre">/dev/ttyUSB0</span></code> (sur la machine hôte) a un majeur 188 qui correspond à un matériel
+bien réel : c’est le convertisseur USB/série de la DE1-SoC, visible sur votre
+machine si le câble USB est branché au connecteur console de la carte.
+Pour récupérer plus d’informations sur ce périphérique, les systèmes de fichiers
+virtuels <code class="file docutils literal notranslate"><span class="pre">/proc</span></code> et <code class="file docutils literal notranslate"><span class="pre">/sys</span></code> sont utiles :
+l’inspection du fichier <code class="file docutils literal notranslate"><span class="pre">/proc/devices</span></code>, listant les périphériques block
+et char du système, permet de découvrir qu’il s’agit d’un périphérique de type
+caractère.</p>
+<div class="admonition-exercice-2-proc admonition">
+<p class="admonition-title"><strong>Exercice 2 : proc</strong></p>
+<p>Retrouvez cette information dans le fichier <code class="file docutils literal notranslate"><span class="pre">/proc/devices</span></code>.</p>
+</div>
+<div class="admonition-exercice-3-sysfs admonition">
+<p class="admonition-title"><strong>Exercice 3 : sysfs</strong></p>
+<p><code class="file docutils literal notranslate"><span class="pre">sysfs</span></code> contient davantage d’informations sur le périphérique.
+Retrouvez-le dans l’arborescence de <code class="file docutils literal notranslate"><span class="pre">sysfs</span></code>, en particulier
+pour ce qui concerne le nom du driver utilisé et le type de connexion.
+Ensuite, utilisez la commande <code class="code bash docutils literal notranslate"><span class="pre">lsmod</span></code> pour confirmer que le
+driver utilisé est bien celui identifié auparavant et cherchez si
+d’autres modules plus génériques sont impliqués.
+(en fonction de la distribution Linux, il se peut qu’aucuns modules
+plus génériques ne soient impliqués, car ils ont été configurés en mode « built-in »
+lors de la compilation du kernel)</p>
+</div>
+</section>
+</section>
+<section id="compilation-de-modules">
+<h2>Compilation de modules<a class="headerlink" href="#compilation-de-modules" title="Lien permanent vers ce titre">#</a></h2>
+<p>En général, un driver simple se présente sous la forme d’un fichier C unique.
+Dans l’arborescence du noyau, les drivers compatibles avec toutes les
+architectures se situent dans le répertoire <code class="file docutils literal notranslate"><span class="pre">drivers</span></code> à la racine du code
+source du noyau Linux.
+Les sous-répertoires représentent les différentes familles de périphériques.
+Le dossier <code class="file docutils literal notranslate"><span class="pre">char</span></code>, par exemple, contient tous les périphériques de type
+char supportés, dont <code class="file docutils literal notranslate"><span class="pre">random</span></code> et <code class="file docutils literal notranslate"><span class="pre">zero</span></code> que nous avons vu auparavant.
+Lors de la compilation du noyau et selon les options de compilation choisies,
+les fichiers sources contenus dans ce répertoire seront inclus dans le noyau ou
+pas.</p>
+<p>Pour nos tests, il est plus simple de compiler un driver séparément. Pour faire
+ceci, il est nécessaire d’avoir les sources du noyau pour lequel le driver doit
+être compilé, et ces sources doivent déjà être configurées et un
+<code class="code bash docutils literal notranslate"><span class="pre">make</span> <span class="pre">modules</span></code> doit avoir été préalablement effectué (ce qui est déjà le cas
+si les sources ont déjà été compilées une fois).</p>
+<p>Si vous êtes sous une distribution de type Debian ou dérivée, pour compiler des
+modules pour votre machine vous devez installer le paquet <code class="file docutils literal notranslate"><span class="pre">linux-headers</span></code>
+correspondant à votre version du noyau (déjà installé sur la machine de
+laboratoire).</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>sudo apt install linux-headers-<span class="k">$(</span>uname -r<span class="k">)</span>
+</pre></div>
+</div>
+<p>Les sources déjà préparées seront installées dans le dossier
+<code class="file docutils literal notranslate"><span class="pre">/lib/modules/$(uname</span> <span class="pre">-r)/build</span></code>.</p>
+<p>Vous pouvez ensuite utiliser le <code class="file docutils literal notranslate"><span class="pre">Makefile</span></code> suivant pour compiler un module
+(dans cet exemple, le module <em>empty</em>).</p>
+<div class="highlight-Makefile notranslate"><div class="highlight"><pre><span></span><span class="nv">obj-m</span> <span class="o">=</span> empty.o
+
+<span class="nv">KVERSION</span> <span class="o">=</span> <span class="k">$(</span>shell uname -r<span class="k">)</span>
+<span class="nv">KERNELSRC</span> <span class="o">=</span> /lib/modules/<span class="k">$(</span>KVERSION<span class="k">)</span>/build/
+
+<span class="nf">all</span><span class="o">:</span>
+	make -C <span class="k">$(</span>KERNELSRC<span class="k">)</span> <span class="nv">M</span><span class="o">=</span><span class="k">$(</span>PWD<span class="k">)</span> modules
+<span class="nf">clean</span><span class="o">:</span>
+	make -C <span class="k">$(</span>KERNELSRC<span class="k">)</span> <span class="nv">M</span><span class="o">=</span><span class="k">$(</span>PWD<span class="k">)</span> clean
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Avertissement</p>
+<p><em>make</em> est très très strict au sujet des TABs. Vous trouverez ces
+Makefiles dans les fichiers du labo, merci de ne <strong>pas</strong>
+copier-coller les sources depuis le fichier HTML (car sinon <em>make</em>
+ne sera pas forcément enthousiaste de la chose…).</p>
+</div>
+<p>Si vous (cross-)compilez votre propre noyau, le répertoire à préciser dans le
+<code class="file docutils literal notranslate"><span class="pre">Makefile</span></code> du module est simplement la racine du dossier contenant
+l’arborescence du noyau.
+Pour cross-compiler, il est donc nécessaire d’avoir les sources kernel et
+d’indiquer le chemin.
+Le <code class="file docutils literal notranslate"><span class="pre">Makefile</span></code> pour votre module <em>empty</em> à cross-compiler deviendra
+donc :</p>
+<div class="highlight-Makefile notranslate"><div class="highlight"><pre><span></span><span class="c">### Put here the path to kernel sources! ###</span>
+<span class="nv">KERNELDIR</span> <span class="o">:=</span> /home/reds/linux-socfpga/
+<span class="nv">TOOLCHAIN</span> <span class="o">:=</span> /opt/toolchains/arm-linux-gnueabihf_6.4.1/bin/arm-linux-gnueabihf-
+
+<span class="nv">obj-m</span> <span class="o">:=</span> empty.o
+
+<span class="nv">PWD</span> <span class="o">:=</span> <span class="k">$(</span>shell <span class="nb">pwd</span><span class="k">)</span>
+<span class="nv">WARN</span> <span class="o">:=</span> -W -Wall -Wstrict-prototypes -Wmissing-prototypes
+
+<span class="nf">all</span><span class="o">:</span> <span class="n">empty</span>
+
+<span class="nf">empty</span><span class="o">:</span>
+	@echo <span class="s2">&quot;Building with kernel sources in </span><span class="k">$(</span>KERNELDIR<span class="k">)</span><span class="s2">&quot;</span>
+	<span class="k">$(</span>MAKE<span class="k">)</span> <span class="nv">ARCH</span><span class="o">=</span>arm <span class="nv">CROSS_COMPILE</span><span class="o">=</span><span class="k">$(</span>TOOLCHAIN<span class="k">)</span> -C <span class="k">$(</span>KERNELDIR<span class="k">)</span> <span class="nv">M</span><span class="o">=</span><span class="k">$(</span>PWD<span class="k">)</span> <span class="si">${</span><span class="nv">WARN</span><span class="si">}</span>
+
+<span class="nf">clean</span><span class="o">:</span>
+	rm -rf *.o *~ core .depend .*.cmd *.ko *.mod.c .tmp_versions modules.order Module.symvers
+</pre></div>
+</div>
+<p>C’est d’ailleurs tout ce qui a besoin d’être précisé dans le <code class="file docutils literal notranslate"><span class="pre">Makefile</span></code>,
+hormis le nom du module, si l’on exclut les paramètres à donner à GCC.
+Il est également possible de passer les paramètres de GCC à l’appel de make, ce
+qui évite de devoir modifier le <code class="file docutils literal notranslate"><span class="pre">Makefile</span></code> :</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>make <span class="nv">ARCH</span><span class="o">=</span>arm <span class="nv">CROSS_COMPILE</span><span class="o">=</span>arm-linux-gnueabihf-
+</pre></div>
+</div>
+<p>La cible <em>all</em> du <code class="file docutils literal notranslate"><span class="pre">Makefile</span></code> du module appelle la cible <em>modules</em> du
+<code class="file docutils literal notranslate"><span class="pre">Makefile</span></code> du répertoire de base du noyau après avoir initialisé la
+variable <em>obj-m</em> avec le nom du driver à compiler.</p>
+<p>Une fois le module compilé, un fichier portant l’extension <code class="file docutils literal notranslate"><span class="pre">ko</span></code> est généré
+dans le répertoire du module.
+La commande <code class="code bash docutils literal notranslate"><span class="pre">insmod</span></code> permet de charger le module dans le noyau.</p>
+<div class="admonition warning">
+<p class="admonition-title">Avertissement</p>
+<p>Les modules sont des parties sensibles du système.
+Ayant accès à l’espace mémoire du noyau, une erreur dans un module
+peut conduire <strong>facilement</strong> au crash du système.
+Comptez sur la possibilité d’un crash à chaque fois que vous
+insérez un de vos modules et sauvegardez vos fichiers !</p>
+</div>
+<div class="admonition hint">
+<p class="admonition-title">Indication</p>
+<p><code class="code bash docutils literal notranslate"><span class="pre">strace</span></code> est un utilitaire permettant de lister tous les
+syscalls (appels à <code class="code c docutils literal notranslate"><span class="name"><span class="pre">read</span></span><span class="punctuation"><span class="pre">()</span></span></code>/<code class="code c docutils literal notranslate"><span class="name"><span class="pre">write</span></span><span class="punctuation"><span class="pre">()</span></span></code>/<code class="code c docutils literal notranslate"><span class="name"><span class="pre">ioctl</span></span><span class="punctuation"><span class="pre">()</span></span></code> et autres)
+effectués par un processus.
+Cela est très utile pour contrôler les paramètres passés lors de la
+lecture/écriture/configuration de node devices.</p>
+</div>
+<p>La commande <code class="code bash docutils literal notranslate"><span class="pre">rmmod</span></code> permet d’enlever un module.
+Souvent, lors de l’insertion et du démontage du module, celui-ci affiche un
+message d’information dans le log du noyau.
+Ce log, stocké dans <code class="file docutils literal notranslate"><span class="pre">/var/log/kern.log</span></code>, peut être affiché directement via
+la commande <code class="code bash docutils literal notranslate"><span class="pre">dmesg</span></code>. L’option <code class="code bash docutils literal notranslate"><span class="pre">-w</span></code> permet de <cite>suivre</cite> les nouveaux messages.
+Si cette option n’est pas disponible (sur la carte p. ex.),
+la commande <code class="code bash docutils literal notranslate"><span class="pre">tail</span></code> permet de filtrer la fin d’un fichier, et avec la
+commande <code class="code bash docutils literal notranslate"><span class="pre">tail</span> <span class="pre">-f</span></code> vous pouvez observer en continu un fichier de texte pour
+des lignes ajoutées à sa fin. (donc <code class="code bash docutils literal notranslate"><span class="pre">tail</span> <span class="pre">-</span> <span class="pre">f</span> <span class="pre">/var/log/kern.log</span></code> étant plus ou moins équivalent à <code class="code bash docutils literal notranslate"><span class="pre">dmesg</span> <span class="pre">-w</span></code>)</p>
+<div class="admonition-exercice-4-empty-module admonition">
+<p class="admonition-title"><strong>Exercice 4 : empty module</strong></p>
+<p><strong>Sur votre machine hôte (laptop, machine de labo), pas sur la DE1-SoC</strong>.
+Compilez le module <em>empty</em> disponible dans les sources de ce
+laboratoire.
+Ensuite, montez-le dans le noyau, démontez-le, et analysez les
+messages enregistrés dans les logs.</p>
+</div>
+<p>Lorsqu’on désire insérer un module ayant été compilé avec le noyau, la commande
+<code class="code bash docutils literal notranslate"><span class="pre">modprobe</span></code> est préférée à la commande <code class="code bash docutils literal notranslate"><span class="pre">insmod</span></code>, car elle va
+directement chercher le module dans le bon sous-répertoire de
+<code class="file docutils literal notranslate"><span class="pre">/lib/modules/</span></code> suivant la version du noyau démarré.
+Cette commande prend comme paramètres le nom du module (pas le chemin complet
+ni l’extension <code class="file docutils literal notranslate"><span class="pre">.ko</span></code>), et s’occupe également de résoudre les dépendances
+entre modules en montant celles-ci avant le module demandé si nécessaire.</p>
+<div class="admonition-exercice-5-parrot-module admonition">
+<p class="admonition-title"><strong>Exercice 5 : Parrot module</strong></p>
+<p>Le module <em>parrot</em> (disponible dans les sources de ce laboratoire), est
+un driver minimal de périphérique virtuel de type caractère.
+Il possède un majeur de 97.
+Une fois un <strong>device node</strong> associé à ce module, il est possible d’y écrire une chaîne de caractère et de la relire
+par la suite.
+A l’aide d’un appel à <code class="code c docutils literal notranslate"><span class="name"><span class="pre">ioctl</span></span><span class="punctuation"><span class="pre">()</span></span></code> sur le device node, il est possible d’agir sur la chaîne en la mettant
+en majuscule/minuscule ou inversant la casse.</p>
+<p>Un appel <code class="code c docutils literal notranslate"><span class="name"><span class="pre">ioctl</span></span><span class="punctuation"><span class="pre">()</span></span></code> prends deux paramètres entiers et renvoie un entier.
+Le programme <code class="file docutils literal notranslate"><span class="pre">ioctl.c</span></code> permet d’effectuer ces appels facilement.
+Afin d’utiliser les bonnes pratiques, les macros <cite>_IO</cite> et <cite>_IOW</cite> ont été utilisées pour générer la valeur du premier
+paramètre (= numéro de l”<code class="code c docutils literal notranslate"><span class="name"><span class="pre">ioctl</span></span></code>). Pour ce module, ces valeurs sont écrites dans les logs à l’insertion.
+Plus d’information sur ces macros sont disponibles <a class="reference external" href="https://www.kernel.org/doc/html/latest/userspace-api/ioctl/ioctl-number.html">sur la doc officiel</a>
+ainsi que dans le chapitre 6 de <a class="reference external" href="https://lwn.net/Kernel/LDD3/">Linux Device Drivers, Third Edition</a> (dans les premières pages du PDF correspondant).</p>
+<p>Le module fonctionne de la façon suivante lors des appels <code class="code c docutils literal notranslate"><span class="name"><span class="pre">ioctl</span></span></code> :</p>
+<ul class="simple">
+<li><p>Si le premier paramètre vaux la valeur de <code class="code c docutils literal notranslate"><span class="name"><span class="pre">PARROT_CMD_TOGGLE</span></span></code>, la casse des lettres est inversée (majuscule en minuscule et inverse)</p></li>
+<li><p>Si le premier paramètre vaux la valeur de <code class="code c docutils literal notranslate"><span class="name"><span class="pre">PARROT_CMD_ALLCASE</span></span></code>, toutes les lettres sont mises en majuscule/minuscule en fonction du second argument (<code class="code c docutils literal notranslate"><span class="name"><span class="pre">TO_UPPERCASE</span></span></code> et <code class="code c docutils literal notranslate"><span class="name"><span class="pre">TO_LOWERCASE</span></span></code>).</p></li>
+</ul>
+<p>Pour cet exercice :</p>
+<ul class="simple">
+<li><p>Compilez et cross-compilez ce driver pour votre machine et pour la DE1-SoC.
+Vérifiez que le driver soit bien inséré sur les deux plates-formes
+et récupérez un maximum d’informations sur ce périphérique grâce aux
+outils précédemment vus.</p></li>
+<li><p>Créez un device node afin de communiquer avec le driver (à choix sur votre machine ou sur la carte).
+Donnez les bons droits sur ce fichier afin que l’utilisateur courant puisse y accéder.
+Rendez un listing du device node. (c.-à-d. <code class="code bash docutils literal notranslate"><span class="pre">ls</span> <span class="pre">-la</span> <span class="pre">/dev/mynode</span></code>).</p></li>
+<li><p>Effectuez une écriture (<code class="code bash docutils literal notranslate"><span class="name builtin"><span class="pre">echo</span></span></code>) et une lecture (<code class="code bash docutils literal notranslate"><span class="pre">cat</span></code>) sur ce device node.
+Grâce à <code class="file docutils literal notranslate"><span class="pre">ioctl.c</span></code>, testez la configuration du périphérique, puis démontez-le.
+Vérifiez également que le démontage du noyau ait bien été effectué.
+Rendez une copie texte de votre console.</p></li>
+<li><p>Ce driver a été écrit par un ingénieur pressé qui n’a pas trop bien fait son boulot :
+les valeurs de retour ne sont pas contrôlées ! Aidez-le en rajoutant ces vérifications !</p></li>
+<li><p>L’ingénieur qui a écrit ce driver doit se croire à l’âge de la pierre, car il a
+utilisé la fonction <code class="code c docutils literal notranslate"><span class="name"><span class="pre">register_chrdev</span></span><span class="punctuation"><span class="pre">()</span></span></code> qui ne devrait pas être utilisée à
+partir du noyau 2.6…  Modernisez ce driver et rendez-le plus agréable à utiliser
+(p. ex., ce serait très bien de ne pas devoir créer à la main le fichier du dispositif…).
+Vous pouvez vous référer à <a class="reference external" href="https://olegkutkov.me/2018/03/14/simple-linux-character-device-driver/">cet article</a>
+pour une utilisation de <code class="code c docutils literal notranslate"><span class="name"><span class="pre">alloc_chrdev_region</span></span></code>, il est également possible d’utiliser <code class="code c docutils literal notranslate"><span class="name"><span class="pre">register_chrdev_region</span></span></code>
+avec un major connu (généralement, on va préférer <code class="code c docutils literal notranslate"><span class="name"><span class="pre">alloc</span></span></code> pour éviter d’avoir le même major qu’un autre driver).
+Il est également possible d’utiliser les misc device donc un exemple est donné par la V1 de <code class="code c docutils literal notranslate"><span class="name"><span class="pre">reds_adder</span></span></code> dans les tutoriels.</p></li>
+<li><p>Modifiez ensuite le module pour ajouter la commande <code class="code c docutils literal notranslate"><span class="name"><span class="pre">ioctl</span></span></code> <code class="code c docutils literal notranslate"><span class="name"><span class="pre">PARROT_CMD_RESET</span></span></code> qui permet de retourner à
+l’état des majuscules/minuscules originales (= valeur écrite par l’utilisateur).</p></li>
+</ul>
+</div>
+</section>
+<section id="travail-a-rendre-et-criteres-d-evaluation">
+<h2>Travail à rendre et critères d’évaluation<a class="headerlink" href="#travail-a-rendre-et-criteres-d-evaluation" title="Lien permanent vers ce titre">#</a></h2>
+<p>S’il est demandé d’écrire du code, ce code doit se trouver dans un fichier <em>ex&lt;n&gt;.c</em>, où &lt;n&gt; correspond au numéro de l’exercice.
+Si un exercice contient plusieurs variantes, alors le fichier sera nommé <em>ex&lt;n&gt;_&lt;variante&gt;.c</em>, où &lt;variante&gt; correspond à la variante.
+Par exemple : <em>ex2.c</em>, <em>ex6_poll.c</em>.
+Il n’est pas nécessaire de renommer les fichiers déjà existants.
+Si un exercice réutilise un fichier précédent, celui-ci doit être dupliqué pour le nouvel exercice, sauf indication contraire.</p>
+<p>Si le code a pour but d’être exécuté sur la DE1-SoC, il doit être compilé en « compilation croisée »,
+c.-à-d. en utilisant la toolchain mentionnée dans le <a class="reference internal" href="../lab_01/lab_01.html#laboratoire1"><span class="std std-ref">Laboratoire 1 — Introduction</span></a>.</p>
+<p>N’oubliez pas de mettre votre prénom et nom !</p>
+<p>Les exercices sont à faire <strong>individuellement</strong>.
+Copier la solution d’un autre et changer le nom/l’ordre des variables n’est pas toléré.</p>
+<p>La date limite est celle communiquée dans l’annonce sur Moodle.
+Vous devez rendre une archive <code class="file docutils literal notranslate"><span class="pre">.tar.gz</span></code> contenant :</p>
+<ul class="simple">
+<li><p>le code source de vos solutions et tous les fichiers nécessaires,</p></li>
+<li><dl class="simple">
+<dt>un fichier <code class="file docutils literal notranslate"><span class="pre">README.md</span></code></dt><dd><ul>
+<li><p>contenant les réponses aux questions posées dans les exercices.</p></li>
+<li><p>les éventuels soucis rencontrés qui péjore le rendu</p></li>
+<li><p>les choix d’implémentation « spéciaux » (si trop long pour expliquer en commentaire)</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p>Les notes seront réparties comme suit :</p>
+<ul class="simple">
+<li><p>80% de la note si l’exercice est correct (c.-à-d., <em>« fonctionne »</em>).
+Il doit bien sûr « fonctionner » sur d’autres PCs que votre PC personnel, et de façon déterministe.
+Il est donc impératif que tout ce qui est nécessaire pour compiler et tester le fonctionnement de la solution soit rendu.</p></li>
+<li><p>20% de la note si l’exercice est « bien fait », c.-à-d. :</p>
+<ul>
+<li><p>Respect des <a class="reference external" href="https://www.kernel.org/doc/html/latest/process/coding-style.html">Linux kernel coding style</a>,
+particulièrement les points suivants :</p>
+<ul>
+<li><ol class="arabic simple">
+<li><p>Indentation</p></li>
+</ol>
+</li>
+<li><ol class="arabic simple" start="2">
+<li><p>Breaking long lines and strings</p></li>
+</ol>
+</li>
+<li><ol class="arabic simple" start="3">
+<li><p>Placing Braces and Spaces</p></li>
+</ol>
+</li>
+<li><ol class="arabic simple" start="4">
+<li><p>Naming</p></li>
+</ol>
+</li>
+<li><ol class="arabic simple" start="6">
+<li><p>Functions</p></li>
+</ol>
+</li>
+<li><ol class="arabic simple" start="8">
+<li><p>Commenting</p></li>
+</ol>
+</li>
+</ul>
+</li>
+<li><p><strong>code lisible</strong></p></li>
+<li><p><strong>documenté/commenté</strong></p></li>
+<li><p><strong>bien structuré</strong></p></li>
+</ul>
+</li>
+</ul>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../tuto_02/tuto_02.html"
+       title="page précédente">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">précédent</p>
+        <p class="prev-next-title">Tutoriel 2 —  REDS-adder driver v0.1 et v1.1</p>
+      </div>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contenu
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#objectifs">Objectifs</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#consignes">Consignes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#materiel-necessaire">Matériel nécessaire</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#introductions-aux-peripheriques-sous-linux">Introductions aux périphériques sous Linux</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#exemple">Exemple</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#compilation-de-modules">Compilation de modules</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#travail-a-rendre-et-criteres-d-evaluation">Travail à rendre et critères d’évaluation</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+Par REDS institute
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024, REDS institute.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

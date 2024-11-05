@@ -1,0 +1,13 @@
+*.o
+*~
+core
+.depend
+.*.cmd
+*.ko
+*.mod.c
+.tmp_versions
+modules.order
+Module.symvers
+*.mod
+*.a
+test_v1
