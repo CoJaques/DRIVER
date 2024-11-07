@@ -4,16 +4,25 @@
 #include <linux/fs.h> /* Needed for file_operations */
 #include <linux/slab.h> /* Needed for kmalloc */
 #include <linux/uaccess.h> /* copy_(to|from)_user */
-
-#include <linux/string.h>
+#include <linux/cdev.h>
+#include <linux/device.h>
 
 #include "parrot.h"
 
-#define MAJOR_NUM 97
 #define DEVICE_NAME "parrot"
 
 static char *global_buffer;
+static char *original_buffer;
 static int buffer_size;
+
+// Device number (major + mino)
+static dev_t dev_num;
+
+// Character device structure
+static struct cdev parrot_cdev;
+
+// Class for auto-creating /dev node
+static struct class *parrot_class;
 
 /**
  * @brief String manipulation to put all char in upper/lower case or invert them.
@@ -49,7 +58,7 @@ static ssize_t parrot_read(struct file *filp, char __user *buf, size_t count,
 			   loff_t *ppos)
 {
 	if (buf == 0 || count < buffer_size) {
-		return 0;
+		return -EINVAL;
 	}
 
 	// This a simple usage of ppos to avoid infinit loop with `cat`
@@ -59,7 +68,9 @@ static ssize_t parrot_read(struct file *filp, char __user *buf, size_t count,
 	}
 	*ppos = buffer_size;
 
-	copy_to_user(buf, global_buffer, buffer_size);
+	if (copy_to_user(buf, global_buffer, buffer_size)) {
+		return -EFAULT;
+	}
 
 	return buffer_size;
 }
@@ -74,25 +85,41 @@ static ssize_t parrot_read(struct file *filp, char __user *buf, size_t count,
  *
  * @return Number of bytes read from the userspace buffer.
  */
-
 static ssize_t parrot_write(struct file *filp, const char __user *buf,
 			    size_t count, loff_t *ppos)
 {
 	if (count == 0) {
-		return 0;
+		return -EINVAL;
 	}
 
 	*ppos = 0;
 
-	if (buffer_size != NULL) {
+	if (global_buffer != NULL) {
 		kfree(global_buffer);
+	}
+	if (original_buffer != NULL) {
+		kfree(original_buffer);
 	}
 
 	global_buffer = kmalloc(count + 1, GFP_KERNEL);
+	original_buffer = kmalloc(count + 1, GFP_KERNEL);
+	if (global_buffer == NULL || original_buffer == NULL) {
+		kfree(global_buffer);
+		kfree(original_buffer);
+		return -ENOMEM;
+	}
 
-	copy_from_user(global_buffer, buf, count);
+	// Copy data from user space and save it as both original and current buffer
+	if (copy_from_user(global_buffer, buf, count)) {
+		kfree(global_buffer);
+		kfree(original_buffer);
+		global_buffer = NULL;
+		original_buffer = NULL;
+		return -EFAULT;
+	}
+
+	strcpy(original_buffer, global_buffer);
 	global_buffer[count] = '\0';
-
 	buffer_size = count + 1;
 
 	return count;
@@ -114,8 +141,8 @@ static ssize_t parrot_write(struct file *filp, const char __user *buf,
 static long parrot_ioctl(struct file *filep, unsigned int cmd,
 			 unsigned long arg)
 {
-	if (buffer_size == NULL) {
-		return -1;
+	if (global_buffer == NULL || original_buffer == NULL) {
+		return -ENOMEM;
 	}
 
 	switch (cmd) {
@@ -134,32 +161,81 @@ static long parrot_ioctl(struct file *filep, unsigned int cmd,
 			break;
 
 		default:
-			return -1;
+			return -EINVAL;
 		}
+		break;
+	case PARROT_CMD_RESET:
+		strcpy(global_buffer, original_buffer);
 		break;
 
 	default:
+		return -EINVAL;
 		break;
 	}
 	return 0;
 }
 
-const static struct file_operations parrot_fops = {
+static const struct file_operations parrot_fops = {
 	.owner = THIS_MODULE,
 	.read = parrot_read,
 	.write = parrot_write,
 	.unlocked_ioctl = parrot_ioctl,
 };
 
+static int parrot_uevent(const struct device *dev, struct kobj_uevent_env *env)
+{
+	add_uevent_var(env, "DEVMODE=%#o", 0666);
+	return 0;
+}
+
 static int __init parrot_init(void)
 {
-	register_chrdev(MAJOR_NUM, DEVICE_NAME, &parrot_fops);
+	int res;
+
+	// Allocate a major number dynamically
+	res = alloc_chrdev_region(&dev_num, 0, 1, DEVICE_NAME);
+	if (res < 0) {
+		pr_err("Failed to allocate a major number\n");
+		return res;
+	}
+
+	// Initialize the cdev structure and add it to the kernel
+	cdev_init(&parrot_cdev, &parrot_fops);
+	parrot_cdev.owner = THIS_MODULE;
+
+	res = cdev_add(&parrot_cdev, dev_num, 1);
+	if (res < 0) {
+		pr_err("Failed to add cdev\n");
+		unregister_chrdev_region(dev_num, 1);
+		return res;
+	}
+
+	// Create class for auto-creating the /dev entry
+	parrot_class = class_create(DEVICE_NAME);
+	if (IS_ERR(parrot_class)) {
+		pr_err("Failed to create class\n");
+		cdev_del(&parrot_cdev);
+		unregister_chrdev_region(dev_num, 1);
+		return PTR_ERR(parrot_class);
+	}
+	parrot_class->dev_uevent = parrot_uevent;
+
+	// Create the device node /dev/parrot
+	if (device_create(parrot_class, NULL, dev_num, NULL, DEVICE_NAME) ==
+	    NULL) {
+		pr_err("Failed to create device\n");
+		class_destroy(parrot_class);
+		cdev_del(&parrot_cdev);
+		unregister_chrdev_region(dev_num, 1);
+		return -1;
+	}
 
 	buffer_size = 0;
 
-	pr_info("Parrot ready!\n");
+	pr_info("Parrot ready! Major: %d\n", MAJOR(dev_num));
 	pr_info("ioctl PARROT_CMD_TOGGLE: %u\n", PARROT_CMD_TOGGLE);
 	pr_info("ioctl PARROT_CMD_ALLCASE: %lu\n", PARROT_CMD_ALLCASE);
+	pr_info("ioctl PARROT_CMD_ALLCASE: %u\n", PARROT_CMD_RESET);
 
 	return 0;
 }
@@ -169,8 +245,15 @@ static void __exit parrot_exit(void)
 	if (global_buffer != NULL) {
 		kfree(global_buffer);
 	}
+	if (original_buffer != NULL) {
+		kfree(original_buffer);
+	}
 
-	unregister_chrdev(MAJOR_NUM, DEVICE_NAME);
+	device_destroy(parrot_class, dev_num);
+	class_destroy(parrot_class);
+
+	cdev_del(&parrot_cdev);
+	unregister_chrdev_region(dev_num, 1);
 
 	pr_info("Parrot done!\n");
 }

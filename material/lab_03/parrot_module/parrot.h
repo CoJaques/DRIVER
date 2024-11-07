@@ -10,8 +10,8 @@
 #define PARROT_IOC_MAGIC   '+'
 #define PARROT_CMD_TOGGLE  _IO(PARROT_IOC_MAGIC, 0)
 #define PARROT_CMD_ALLCASE _IOW(PARROT_IOC_MAGIC, 1, int)
-
-#define TO_UPPERCASE 0
-#define TO_LOWERCASE 1
+#define PARROT_CMD_RESET   _IO(PARROT_IOC_MAGIC, 2)
+#define TO_UPPERCASE	   0
+#define TO_LOWERCASE	   1
 
 #endif /* PARROT_H */
