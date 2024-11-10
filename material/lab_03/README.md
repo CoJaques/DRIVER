@@ -84,10 +84,6 @@ Voici un résumé des modifications apportées pour améliorer et moderniser le 
      - Ajout d'un nouveau buffer `original_buffer` pour stocker la chaîne écrite par l'utilisateur.
      - Copie du contenu de `original_buffer` dans `global_buffer` lorsque la commande `PARROT_CMD_RESET` est appelée dans `parrot_ioctl`.
 
-### 5. **Définition d'identifiants uniques pour chaque commande `ioctl`**
-   - **Objectif** : Éviter les conflits entre les commandes `ioctl`.
-   - **Modification** : Affectation de numéros uniques pour `PARROT_CMD_TOGGLE`, `PARROT_CMD_ALLCASE`, et `PARROT_CMD_RESET` dans le fichier d'en-tête `parrot.h`.
-
-### 6. **Gestion de la mémoire et libération des ressources**
+### 5. **Gestion de la mémoire et libération des ressources**
    - **Objectif** : Éviter les fuites de mémoire.
    - **Modification** : Libération de `global_buffer` et `original_buffer` dans `parrot_exit`, ainsi que destruction de la classe, du périphérique et désenregistrement du numéro de périphérique.
