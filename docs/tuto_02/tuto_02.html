@@ -1,13 +1,12 @@
 
-
 <!DOCTYPE html>
 
 
-<html lang="fr" data-content_root="" >
+<html lang="fr" data-content_root="../" >
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>Tutoriel 2 — REDS-adder driver v0.1 et v1.1 &#8212; Documentation DRV 2024 </title>
   
@@ -29,21 +28,20 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/color.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/color.css?v=8770e769" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/scripts/sphinx-book-theme.js"></script>
-    <script src="../_static/translations.js"></script>
+    <script src="../_static/documentation_options.js?v=72dce1d2"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script src="../_static/translations.js?v=041d0952"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'tuto_02/tuto_02';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Recherche" href="../search.html" />
@@ -168,6 +166,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../lab_02/lab_02.html">Laboratoire 2</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Tuto 2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../lab_03/lab_03.html">Laboratoire 3</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lab_04/lab_04.html">Laboratoire 4</a></li>
 </ul>
 
     </div>
@@ -319,7 +318,7 @@ document.write(`
                 <article class="bd-article">
                   
   <section id="tutoriel-2-reds-adder-driver-v0-1-et-v1-1">
-<span id="tutoriel2"></span><h1>Tutoriel 2 —  REDS-adder driver v0.1 et v1.1<a class="headerlink" href="#tutoriel-2-reds-adder-driver-v0-1-et-v1-1" title="Lien permanent vers ce titre">#</a></h1>
+<span id="tutoriel2"></span><h1>Tutoriel 2 —  REDS-adder driver v0.1 et v1.1<a class="headerlink" href="#tutoriel-2-reds-adder-driver-v0-1-et-v1-1" title="Lien vers cette rubrique">#</a></h1>
 <p>Dans ce tutoriel on explorera le développement de drivers Linux plus en détail.
 En particulier, deux exemples de driver Linux ont été écrits pour notre dispositif
 REDS-adder (voir <a class="reference internal" href="../tuto_01/tuto_01.html#tutoriel1"><span class="std std-ref">Tutoriel 1 — Prise en main</span></a>), et un logiciel de test a également été développé.</p>
@@ -328,38 +327,38 @@ REDS-adder (voir <a class="reference internal" href="../tuto_01/tuto_01.html#tut
 en réalité un puissant système de chiffrement, qui est censé fonctionner de la
 façon suivante :</p>
 <ul class="simple">
-<li><p>l’utilisateur rentre la chaîne de caractères à chiffrer avec un appel à <code class="code c docutils literal notranslate"><span class="name"><span class="pre">write</span></span><span class="punctuation"><span class="pre">()</span></span></code> sur le dispositif dans <code class="file docutils literal notranslate"><span class="pre">/dev</span></code>. Mais attention ! Notre dispositif de chiffrement n’opère qu’avec des entiers, il faudra donc bien soigner la conversion entre caractères et valeurs entières</p></li>
-<li><p>l’algorithme en effectue le chiffrement en rajoutant à la valeur ASCII de chaque caractère la valeur actuelle du registre <code class="code c docutils literal notranslate"><span class="name"><span class="pre">VALUE</span></span></code>. La valeur du seuil ramène cette valeur à 1 grâce à l’intervention d’un interrupt</p></li>
+<li><p>l’utilisateur rentre la chaîne de caractères à chiffrer avec un appel à <code class="code highlight c docutils literal highlight-c"><span class="n">write</span><span class="p">()</span></code> sur le dispositif dans <code class="file docutils literal notranslate"><span class="pre">/dev</span></code>. Mais attention ! Notre dispositif de chiffrement n’opère qu’avec des entiers, il faudra donc bien soigner la conversion entre caractères et valeurs entières</p></li>
+<li><p>l’algorithme en effectue le chiffrement en rajoutant à la valeur ASCII de chaque caractère la valeur actuelle du registre <code class="code highlight c docutils literal highlight-c"><span class="n">VALUE</span></code>. La valeur du seuil ramène cette valeur à 1 grâce à l’intervention d’un interrupt</p></li>
 <li><p>en lisant depuis le fichier du dispositif dans <code class="file docutils literal notranslate"><span class="pre">/dev</span></code>, l’utilisateur obtient une chaîne d’entiers en format binaire, qui doit être convertie en chaîne de caractères pour qu’on puisse avoir notre message chiffré.</p></li>
 </ul>
 <p>Afin que le dispositif soit détecté par le noyau, il est impératif de modifier le
 device tree en rajoutant dans le fichier <code class="file docutils literal notranslate"><span class="pre">arch/arm/boot/dts/socfpga_cyclone5_sockit.dts</span></code>
-(juste après le noeud de <code class="code c docutils literal notranslate"><span class="name"><span class="pre">drv2024</span></span></code>) le noeud :</p>
-<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">reds</span><span class="o">-</span><span class="n">adder</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="n">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;reds,reds-adder&quot;</span><span class="p">;</span><span class="w"></span>
-<span class="w">    </span><span class="n">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0xFF205000</span><span class="w"> </span><span class="mh">0x1000</span><span class="o">&gt;</span><span class="p">;</span><span class="w"></span>
-<span class="w">    </span><span class="n">interrupts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="n">GIC_SPI</span><span class="w"> </span><span class="mi">43</span><span class="w"> </span><span class="n">IRQ_TYPE_EDGE_RISING</span><span class="o">&gt;</span><span class="p">;</span><span class="w"></span>
-<span class="w">    </span><span class="n">interrupt</span><span class="o">-</span><span class="n">parent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;&amp;</span><span class="n">intc</span><span class="o">&gt;</span><span class="p">;</span><span class="w"></span>
-<span class="p">};</span><span class="w"></span>
+(juste après le noeud de <code class="code highlight c docutils literal highlight-c"><span class="n">drv2024</span></code>) le noeud :</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="n">reds</span><span class="o">-</span><span class="n">adder</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">compatible</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;reds,reds-adder&quot;</span><span class="p">;</span>
+<span class="w">    </span><span class="n">reg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="mh">0xFF205000</span><span class="w"> </span><span class="mh">0x1000</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">    </span><span class="n">interrupts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="n">GIC_SPI</span><span class="w"> </span><span class="mi">43</span><span class="w"> </span><span class="n">IRQ_TYPE_EDGE_RISING</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="w">    </span><span class="n">interrupt</span><span class="o">-</span><span class="n">parent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;&amp;</span><span class="n">intc</span><span class="o">&gt;</span><span class="p">;</span>
+<span class="p">};</span>
 </pre></div>
 </div>
 <p>Pourquoi 43 alors que l’interrupt que l’ingénieur HW nous a donné était 75 ?
 Car il est shared, donc il faut soustraire 32 au numéro de l’interrupt, voir
 <a class="reference external" href="http://billauer.co.il/blog/2012/08/irq-zynq-dts-cortex-a9/">ici</a>.
-(vous pouvez vérifier qu’il est correct en regardant la sortie de <code class="code bash docutils literal notranslate"><span class="pre">cat</span> <span class="pre">/proc/interrupts</span></code> une fois
+(vous pouvez vérifier qu’il est correct en regardant la sortie de <code class="code highlight bash docutils literal highlight-bash">cat<span class="w"> </span>/proc/interrupts</code> une fois
 le driver inséré).</p>
 <p>N’oubliez pas de compiler et copier le nouveau DT avec :</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nb">export</span> <span class="nv">TOOLCHAIN</span><span class="o">=</span>/opt/toolchains/arm-linux-gnueabihf_6.4.1/bin/arm-linux-gnueabihf-
-<span class="gp">$ </span>make <span class="nv">ARCH</span><span class="o">=</span>arm <span class="nv">CROSS_COMPILE</span><span class="o">=</span><span class="nv">$TOOLCHAIN</span> socfpga_cyclone5_sockit.dtb
-<span class="gp">$ </span>cp <span class="nv">$HOME</span>/tftpboot/socfpga.dtb <span class="nv">$HOME</span>/tftpboot/socfpga.dtb.old
-<span class="gp">$ </span>cp arch/arm/boot/dts/socfpga_cyclone5_sockit.dtb <span class="nv">$HOME</span>/tftpboot/socfpga.dtb
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nb">export</span><span class="w"> </span><span class="nv">TOOLCHAIN</span><span class="o">=</span>/opt/toolchains/arm-linux-gnueabihf_6.4.1/bin/arm-linux-gnueabihf-
+<span class="gp">$ </span>make<span class="w"> </span><span class="nv">ARCH</span><span class="o">=</span>arm<span class="w"> </span><span class="nv">CROSS_COMPILE</span><span class="o">=</span><span class="nv">$TOOLCHAIN</span><span class="w"> </span>socfpga_cyclone5_sockit.dtb
+<span class="gp">$ </span>cp<span class="w"> </span><span class="nv">$HOME</span>/tftpboot/socfpga.dtb<span class="w"> </span><span class="nv">$HOME</span>/tftpboot/socfpga.dtb.old
+<span class="gp">$ </span>cp<span class="w"> </span>arch/arm/boot/dts/socfpga_cyclone5_sockit.dtb<span class="w"> </span><span class="nv">$HOME</span>/tftpboot/socfpga.dtb
 </pre></div>
 </div>
 <p>Les deux drivers d’exemples se situent dans les dossiers <code class="file docutils literal notranslate"><span class="pre">material/reds_adder__x.1</span></code> (<cite>x</cite> étant <cite>0</cite> et <cite>1</cite>).
-Un fichier <code class="code bash docutils literal notranslate"><span class="pre">Makefile</span></code> se trouve dans ces dossiers pour la compilation. Modifiez les valeurs des variables <code class="code bash docutils literal notranslate"><span class="pre">KERNELDIR</span></code> (chemin vers la racine de votre copie local du kernel Linux cloné dans les précédents labos) et <code class="code bash docutils literal notranslate"><span class="pre">TOOLCHAIN</span></code>.</p>
-<p>Une fois une version du driver compilé à l’aide de <code class="code bash docutils literal notranslate"><span class="pre">make</span></code>, un module (fichier <code class="file docutils literal notranslate"><span class="pre">.ko</span></code>) est créé, ainsi qu’un exécutable du programme de test.
+Un fichier <code class="code highlight bash docutils literal highlight-bash">Makefile</code> se trouve dans ces dossiers pour la compilation. Modifiez les valeurs des variables <code class="code highlight bash docutils literal highlight-bash">KERNELDIR</code> (chemin vers la racine de votre copie local du kernel Linux cloné dans les précédents labos) et <code class="code highlight bash docutils literal highlight-bash">TOOLCHAIN</code>.</p>
+<p>Une fois une version du driver compilé à l’aide de <code class="code highlight bash docutils literal highlight-bash">make</code>, un module (fichier <code class="file docutils literal notranslate"><span class="pre">.ko</span></code>) est créé, ainsi qu’un exécutable du programme de test.
 Ces deux fichiers peuvent être copiés dans le dossier partagé avec la carte (<code class="file docutils literal notranslate"><span class="pre">/export/drv</span></code>).
-Le module peut être inséré à l’aide de <code class="code bash docutils literal notranslate"><span class="pre">insmod</span></code>. Attention à bien enlever le module avant d’insérer une nouvelle version à l’aide de <code class="code bash docutils literal notranslate"><span class="pre">rmmod</span></code>.</p>
+Le module peut être inséré à l’aide de <code class="code highlight bash docutils literal highlight-bash">insmod</code>. Attention à bien enlever le module avant d’insérer une nouvelle version à l’aide de <code class="code highlight bash docutils literal highlight-bash">rmmod</code>.</p>
 <p>Plus de détails sur les drivers sont donnés en tant que commentaires dans le code.
 Explorer le code pour comprendre son fonctionnement et n’hésitez pas à vous en inspirer pour vos futurs drivers !
 N’hésitez pas non plus à bricoler le logiciel de test ainsi que le driver !</p>

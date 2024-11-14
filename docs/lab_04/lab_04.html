@@ -1,0 +1,759 @@
+
+<!DOCTYPE html>
+
+
+<html lang="fr" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Laboratoire 4 — Développement de drivers kernel-space I &#8212; Documentation DRV 2024 </title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/color.css?v=8770e769" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=72dce1d2"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script src="../_static/translations.js?v=041d0952"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'lab_04/lab_04';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Recherche" href="../search.html" />
+    <link rel="prev" title="Laboratoire 3 — Introduction aux drivers kernel-space" href="../lab_03/lab_03.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="fr"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Passer au contenu principal</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Haut de page</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo_drv.png" class="logo__image only-light" alt="Documentation DRV 2024  - Home"/>
+    <script>document.write(`<img src="../_static/logo_drv.png" class="logo__image only-dark" alt="Documentation DRV 2024  - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Recherche" aria-label="Recherche" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Recherche</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../helper/helper.html">Helper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../helper/ssh.html">Mise en place SSH</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../helper/eval_criterion.html">Consigne de rendu</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lab_00/lab_00.html">Laboratoire 0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lab_01/lab_01.html">Laboratoire 1</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tuto_01/tuto_01.html">Tuto 1</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lab_02/lab_02.html">Laboratoire 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tuto_02/tuto_02.html">Tuto 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lab_03/lab_03.html">Laboratoire 3</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Laboratoire 4</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Téléchargez cette page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/lab_04/lab_04.rst" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Télécharger le fichier source"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.rst</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Imprimer au format PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Mode plein écran"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="clair/sombre" aria-label="clair/sombre" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Recherche" aria-label="Recherche" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Laboratoire 4 — Développement de drivers kernel-space I</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contenu </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#objectifs">Objectifs</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#materiel-necessaire">Matériel nécessaire</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#structure-d-un-module">Structure d’un module</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#printk-co">printk() &amp; co</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#transfert-de-donnees-user-kernel">Transfert de données user &lt;-&gt; kernel</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#allocation-dynamique-de-memoire">Allocation dynamique de mémoire</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#managed-resources">Managed resources</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#interruptions">Interruptions</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#donnees-privees-platform-drivers-et-device-tree">Données privées, platform drivers, et device tree</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#travail-a-rendre-et-criteres-d-evaluation">Travail à rendre et critères d’évaluation</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="laboratoire-4-developpement-de-drivers-kernel-space-i">
+<span id="laboratoire4"></span><h1>Laboratoire 4 — Développement de drivers kernel-space I<a class="headerlink" href="#laboratoire-4-developpement-de-drivers-kernel-space-i" title="Lien vers cette rubrique">#</a></h1>
+<figure class="align-right">
+<a class="reference internal image-reference" href="../_images/logo_drv.png"><img alt="../_images/logo_drv.png" src="../_images/logo_drv.png" style="width: 6cm;" />
+</a>
+</figure>
+<section id="objectifs">
+<h2>Objectifs<a class="headerlink" href="#objectifs" title="Lien vers cette rubrique">#</a></h2>
+<ul class="simple">
+<li><p>Savoir créer des drivers simples</p></li>
+<li><p>Comprendre les outils disponibles pour effectuer des transferts entre le user-space et le kernel-space</p></li>
+</ul>
+</section>
+<section id="materiel-necessaire">
+<h2>Matériel nécessaire<a class="headerlink" href="#materiel-necessaire" title="Lien vers cette rubrique">#</a></h2>
+<p>Vous avez juste besoin de l’archive disponible dans le git du laboratoire.</p>
+</section>
+<section id="structure-d-un-module">
+<h2>Structure d’un module<a class="headerlink" href="#structure-d-un-module" title="Lien vers cette rubrique">#</a></h2>
+<p>Un module noyau minimaliste peut être très simple, comme on peut le voir dans les
+sources du module qui suit (<em>empty_module</em>) :</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;linux/module.h&gt;</span><span class="c1">       /* Needed by all modules */</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;linux/kernel.h&gt;</span><span class="c1">       /* Needed for KERN_* */</span>
+
+<span class="k">static</span><span class="w"> </span><span class="kt">int</span>
+<span class="n">__init</span><span class="w"> </span><span class="nf">empty_init</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">	</span><span class="n">pr_info</span><span class="p">(</span><span class="s">&quot;Hello!</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="w">	</span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">static</span><span class="w"> </span><span class="kt">void</span>
+<span class="n">__exit</span><span class="w"> </span><span class="nf">empty_exit</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">	</span><span class="n">pr_info</span><span class="p">(</span><span class="s">&quot;Bye!</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="n">MODULE_AUTHOR</span><span class="p">(</span><span class="s">&quot;REDS&quot;</span><span class="p">);</span>
+<span class="n">MODULE_LICENSE</span><span class="p">(</span><span class="s">&quot;GPL&quot;</span><span class="p">);</span>
+
+<span class="n">module_init</span><span class="p">(</span><span class="n">empty_init</span><span class="p">);</span>
+<span class="n">module_exit</span><span class="p">(</span><span class="n">empty_exit</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Chaque module doit obligatoirement déclarer une fonction d’initialisation, appelée
+lors du <code class="code highlight c docutils literal highlight-c"><span class="n">insmod</span></code>, et une fonction de cleanup, appelée lors du <code class="code highlight c docutils literal highlight-c"><span class="n">rmmod</span></code>.
+Le nom donné à ces fonctions est libre, mais celles-ci doivent être déclarées comme
+étant les points d’entrée et de sortie du module via les fonctions
+<code class="code highlight c docutils literal highlight-c"><span class="n">module_init</span></code> et <code class="code highlight c docutils literal highlight-c"><span class="n">module_exit</span></code>. <code class="code highlight c docutils literal highlight-c"><span class="n">__init</span></code> et <code class="code highlight c docutils literal highlight-c"><span class="n">__exit</span></code> sont des
+attributs du compilateur qui permettent certaines optimisations.
+Notez que ce module n’expose pas de numéros de majeur/mineur, ni de fonctions de
+lecture/écriture, spécifiques aux périphériques de type char ou de type block.
+Il ne peut donc pas être accédé par un device node.</p>
+<p>La déclaration de l’auteur et de la licence n’est pas strictement nécessaire,
+mais importante dans certains cas.
+Vous trouverez davantage de détails sur ce dernier point <a class="reference external" href="https://lwn.net/Articles/82305/">dans cet article</a>.</p>
+<section id="printk-co">
+<h3>printk() &amp; co<a class="headerlink" href="#printk-co" title="Lien vers cette rubrique">#</a></h3>
+<p>Le mécanisme le plus « primitif » pour afficher des messages d’erreur dans le noyau
+est la fonction <code class="code highlight c docutils literal highlight-c"><span class="n">printk</span><span class="p">()</span></code>.</p>
+<p>Utilisée dans un <code class="code highlight c docutils literal highlight-c"><span class="n">printk</span></code>, la constante <code class="code highlight c docutils literal highlight-c"><span class="n">KERN_ERR</span></code> permet de préciser que le message
+que l’on désire afficher est de type « erreur ».
+Il existe en tout 8 catégories de messages différentes :</p>
+<ol class="arabic simple" start="0">
+<li><p><code class="code highlight c docutils literal highlight-c"><span class="n">KERN_EMERG</span></code> (système inutilisable)</p></li>
+<li><p><code class="code highlight c docutils literal highlight-c"><span class="n">KERN_ALERT</span></code> (action immédiate requise)</p></li>
+<li><p><code class="code highlight c docutils literal highlight-c"><span class="n">KERN_CRIT</span></code> (conditions critiques)</p></li>
+<li><p><code class="code highlight c docutils literal highlight-c"><span class="n">KERN_ERR</span></code> (erreur)</p></li>
+<li><p><code class="code highlight c docutils literal highlight-c"><span class="n">KERN_WARNING</span></code> (attention)</p></li>
+<li><p><code class="code highlight c docutils literal highlight-c"><span class="n">KERN_NOTICE</span></code> (condition normale, mais significative)</p></li>
+<li><p><code class="code highlight c docutils literal highlight-c"><span class="n">KERN_INFO</span></code> (information)</p></li>
+<li><p><code class="code highlight c docutils literal highlight-c"><span class="n">KERN_DEBUG</span></code> (informations de debug)</p></li>
+</ol>
+<p>Ces niveaux de sévérité permettent de classifier les différents messages en provenance du noyau.
+Ces niveaux sont aussi utilisés pour décider quels messages seront affichés dans la console et quels
+autres seront juste enregistrés dans le kernel log.
+Ce « filtrage » est appelé <strong>loglevel</strong>.
+Le fichier <code class="file docutils literal notranslate"><span class="pre">/proc/sys/kernel/printk</span></code> permet de connaître le loglevel actuel du système.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>cat<span class="w"> </span>/proc/sys/kernel/printk
+<span class="go">4    4       1       7</span>
+</pre></div>
+</div>
+<p>Le loglevel de la console (premier nombre) indique que toutes les erreurs (c.-à-.d. WARNING,
+ERR, CRIT, ALERT et EMERG) seront affichés à l’écran.
+Le deuxième nombre indique que tous les <code class="code highlight c docutils literal highlight-c"><span class="n">printk</span></code> sans loglevel spécifié seront de type 4 (WARNING),
+le troisième nombre indique qu’une console ne peut pas avoir un loglevel inférieur à 1
+(les messages de type KERN_EMERG sont toujours affichés) et le dernier nombre indique le loglevel
+au boot (tous les messages sauf KERN_DEBUG sont affichés).
+Notez que, peu importe le loglevel, tous les messages noyau sont enregistrés dans le log,
+accessible par <code class="code highlight bash docutils literal highlight-bash">dmesg</code>.
+Plus d’infos dans <a class="reference external" href="https://www.kernel.org/doc/html/latest/core-api/printk-basics.html">la documentation</a>.</p>
+<p>Le loglevel par défaut de la console courante est modifiable par root :</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nb">echo</span><span class="w"> </span><span class="m">8</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sudo<span class="w"> </span>tee<span class="w"> </span>/proc/sys/kernel/printk
+<span class="gp">$ </span>cat<span class="w"> </span>/proc/sys/kernel/printk
+<span class="go">8    4       1       7</span>
+</pre></div>
+</div>
+<p>Notez que les messages noyau ne sont jamais affichés dans un terminal de type GUI (<em>xterm</em>, <em>konsole</em>, …).
+Ils sont affichés sur les terminaux de type tty ou série uniquement (utilisez <em>Ctrl+Alt+F[3..6]</em> pour basculer dans
+un de ces terminaux, <em>Ctrl+Alt+F[1..2]</em> pointent sur le serveur graphique).</p>
+<p>Alternativement, il est possible d’utiliser les alias <code class="code highlight c docutils literal highlight-c"><span class="n">pr_</span><span class="o">*</span><span class="p">()</span></code> (p.ex. <code class="code highlight c docutils literal highlight-c"><span class="n">pr_info</span><span class="p">()</span></code>) qui sont plus <em>joli</em>.
+Voir la documentation pour les alias des différents niveaux de log.</p>
+<p>Lors que l’on travaille avec un device, il y a la possibilité d’utiliser les fonctions de la famille <code class="code highlight c docutils literal highlight-c"><span class="n">dev_</span><span class="o">*</span><span class="p">()</span></code> (p.ex <code class="code highlight c docutils literal highlight-c"><span class="n">dev_info</span><span class="p">()</span></code>).
+Ces fonctions prennent, en plus du message, un pointeur vers <code class="code highlight c docutils literal highlight-c"><span class="k">struct</span><span class="w"> </span><span class="nc">device</span></code>, généralement créé en amont via le device tree ou par un driver de bus (USB, PCI, …) qui découvre le périphérique.
+Cela permet aux fonctions de préfixer le message avec des informations provenant du device. Par exemple, pour le driver du dernier exercice, les messages sont préfixés par <code class="code highlight c docutils literal highlight-c"><span class="n">drv</span><span class="o">-</span><span class="n">lab4</span><span class="w"> </span><span class="n">ff200000</span><span class="p">.</span><span class="n">drv2024</span><span class="o">:</span></code></p>
+</section>
+</section>
+<section id="transfert-de-donnees-user-kernel">
+<h2>Transfert de données user &lt;-&gt; kernel<a class="headerlink" href="#transfert-de-donnees-user-kernel" title="Lien vers cette rubrique">#</a></h2>
+<p>Le noyau et l’espace utilisateur possèdent deux espaces d’adressage distincts.
+Par exemple, lorsqu’un logiciel user-space effectue un appel système pour lire depuis un dispositif, le pointeur
+contenant l’adresse à laquelle copier les données contient une adresse valide <strong>uniquement</strong> dans le contexte
+d’exécution du programme dans l’espace utilisateur.
+Il est donc <strong>nécessaire</strong> d’effectuer une traduction d’adresse ; on utilise pour cela la fonction
+<code class="code highlight c docutils literal highlight-c"><span class="n">copy_to_user</span></code> plutôt qu’un simple <code class="code highlight c docutils literal highlight-c"><span class="n">memcpy</span></code>.
+La fonction permettant un transfert de données dans l’autre sens est logiquement appelée <code class="code highlight c docutils literal highlight-c"><span class="n">copy_from_user</span></code>.</p>
+<p>Pour transférer des types simples, comme des entiers ou des caractères, une autre paire de fonctions plus légères
+existent, <code class="code highlight c docutils literal highlight-c"><span class="n">put_user</span></code> et <code class="code highlight c docutils literal highlight-c"><span class="n">get_user</span></code>.</p>
+<p>D’autres fonctions aidant à ces transferts user &lt;-&gt; kernel existent :
+<code class="code highlight c docutils literal highlight-c"><span class="n">access_ok</span></code> est une fonction de vérification d’adresse, <code class="code highlight c docutils literal highlight-c"><span class="n">strnlen_user</span></code> et <code class="code highlight c docutils literal highlight-c"><span class="n">strncpy_from_user</span></code> sont des
+fonctions servant à gérer les transferts de tampons terminé par un byte nul.</p>
+<p>La gestion des espaces mémoire dans le noyau Linux est expliquée en détail dans
+<a class="reference external" href="https://developer.ibm.com/articles/l-kernel-memory-access/">cet article</a>.</p>
+</section>
+<section id="allocation-dynamique-de-memoire">
+<h2>Allocation dynamique de mémoire<a class="headerlink" href="#allocation-dynamique-de-memoire" title="Lien vers cette rubrique">#</a></h2>
+<p>Dans le noyau, il est possible d’allouer dynamiquement de la mémoire à l’aide de fonctions
+similaires à <code class="code highlight c docutils literal highlight-c"><span class="n">malloc</span></code> et <code class="code highlight c docutils literal highlight-c"><span class="n">free</span></code>:
+<code class="code highlight c docutils literal highlight-c"><span class="n">kmalloc</span></code> et <code class="code highlight c docutils literal highlight-c"><span class="n">kfree</span></code> (et leurs variantes, p.ex., <code class="code highlight c docutils literal highlight-c"><span class="n">kzalloc</span></code>).
+Ces fonctions se comportent comme leurs homologues de l’espace utilisateur, hormis le fait
+que <code class="code highlight c docutils literal highlight-c"><span class="n">kmalloc</span></code> est plus finement paramétrable, possédant un argument supplémentaire obligatoire.</p>
+<div class="admonition hint">
+<p class="admonition-title">Indication</p>
+<p>Pour plus d’infos : chapitre 8 de <a class="reference external" href="https://lwn.net/Kernel/LDD3">Linux Device Drivers, 3rd edition</a>.</p>
+</div>
+<div class="admonition-exercice-1-read-write-et-allocation-dynamique admonition">
+<p class="admonition-title"><strong>Exercice 1 : read/write et allocation dynamique</strong></p>
+<p>Le module <code class="code highlight c docutils literal highlight-c"><span class="n">stack</span></code> dans le dossier <code class="code highlight c docutils literal highlight-c"><span class="n">stack_module</span></code> crée un <em>character device</em> accessible via le fichier <code class="code highlight c docutils literal highlight-c"><span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">stack</span></code>.
+Ce module doit agir comme une pile d’entier sur 32 bits.</p>
+<p>Compléter les fonctions <code class="code highlight c docutils literal highlight-c"><span class="n">stack_read</span></code> et <code class="code highlight c docutils literal highlight-c"><span class="n">stack_write</span></code>
+du module pour que le module se comporte de la façon suivante :</p>
+<ul class="simple">
+<li><p>Lors de l’écriture d’un entier de 32 bits dans <code class="code highlight c docutils literal highlight-c"><span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">stack</span></code>, la donnée est ajoutée (PUSH) sur la pile</p></li>
+<li><p>Lors de la lecture sur le fichier, le dernier entier ayant été ajouté sur la pile est retourné et enlever de la pile (POP)</p></li>
+<li><p>Si un tableau d’entier est écrit, tous les éléments du tableau doivent être ajoutés dans la pile en commençant par le premier.</p></li>
+<li><p>Si un tableau d’entier est lu, celui-ci doit être rempli au maximum en fonction du nombre de valeurs dans la pile.</p></li>
+<li><p>Si le pile est vide lors de la lecture, le buffer user est intouché et la fonction retourne 0.</p></li>
+<li><p>Si la taille lue/écrite est anormale (= pas un multiple de 4), une erreur est retournée.</p></li>
+<li><p>Il n’y a pas de taille limite maximale à la pile.</p></li>
+<li><p>L’implémentation de la pile est libre (tableau, liste, autre).</p></li>
+<li><p>L’empreinte mémoire doit être minimal.
+P.ex. pour un tableau, la taille allouée correspond, au maximum, à la puissance de 2 supérieure au nombre d’éléments dans la pile.
+(C.-à-d. pour 10 éléments, au maximum 16 alloués, pour 1025 éléments au maximum 2048 éléments, …)</p></li>
+</ul>
+<p>Le programme <code class="file docutils literal notranslate"><span class="pre">stack_test.c</span></code> implémente un test basique du driver.</p>
+</div>
+<p>Dans un module, la mémoire à laquelle nous avons accès est réservée au noyau.
+Cependant, il s’agit encore, comme dans l’espace utilisateur, de mémoire paginée dans un espace
+d’adressage virtuel.
+Si l’on désire accéder à l’adressage physique d’un périphérique, un appel à la fonction
+<code class="code highlight c docutils literal highlight-c"><span class="n">ioremap</span></code> s’avère nécessaire.
+Cette fonction permet de mapper un intervalle d’adresses physique dans l’espace d’adressage du noyau.
+Une fois la conversion effectuée, il existe plusieurs fonctions permettant de transférer des données
+entre les deux domaines : <code class="code highlight c docutils literal highlight-c"><span class="n">iowrite</span></code>/<code class="code highlight c docutils literal highlight-c"><span class="n">ioread</span></code> pour les types simples, et <code class="code highlight c docutils literal highlight-c"><span class="n">memcpy_fromio</span></code>/<code class="code highlight c docutils literal highlight-c"><span class="n">memcpy_toio</span></code>
+pour les tampons en chaînes de caractères.</p>
+<div class="admonition warning">
+<p class="admonition-title">Avertissement</p>
+<p>Même si vous avez des pointeurs, l’accès à la mémoire du dispositif
+<strong>ne se fait qu’avec les fonctions susmentionnées !!!</strong>
+L’utilisation de l’indirection des pointeurs est <strong>interdite!!!</strong>.
+Vous <strong>devez</strong> utiliser <code class="code highlight c docutils literal highlight-c"><span class="n">iowrite</span></code>/<code class="code highlight c docutils literal highlight-c"><span class="n">ioread</span></code>.</p>
+</div>
+</section>
+<section id="managed-resources">
+<h2>Managed resources<a class="headerlink" href="#managed-resources" title="Lien vers cette rubrique">#</a></h2>
+<p>Lorsqu’on manipule certaines ressources, p. ex. la mémoire, on doit souvent
+répéter des étapes « fixes » : dans le cas de la mémoire, on essaye de l’allouer,
+et si tout va bien on doit se souvenir de la désallouer dès qu’on a terminé de
+l’utiliser ou bien si une erreur est survenue entre-temps.
+Bien sûr, un jour ou l’autre on va oublier de le faire, non ?</p>
+<p>Pour éviter cela, le noyau offre les « managed resources ».
+Celles-ci sont utilisables en ajoutant le préfixe <code class="code highlight c docutils literal highlight-c"><span class="n">devm_</span></code> aux différentes fonctions
+(<code class="code highlight c docutils literal highlight-c"><span class="n">kmalloc</span><span class="p">()</span></code> devient <code class="code highlight c docutils literal highlight-c"><span class="n">devm_kmalloc</span><span class="p">()</span></code>) et en ajoutant en premier paramètre le pointeur
+vers <code class="code highlight c docutils literal highlight-c"><span class="k">struct</span><span class="w"> </span><span class="nc">device</span></code> (de la même manière que les fonctions <code class="code highlight c docutils literal highlight-c"><span class="n">dev_</span><span class="o">*</span><span class="p">()</span></code> pour le logging).
+En utilisant ces fonctions, les ressources allouées seront automatiquement libérées lorsqu’une erreur
+intervient à l’initialisation du module ou qu’il est déchargé. Il n’est donc plus nécessaire d’appeler
+les fonctions inverses (<code class="code highlight c docutils literal highlight-c"><span class="n">devm_kfree</span><span class="p">()</span></code>) explicitement !
+Attention à s’assurer de quand même libérer la mémoire quand elle n’est plus utilisée !</p>
+<p>Cette fonctionnalité n’est pas disponible avec toutes les fonctions de gestion de ressources.
+Plus d’information, ainsi qu’une liste de ces fonctions est disponible
+dans <a class="reference external" href="https://www.kernel.org/doc/html/latest/driver-api/driver-model/devres.html">la documentation</a>
+et dans <a class="reference external" href="https://lwn.net/Articles/222860">cet article</a>.</p>
+</section>
+<section id="interruptions">
+<h2>Interruptions<a class="headerlink" href="#interruptions" title="Lien vers cette rubrique">#</a></h2>
+<p>Le noyau Linux expose un mécanisme simple pour la gestion des interruptions.
+Un appel à <code class="code highlight c docutils literal highlight-c"><span class="p">[</span><span class="n">devm_</span><span class="p">]</span><span class="n">request_irq</span><span class="p">()</span></code> permet d’enregistrer une fonction comme routine
+pour un IRQ donné et <code class="code highlight c docutils literal highlight-c"><span class="p">[</span><span class="n">devm_</span><span class="p">]</span><span class="n">free_irq</span><span class="p">()</span></code> permet de libérer le numéro d’IRQ.</p>
+<p>Le paramètre <code class="code highlight c docutils literal highlight-c"><span class="n">flags</span></code> peut combiner plusieurs valeurs de <a class="reference external" href="https://elixir.bootlin.com/linux/v6.8.6/source/include/linux/interrupt.h#L39">cette liste</a>
+dont par exemple <strong>IRQF_SHARED</strong> qui indique que le numéro d’IRQ peut être partagé entre plusieurs périphériques.</p>
+<p>Notez que dans le hardware récent, x86 surtout, les numéros d’IRQ sont souvent partagés par
+plusieurs périphériques.
+Si l’exclusion mutuelle est requise pour la routine de service, il est aussi possible de
+désactiver les interruptions sur la ligne IRQ courante en appelant
+<code class="code highlight c docutils literal highlight-c"><span class="n">disable_irq</span></code> ou <code class="code highlight c docutils literal highlight-c"><span class="n">disable_irq_nosync</span></code>.</p>
+<div class="admonition hint">
+<p class="admonition-title">Indication</p>
+<p>Pour plus d’infos : chapitre 10 de <a class="reference external" href="https://lwn.net/Kernel/LDD3">Linux Device Drivers, 3rd edition</a>.</p>
+</div>
+</section>
+<section id="donnees-privees-platform-drivers-et-device-tree">
+<h2>Données privées, platform drivers, et device tree<a class="headerlink" href="#donnees-privees-platform-drivers-et-device-tree" title="Lien vers cette rubrique">#</a></h2>
+<p>Les drivers n’existent pas dans un vacuum, mais ils sont généralement inclus dans
+un sous-système.
+Par exemple, les drivers des périphériques sur bus I2C seront dans le système I2C,
+ceux sur PCIe dans le sous-système PCI, …
+Utiliser l’interface offerte par le sous-système permet de disposer d’une série
+de fonctionnalités communes aux périphériques du même type.</p>
+<p>Les <strong>platform drivers</strong>, en particulier, sont utilisés lorsqu’on a un type de
+périphérique qui n’est pas <em>discoverable</em>, ils sont donc très utilisés dans le monde embedded.
+Un périphérique est dit <em>discoverable</em> si le bus auquel il est connecté possède
+une méthode pour prendre connaissance des différents périphériques qui y sont connectés.
+Par exemple, lorsqu’on rajoute une carte PCIe, au démarrage le driver du bus va la détecter automatiquement
+et charger le bon sous-driver. Par contre, le contrôleur du bus PCIe étant directement <em>memmory-mapped</em>,
+il faut donner <em>manuellement</em> les informations au kernel pour le retrouver (hard-codé, via le device tree, …).</p>
+<p>Malgré les points en commun, chaque driver à des exigences particulières. Par
+exemple, il a besoin de plusieurs pointeurs vers la mémoire, ou bien deux
+numéros d’IRQ.
+Pour garder ces informations <em>privées</em> au driver et, en même temps, pouvoir les
+passer entre les différents appels de fonction sans avoir des interfaces
+superflues, Linux a introduit la notion de <strong>données privées</strong>.
+Il s’agit d’une structure de données qui peut être récupérée depuis certains
+paramètres (avec une façon qui change, malheureusement, d’un sous-système à
+l’autre). Observer l’utilisation des <code class="code highlight c docutils literal highlight-c"><span class="k">struct</span><span class="w"> </span><span class="nc">priv</span></code> dans les drivers <code class="code highlight c docutils literal highlight-c"><span class="n">reds_adder</span></code>
+provenant des tutos.</p>
+<div class="admonition-exercice-2-interrupt-et-platform-drivers admonition">
+<p class="admonition-title"><strong>Exercice 2 : Interrupt et platform drivers</strong></p>
+<p>Le dossier <code class="file docutils literal notranslate"><span class="pre">switch_copy_module</span></code> contient un squelette de module utilisant un platform driver.</p>
+<p>Compléter les différentes fonctions et la structure privée pour que lors de l’appui sur <code class="code highlight c docutils literal highlight-c"><span class="n">KEY0</span></code>,
+la valeur des switchs soit affichée sur les 7-segments et à l’appui sur <code class="code highlight c docutils literal highlight-c"><span class="n">KEY1</span></code> la valeur affichée soit incrémenté.</p>
+<p>Référez-vous aux codes du tutoriel pour les différentes étapes à faire dans les fonctions
+(allocation mémoire, configuration I/O et IRQ, …)
+ainsi qu’à l’exercice 4 du <a class="reference internal" href="../lab_02/lab_02.html#laboratoire2"><span class="std std-ref">Laboratoire 2 — User-space Drivers</span></a> pour l’utilisation des IRQ avec les boutons,
+notamment pour les différents registres et leurs utilités.</p>
+</div>
+</section>
+<section id="travail-a-rendre-et-criteres-d-evaluation">
+<h2>Travail à rendre et critères d’évaluation<a class="headerlink" href="#travail-a-rendre-et-criteres-d-evaluation" title="Lien vers cette rubrique">#</a></h2>
+<p>S’il est demandé d’écrire du code, ce code doit se trouver dans un fichier <em>ex&lt;n&gt;.c</em>, où &lt;n&gt; correspond au numéro de l’exercice.
+Si un exercice contient plusieurs variantes, alors le fichier sera nommé <em>ex&lt;n&gt;_&lt;variante&gt;.c</em>, où &lt;variante&gt; correspond à la variante.
+Par exemple : <em>ex2.c</em>, <em>ex6_poll.c</em>.
+Il n’est pas nécessaire de renommer les fichiers déjà existants.
+Si un exercice réutilise un fichier précédent, celui-ci doit être dupliqué pour le nouvel exercice, sauf indication contraire.</p>
+<p>Si le code a pour but d’être exécuté sur la DE1-SoC, il doit être compilé en « compilation croisée »,
+c.-à-d. en utilisant la toolchain mentionnée dans le <a class="reference internal" href="../lab_01/lab_01.html#laboratoire1"><span class="std std-ref">Laboratoire 1 — Introduction</span></a>.</p>
+<p>N’oubliez pas de mettre votre prénom et nom !</p>
+<p>Les exercices sont à faire <strong>individuellement</strong>.
+Copier la solution d’un autre et changer le nom/l’ordre des variables n’est pas toléré.</p>
+<p>La date limite est celle communiquée dans l’annonce sur Moodle.
+Vous devez rendre une archive <code class="file docutils literal notranslate"><span class="pre">.tar.gz</span></code> contenant :</p>
+<ul class="simple">
+<li><p>le code source de vos solutions et tous les fichiers nécessaires,</p></li>
+<li><dl class="simple">
+<dt>un fichier <code class="file docutils literal notranslate"><span class="pre">README.md</span></code></dt><dd><ul>
+<li><p>contenant les réponses aux questions posées dans les exercices.</p></li>
+<li><p>les éventuels soucis rencontrés qui péjore le rendu</p></li>
+<li><p>les choix d’implémentation « spéciaux » (si trop long pour expliquer en commentaire)</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p>Les notes seront réparties comme suit :</p>
+<ul class="simple">
+<li><p>80% de la note si l’exercice est correct (c.-à-d., <em>« fonctionne »</em>).
+Il doit bien sûr « fonctionner » sur d’autres PCs que votre PC personnel, et de façon déterministe.
+Il est donc impératif que tout ce qui est nécessaire pour compiler et tester le fonctionnement de la solution soit rendu.</p></li>
+<li><p>20% de la note si l’exercice est « bien fait », c.-à-d. :</p>
+<ul>
+<li><p>Respect des <a class="reference external" href="https://www.kernel.org/doc/html/latest/process/coding-style.html">Linux kernel coding style</a>,
+particulièrement les points suivants :</p>
+<ul>
+<li><ol class="arabic simple">
+<li><p>Indentation</p></li>
+</ol>
+</li>
+<li><ol class="arabic simple" start="2">
+<li><p>Breaking long lines and strings</p></li>
+</ol>
+</li>
+<li><ol class="arabic simple" start="3">
+<li><p>Placing Braces and Spaces</p></li>
+</ol>
+</li>
+<li><ol class="arabic simple" start="4">
+<li><p>Naming</p></li>
+</ol>
+</li>
+<li><ol class="arabic simple" start="6">
+<li><p>Functions</p></li>
+</ol>
+</li>
+<li><ol class="arabic simple" start="8">
+<li><p>Commenting</p></li>
+</ol>
+</li>
+</ul>
+</li>
+<li><p><strong>code lisible</strong></p></li>
+<li><p><strong>documenté/commenté</strong></p></li>
+<li><p><strong>bien structuré</strong></p></li>
+</ul>
+</li>
+</ul>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../lab_03/lab_03.html"
+       title="page précédente">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">précédent</p>
+        <p class="prev-next-title">Laboratoire 3 — Introduction aux drivers kernel-space</p>
+      </div>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contenu
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#objectifs">Objectifs</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#materiel-necessaire">Matériel nécessaire</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#structure-d-un-module">Structure d’un module</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#printk-co">printk() &amp; co</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#transfert-de-donnees-user-kernel">Transfert de données user &lt;-&gt; kernel</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#allocation-dynamique-de-memoire">Allocation dynamique de mémoire</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#managed-resources">Managed resources</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#interruptions">Interruptions</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#donnees-privees-platform-drivers-et-device-tree">Données privées, platform drivers, et device tree</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#travail-a-rendre-et-criteres-d-evaluation">Travail à rendre et critères d’évaluation</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+Par REDS institute
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024, REDS institute.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
