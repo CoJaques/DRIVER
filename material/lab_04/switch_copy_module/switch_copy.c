@@ -13,7 +13,7 @@
 #define BUTTON_EDGE_OFFSET    0x5C
 #define BUTTON_INTERRUPT_MASK 0x58
 #define SWITCH_OFFSET	      0x40
-#define SWITCHES_MASK	      0x0F
+#define SWITCHES_MASK	      0x3FF
 #define SEGMENT1_OFFSET	      0x20
 #define SEGMENT2_OFFSET	      0x30
 #define INTERRUPT_MASK_OFFSET 0x58
@@ -37,6 +37,7 @@ struct priv {
 	void __iomem *button_edge;
 	void __iomem *button_interrupt_mask;
 
+	uint32_t counter;
 	int irq_num;
 	struct device *dev;
 };
@@ -46,10 +47,10 @@ static const uint32_t number_representation_7segment[] = {
 };
 
 // Set the 7-segment display based on the value to print (max 999999)
-static void set_7_segment(uint16_t value, struct priv *priv)
+static void set_7_segment(uint32_t value, struct priv *priv)
 {
-	if (value > 9999) {
-		value = 9999; // cap value to 9999 as we only have 10 switches to display
+	if (value > 999999) {
+		value = 999999; // cap value to 999999
 	}
 
 	// Extract digits from the value
@@ -81,10 +82,18 @@ static void set_7_segment(uint16_t value, struct priv *priv)
 static irqreturn_t irq_handler(int irq, void *dev_id)
 {
 	struct priv *priv = (struct priv *)dev_id;
+	uint8_t last_pressed_button = ioread8(priv->button_edge);
 
-	uint16_t switches = ioread16(priv->switches);
+	switch (last_pressed_button) {
+	case KEY_0:
+		priv->counter = ioread16(priv->switches) & SWITCHES_MASK;
+		break;
+	case KEY_1:
+		priv->counter++;
+		break;
+	}
 
-	set_7_segment(switches, priv);
+	set_7_segment(priv->counter, priv);
 
 	iowrite8(0x0F, priv->button_edge);
 
