@@ -1,5 +1,5 @@
 ### Put here the path to kernel sources! ###
-KERNELDIR := /home/cdk/assistanat/drv/linux-socfpga/
+KERNELDIR :=  /home/CoJak/Documents/repo/linux-socfpga
 TOOLCHAIN := /opt/toolchains/arm-linux-gnueabihf_6.4.1/bin/arm-linux-gnueabihf-
 
 obj-m := stack.o
