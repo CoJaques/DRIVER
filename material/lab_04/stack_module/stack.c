@@ -1,3 +1,5 @@
+// COLIN JAQUES
+
 // License-Identifier: GPL-2.0
 /*
  * Stack file
