@@ -125,12 +125,11 @@ static int switch_copy_probe(struct platform_device *pdev)
 		return -EINVAL;
 	}
 
-	if (devm_request_irq(&pdev->dev, priv->irq_num, irq_handler, 0,
-			     "switch_copy", priv) < 0) {
-		if (ret) {
-			dev_err(priv->dev, "Failed to request IRQ\n");
-			return ret;
-		}
+	ret = devm_request_irq(&pdev->dev, priv->irq_num, irq_handler, 0,
+			       "switch_copy", priv);
+	if (ret < 0) {
+		dev_err(priv->dev, "Failed to request IRQ\n");
+		return ret;
 	}
 
 	priv->switches = base_address + SWITCH_OFFSET;
