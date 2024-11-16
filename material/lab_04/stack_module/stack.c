@@ -44,10 +44,59 @@ struct stack_device {
  * @return Actual number of bytes read from internal buffer,
  *         or a negative error code
  */
+
 static ssize_t stack_read(struct file *filp, char __user *buf, size_t count,
 			  loff_t *ppos)
 {
-	return 0;
+	struct stack_device *stack_dev;
+	ssize_t nb_values, i;
+	uint32_t *read_values;
+	struct stack_node *node;
+
+	stack_dev =
+		container_of(filp->f_inode->i_cdev, struct stack_device, cdev);
+	if (!stack_dev) {
+		pr_err("Stack: Unable to retrieve stack_device\n");
+		return -ENODEV;
+	}
+
+	if (count % sizeof(uint32_t) != 0)
+		return -EINVAL;
+
+	nb_values = count / sizeof(uint32_t);
+
+	if (stack_dev->stack_size == 0)
+		return 0;
+
+	if (nb_values > stack_dev->stack_size)
+		nb_values = stack_dev->stack_size;
+
+	read_values = kmalloc(nb_values * sizeof(uint32_t), GFP_KERNEL);
+	if (!read_values)
+		return -ENOMEM;
+
+	for (i = 0; i < nb_values; i++) {
+		node = list_first_entry(&stack_dev->head, struct stack_node,
+					list);
+
+		read_values[i] = node->value;
+		list_del(&node->list);
+		kfree(node);
+	}
+
+	stack_dev->stack_size -= nb_values;
+
+	if (copy_to_user(buf, read_values, nb_values * sizeof(uint32_t)) != 0) {
+		kfree(read_values);
+		pr_err("Stack: Failed to copy data to user\n");
+		return -EFAULT;
+	}
+
+	kfree(read_values);
+
+	// do not return count, because if the stack is smaller than count we
+	// should return the actual number of bytes read
+	return nb_values * sizeof(uint32_t);
 }
 
 /**
