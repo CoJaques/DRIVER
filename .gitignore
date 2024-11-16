@@ -3,3 +3,13 @@
 !*/
 .vscode
 resources
+*.o
+*.cmd
+*.ko
+*.idea
+*.mod
+*.symvers
+*.order
+*.cache
+*compile_commands.json
+*.mod.c
