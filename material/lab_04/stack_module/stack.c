@@ -277,4 +277,3 @@ MODULE_AUTHOR("REDS");
 MODULE_LICENSE("GPL");
 
 module_init(stack_init);
-module_exit(stack_exit);

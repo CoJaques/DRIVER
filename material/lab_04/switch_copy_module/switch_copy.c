@@ -122,7 +122,7 @@ static int switch_copy_probe(struct platform_device *pdev)
 	}
 
 	base_address = devm_ioremap_resource(priv->dev, mem_info);
-	if (IS_ERR(priv)) {
+	if (IS_ERR(base_address)) {
 		dev_err(priv->dev, "Failed to map memory resource\n");
 		return PTR_ERR(base_address);
 	}
