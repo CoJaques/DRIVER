@@ -61,38 +61,52 @@ static ssize_t stack_read(struct file *filp, char __user *buf, size_t count,
  * @return Actual number of bytes writen to internal buffer,
  *         or a negative error code
  */
+
 static ssize_t stack_write(struct file *filp, const char __user *buf,
 			   size_t count, loff_t *ppos)
 {
+	struct stack_device *stack_dev;
 	ssize_t nb_values;
+	uint32_t *new_values;
+	struct stack_node *elements;
+	stack_dev =
+		container_of(filp->f_inode->i_cdev, struct stack_device, cdev);
+	if (!stack_dev) {
+		pr_err("Stack: Unable to retrieve stack_device\n");
+		return -ENODEV;
+	}
 
 	if (count % sizeof(uint32_t) != 0)
 		return -EINVAL;
 
 	nb_values = count / sizeof(uint32_t);
-	uint32_t *new_values = kmalloc(count, GFP_KERNEL);
+	new_values = kmalloc(count, GFP_KERNEL);
 
-	if (new_values == NULL)
+	if (!new_values)
 		return -ENOMEM;
 
 	if (copy_from_user(new_values, buf, count) != 0) {
 		kfree(new_values);
-		dev_err(cl->dev, "Failed to copy buffer from user\n");
+		pr_err("Stack: Failed to copy buffer from user\n");
 		return -EFAULT;
 	}
 
-	struct stack_node *new_elem;
-	for (ssize_t i = 0; i < nb_values; i++) {
-		new_elem = kmalloc(sizeof(struct stack_node), GFP_KERNEL);
-		if (new_elem == NULL)
-			return -ENOMEM;
-
-		new_elem->value = new_values[i];
-		list_add(&new_elem->list, &stack_head);
+	elements =
+		kmalloc_array(nb_values, sizeof(struct stack_node), GFP_KERNEL);
+	if (!elements) {
+		kfree(new_values);
+		pr_err("Stack: Failed to allocate memory for stack elements\n");
+		return -ENOMEM;
 	}
 
-	current_node = new_elem;
+	for (ssize_t i = 0; i < nb_values; i++) {
+		elements[i].value = new_values[i];
+		list_add(&elements[i].list, &stack_dev->head);
+	}
 
+	stack_dev->tail = &elements[nb_values - 1].list;
+
+	kfree(new_values);
 	return count;
 }
 
@@ -119,6 +133,7 @@ static int __init stack_init(void)
 {
 	int err;
 	struct stack_device *stack_dev;
+	struct device *dev;
 
 	// Allocate memory for the device
 	stack_dev = kzalloc(sizeof(struct stack_device), GFP_KERNEL);
@@ -146,8 +161,7 @@ static int __init stack_init(void)
 		return -1;
 	}
 	stack_dev->cl->dev_uevent = stack_uevent;
-	struct device *dev =
-		device_create(stack_dev->cl, NULL, MAJMIN, NULL, DEVICE_NAME);
+	dev = device_create(stack_dev->cl, NULL, MAJMIN, NULL, DEVICE_NAME);
 	if (dev == NULL) {
 		pr_err("Stack: Error creating device\n");
 		class_destroy(stack_dev->cl);
