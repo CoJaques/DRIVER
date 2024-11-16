@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-2.0
+// License-Identifier: GPL-2.0
 /*
  * Stack file
  */
@@ -30,7 +30,7 @@ struct stack_device {
 	struct cdev cdev;
 	struct class *cl;
 	struct list_head head;
-	struct list_head *tail;
+	ssize_t stack_size;
 };
 
 /**
@@ -104,7 +104,7 @@ static ssize_t stack_write(struct file *filp, const char __user *buf,
 		list_add(&elements[i].list, &stack_dev->head);
 	}
 
-	stack_dev->tail = &elements[nb_values - 1].list;
+	stack_dev->stack_size += nb_values;
 
 	kfree(new_values);
 	return count;
@@ -143,7 +143,7 @@ static int __init stack_init(void)
 	}
 
 	INIT_LIST_HEAD(&stack_dev->head);
-	stack_dev->tail = &stack_dev->head;
+	stack_dev->stack_size = 0;
 
 	// Register the device
 	err = register_chrdev_region(MAJMIN, 1, DEVICE_NAME);
