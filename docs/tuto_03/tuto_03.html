@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Laboratoire de Conception de Drivers — semestre d’été 2024-2025 &#8212; Documentation DRV 2024 </title>
+    <title>Tutoriel 3 — REDS-adder driver v2.1 et v3.1 &#8212; Documentation DRV 2024 </title>
   
   
   
@@ -19,35 +19,36 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-<link href="_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
 
   
-  <link href="_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css" />
-    <link rel="stylesheet" type="text/css" href="_static/color.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/color.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
-<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
-  <script src="_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/doctools.js"></script>
-    <script src="_static/scripts/sphinx-book-theme.js"></script>
-    <script src="_static/translations.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'index';</script>
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Recherche" href="search.html" />
-    <link rel="next" title="Helper" href="helper/helper.html" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js"></script>
+    <script src="../_static/translations.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'tuto_03/tuto_03';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Recherche" href="../search.html" />
+    <link rel="next" title="Laboratoire 5 — Développement de drivers kernel-space II" href="../lab_05/lab_05.html" />
+    <link rel="prev" title="Laboratoire 4 — Développement de drivers kernel-space I" href="../lab_04/lab_04.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="fr"/>
   </head>
@@ -79,7 +80,7 @@
     <div class="search-button__overlay"></div>
     <div class="search-button__search-container">
 <form class="bd-search d-flex align-items-center"
-      action="search.html"
+      action="../search.html"
       method="get">
   <i class="fa-solid fa-magnifying-glass"></i>
   <input type="search"
@@ -110,8 +111,6 @@
       
       
       
-        
-      
       <div class="bd-sidebar-primary bd-sidebar">
         
 
@@ -130,7 +129,7 @@
     
   
 
-<a class="navbar-brand logo" href="#">
+<a class="navbar-brand logo" href="../index.html">
   
   
   
@@ -141,8 +140,8 @@
       
     
     
-    <img src="_static/logo_drv.png" class="logo__image only-light" alt="Documentation DRV 2024  - Home"/>
-    <script>document.write(`<img src="_static/logo_drv.png" class="logo__image only-dark" alt="Documentation DRV 2024  - Home"/>`);</script>
+    <img src="../_static/logo_drv.png" class="logo__image only-light" alt="Documentation DRV 2024  - Home"/>
+    <script>document.write(`<img src="../_static/logo_drv.png" class="logo__image only-dark" alt="Documentation DRV 2024  - Home"/>`);</script>
   
   
 </a></div>
@@ -159,19 +158,19 @@
  </script></div>
         <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
-        <ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="helper/helper.html">Helper</a></li>
-<li class="toctree-l1"><a class="reference internal" href="helper/ssh.html">Mise en place SSH</a></li>
-<li class="toctree-l1"><a class="reference internal" href="helper/eval_criterion.html">Consigne de rendu</a></li>
-<li class="toctree-l1"><a class="reference internal" href="lab_00/lab_00.html">Laboratoire 0</a></li>
-<li class="toctree-l1"><a class="reference internal" href="lab_01/lab_01.html">Laboratoire 1</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tuto_01/tuto_01.html">Tuto 1</a></li>
-<li class="toctree-l1"><a class="reference internal" href="lab_02/lab_02.html">Laboratoire 2</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tuto_02/tuto_02.html">Tuto 2</a></li>
-<li class="toctree-l1"><a class="reference internal" href="lab_03/lab_03.html">Laboratoire 3</a></li>
-<li class="toctree-l1"><a class="reference internal" href="lab_04/lab_04.html">Laboratoire 4</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tuto_03/tuto_03.html">Tuto 3</a></li>
-<li class="toctree-l1"><a class="reference internal" href="lab_05/lab_05.html">Laboratoire 5</a></li>
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../helper/helper.html">Helper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../helper/ssh.html">Mise en place SSH</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../helper/eval_criterion.html">Consigne de rendu</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lab_00/lab_00.html">Laboratoire 0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lab_01/lab_01.html">Laboratoire 1</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tuto_01/tuto_01.html">Tuto 1</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lab_02/lab_02.html">Laboratoire 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tuto_02/tuto_02.html">Tuto 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lab_03/lab_03.html">Laboratoire 3</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lab_04/lab_04.html">Laboratoire 4</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Tuto 3</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lab_05/lab_05.html">Laboratoire 5</a></li>
 </ul>
 
     </div>
@@ -226,7 +225,7 @@
       
       
       
-      <li><a href="_sources/index.rst" target="_blank"
+      <li><a href="../_sources/tuto_03/tuto_03.rst" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Télécharger le fichier source"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -308,7 +307,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Laboratoire de Conception de Drivers — semestre d’été 2024-2025</h1>
+    <h1>Tutoriel 3 —  REDS-adder driver v2.1 et v3.1</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -322,24 +321,39 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="laboratoire-de-conception-de-drivers-semestre-d-ete-2024-2025">
-<h1>Laboratoire de Conception de Drivers — semestre d’été 2024-2025<a class="headerlink" href="#laboratoire-de-conception-de-drivers-semestre-d-ete-2024-2025" title="Lien permanent vers ce titre">#</a></h1>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="helper/helper.html">Helper</a></li>
-<li class="toctree-l1"><a class="reference internal" href="helper/ssh.html">Mise en place SSH</a></li>
-<li class="toctree-l1"><a class="reference internal" href="helper/eval_criterion.html">Consigne de rendu</a></li>
-<li class="toctree-l1"><a class="reference internal" href="lab_00/lab_00.html">Laboratoire 0</a></li>
-<li class="toctree-l1"><a class="reference internal" href="lab_01/lab_01.html">Laboratoire 1</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tuto_01/tuto_01.html">Tuto 1</a></li>
-<li class="toctree-l1"><a class="reference internal" href="lab_02/lab_02.html">Laboratoire 2</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tuto_02/tuto_02.html">Tuto 2</a></li>
-<li class="toctree-l1"><a class="reference internal" href="lab_03/lab_03.html">Laboratoire 3</a></li>
-<li class="toctree-l1"><a class="reference internal" href="lab_04/lab_04.html">Laboratoire 4</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tuto_03/tuto_03.html">Tuto 3</a></li>
-<li class="toctree-l1"><a class="reference internal" href="lab_05/lab_05.html">Laboratoire 5</a></li>
+  <section id="tutoriel-3-reds-adder-driver-v2-1-et-v3-1">
+<span id="tutoriel3"></span><h1>Tutoriel 3 —  REDS-adder driver v2.1 et v3.1<a class="headerlink" href="#tutoriel-3-reds-adder-driver-v2-1-et-v3-1" title="Lien permanent vers ce titre">#</a></h1>
+<figure class="align-right">
+<a class="reference internal image-reference" href="../_images/logo_drv.png"><img alt="../_images/logo_drv.png" src="../_images/logo_drv.png" style="width: 6cm;" /></a>
+</figure>
+<p>Dans ce tutoriel, on explorera davantage de possibilités offertes par le Linux
+Device Model pour améliorer notre driver.</p>
+<p>Les fichiers de ce tutoriel se trouvent dans le dépôt git.</p>
+<p><strong>sysfs</strong> nous permet d’exposer à l’utilisateur une série de propriétés, afin
+de pouvoir aisément configurer et interagir avec notre dispositif.
+Dans le contexte de notre driver, on utilisera sysfs pour :</p>
+<ul class="simple">
+<li><p>voir la taille maximale de la chaîne de caractères à chiffrer;</p></li>
+<li><p>voir et modifier le seuil utilisé pour le chiffrement;</p></li>
+<li><p>voir et modifier l’opération effectuée par le dispositif (chiffrement ou
+déchiffrement).</p></li>
 </ul>
-</div>
+<p>Le driver v2.1 est identique à la version 1.1, sauf qu’une entrée dans sysfs a
+été ajoutée — n’hésitez pas à comparer les deux versions du driver à l’aide
+d’un outil tel que <a class="reference external" href="https://meldmerge.org/">meld</a>, cela vous montrera comment
+vous pouvez ajouter des fichiers dans sysfs.</p>
+<p>Pouvoir changer ces propriétés à la volée introduit des problèmes potentiels : par
+exemple, qu’est-ce qui va se passer si l’on modifie l’opération effectuée pendant
+qu’elle est en cours ?
+Pour éviter ces situations, une primitive de synchronisation (mutex) a été
+introduite.</p>
+<p>De plus, afin de mieux pouvoir gérer les données stockées dans notre driver, le
+vecteur qu’on avait utilisé dans le tutoriel 2 a été remplacé par une KFIFO.</p>
+<p>Le driver v3.1 est donc une version bien plus complète du driver pour notre
+dispositif.
+Essayez de comprendre ses mécanismes de fonctionnement et cherchez à
+l’améliorer en rajoutant des fonctionnalités et en optimisant ses opérations.</p>
+<p><em>Have fun</em> et, bien sûr, on est à votre disposition pour toute question éventuelle ! :-)</p>
 </section>
 
 
@@ -353,12 +367,21 @@ document.write(`
                 <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
+    <a class="left-prev"
+       href="../lab_04/lab_04.html"
+       title="page précédente">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">précédent</p>
+        <p class="prev-next-title">Laboratoire 4 — Développement de drivers kernel-space I</p>
+      </div>
+    </a>
     <a class="right-next"
-       href="helper/helper.html"
+       href="../lab_05/lab_05.html"
        title="page suivante">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">suivant</p>
-        <p class="prev-next-title">Helper</p>
+        <p class="prev-next-title">Laboratoire 5 — Développement de drivers kernel-space II</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -412,8 +435,8 @@ Par REDS institute
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
-<script src="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
 
   <footer class="bd-footer">
   </footer>

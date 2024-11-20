@@ -1,0 +1,767 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="fr" data-content_root="" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Laboratoire 5 — Développement de drivers kernel-space II &#8212; Documentation DRV 2024 </title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/color.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js"></script>
+    <script src="../_static/translations.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'lab_05/lab_05';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Recherche" href="../search.html" />
+    <link rel="prev" title="Tutoriel 3 — REDS-adder driver v2.1 et v3.1" href="../tuto_03/tuto_03.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="fr"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Passer au contenu principal</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Haut de page</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo_drv.png" class="logo__image only-light" alt="Documentation DRV 2024  - Home"/>
+    <script>document.write(`<img src="../_static/logo_drv.png" class="logo__image only-dark" alt="Documentation DRV 2024  - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Recherche" aria-label="Recherche" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Recherche</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../helper/helper.html">Helper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../helper/ssh.html">Mise en place SSH</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../helper/eval_criterion.html">Consigne de rendu</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lab_00/lab_00.html">Laboratoire 0</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lab_01/lab_01.html">Laboratoire 1</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tuto_01/tuto_01.html">Tuto 1</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lab_02/lab_02.html">Laboratoire 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tuto_02/tuto_02.html">Tuto 2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lab_03/lab_03.html">Laboratoire 3</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lab_04/lab_04.html">Laboratoire 4</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tuto_03/tuto_03.html">Tuto 3</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Laboratoire 5</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Téléchargez cette page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/lab_05/lab_05.rst" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Télécharger le fichier source"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.rst</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Imprimer au format PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Mode plein écran"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="clair/sombre" aria-label="clair/sombre" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Recherche" aria-label="Recherche" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Laboratoire 5 — Développement de drivers kernel-space II</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contenu </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#objectifs">Objectifs</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#materiel-necessaire">Matériel nécessaire</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#kthreads-et-timers">KThreads et timers</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#queues-kfifos">Queues (KFIFOs)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sysfs">Sysfs</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#synchronisation">Synchronisation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#travail-a-rendre-et-criteres-d-evaluation">Travail à rendre et critères d’évaluation</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="laboratoire-5-developpement-de-drivers-kernel-space-ii">
+<span id="laboratoire5"></span><h1>Laboratoire 5 — Développement de drivers kernel-space II<a class="headerlink" href="#laboratoire-5-developpement-de-drivers-kernel-space-ii" title="Lien permanent vers ce titre">#</a></h1>
+<figure class="align-right">
+<a class="reference internal image-reference" href="../_images/logo_drv.png"><img alt="../_images/logo_drv.png" src="../_images/logo_drv.png" style="width: 6cm;" /></a>
+</figure>
+<section id="objectifs">
+<h2>Objectifs<a class="headerlink" href="#objectifs" title="Lien permanent vers ce titre">#</a></h2>
+<ul class="simple">
+<li><p>Savoir gérer threads, timers et interruptions en kernel-space</p></li>
+<li><p>Savoir utiliser les queues en kernel-space</p></li>
+<li><p>Apprendre à utiliser les symboles exportés par d’autres modules</p></li>
+<li><p>Savoir utiliser les mécanismes pour la configuration depuis le user-space (<em>command line parameters</em>, <em>sysfs</em>, …)</p></li>
+<li><p>Connaître les mécanismes principaux de synchronisation</p></li>
+</ul>
+</section>
+<section id="materiel-necessaire">
+<h2>Matériel nécessaire<a class="headerlink" href="#materiel-necessaire" title="Lien permanent vers ce titre">#</a></h2>
+<p>Ce laboratoire utilise le même environnement que le laboratoire précédent,
+qui peut donc être réutilisé.</p>
+</section>
+<section id="kthreads-et-timers">
+<h2>KThreads et timers<a class="headerlink" href="#kthreads-et-timers" title="Lien permanent vers ce titre">#</a></h2>
+<p>D’autres fonctionnalités que l’on retrouve également dans l’espace noyau sont les threads et les timers.
+Il est possible pour un module de démarrer des tâches d’arrière-plan, d’effectuer un polling
+sur un périphérique à intervalle régulier, ou encore de déléguer le traitement d’une interruption
+à un thread afin de ne pas rester dans une routine d’interruption trop longtemps.</p>
+<p>La macro <code class="code c docutils literal notranslate"><span class="name"><span class="pre">kthread_run</span></span></code> permet de créer un kthread et de la démarrer automatiquement.
+En <em>arrière-plan</em>, cette macro fait appel à <code class="code c docutils literal notranslate"><span class="name"><span class="pre">kthread_create</span></span></code>, qui crée le kthread sans le démarrer et <code class="code c docutils literal notranslate"><span class="name"><span class="pre">wake_up_process</span></span></code> qui le démarre.
+Ces deux fonctions peuvent également être utilisées séparément en fonction des besoins.</p>
+<p>Un kthread peut ensuite se terminer de deux manières différentes :</p>
+<ul class="simple">
+<li><p>de manière <em>spontanée</em>, en faisant un simple <code class="code c docutils literal notranslate"><span class="keyword"><span class="pre">return</span></span></code></p></li>
+<li><p>lorsque <code class="code c docutils literal notranslate"><span class="name"><span class="pre">kthread_stop</span></span></code> a été appelé depuis un autre thread.</p></li>
+</ul>
+<p><code class="code c docutils literal notranslate"><span class="name"><span class="pre">kthread_stop</span></span></code> ne tue pas le thread directement, mais active un flag partagé indiquant que le thread
+doit s’arrêter et bloque en attendant que le thread se termine.
+Ce flag est accessible comme retour de la fonction <code class="code c docutils literal notranslate"><span class="name"><span class="pre">kthread_should_stop</span></span></code>, et le thread doit contrôler
+périodiquement cette valeur s’il s’attend à être stoppé.
+La valeur de retour de <code class="code c docutils literal notranslate"><span class="name"><span class="pre">kthread_stop</span></span></code> correspond à la valeur de retour de la fonction.</p>
+<p>Un thread peut être mis en sommeil grâce à la macro <code class="code c docutils literal notranslate"><span class="name"><span class="pre">wait_event</span></span></code> (et ses variantes), qui prend comme
+paramètre une queue sur laquelle le thread attend et une condition qui doit être respectée pour que
+ce thread se réveille.
+Le thread peut ensuite être réveillé via un appel à <code class="code c docutils literal notranslate"><span class="name"><span class="pre">wake_up</span></span></code> (et ses variantes), prenant comme paramètre
+la queue de threads à réveiller.
+Vous pouvez trouver une description de ces fonctions
+<a class="reference external" href="https://www.kernel.org/doc/html/latest/driver-api/basics.html#wait-queues-and-wake-events">ici</a>.
+Sur le même principe, il est également possible d’utiliser <code class="code c docutils literal notranslate"><span class="name"><span class="pre">wait_for_completion</span></span></code> et <code class="code c docutils literal notranslate"><span class="name"><span class="pre">complete</span></span></code>
+donc la documentation est disponible <cite>ici &lt;https://www.kernel.org/doc/html/latest/scheduler/completion.html&gt;</cite></p>
+<p>Un module peut également faire appel aux timers s’il désire effectuer une tâche cyclique ou compter
+précisément un intervalle de temps.
+L’interface des timers a beaucoup changé, et il est assez difficile de trouver des exemples qui fonctionnent
+(la plupart ne compilent même pas !). Vous pouvez trouver une description de la nouvelle interface
+<a class="reference external" href="https://lwn.net/Articles/735887/">ici</a>.</p>
+<p>Des exemples d’utilisation de kthread et des timer sont disponibles dans le dossier <code class="file docutils literal notranslate"><span class="pre">example</span></code> dans les sources du labos.</p>
+<div class="admonition warning">
+<p class="admonition-title">Avertissement</p>
+<p>Attention, ces deux modules écrivent régulièrement dans les logs du kernel !
+Ne les laissez pas insérer trop longtemps, au risque de petit à petit remplir votre espace disque !</p>
+</div>
+</section>
+<section id="queues-kfifos">
+<h2>Queues (KFIFOs)<a class="headerlink" href="#queues-kfifos" title="Lien permanent vers ce titre">#</a></h2>
+<p>Un type de structure de données très souvent utilisé lorsque l’on discute avec un
+vrai dispositif est la queue, aussi appelée <strong>KFIFO</strong>.
+Le noyau offre une interface qui vous permet facilement d’insérer et de retirer
+des éléments.
+L’interface est détaillée <a class="reference external" href="https://www.kernel.org/doc/html/latest/core-api/kernel-api.html#fifo-buffer">ici</a>, et
+des exemples d’utilisation sont disponibles dans le sous-répertoire <code class="file docutils literal notranslate"><span class="pre">samples</span></code> des sources
+du noyau.</p>
+<div class="admonition-exercice-1-kfifos-et-kthread admonition">
+<p class="admonition-title"><strong>Exercice 1 : KFIFOs et kthread</strong></p>
+<p>Implémentez un module du noyau qui permet la gestion d’une liste de lecture de musique.</p>
+<p>Une musique sera représentée par les informations suivantes :</p>
+<ul class="simple">
+<li><p>Durée en seconde.</p></li>
+<li><p>Titre (limiter à 25 caractères)</p></li>
+<li><p>Nom de l’artiste/groupe (Limiter à 25 caractères)</p></li>
+</ul>
+<p>Le driver doit exposer le <em>device node</em> <code class="code c docutils literal notranslate"><span class="operator"><span class="pre">/</span></span><span class="name"><span class="pre">dev</span></span><span class="operator"><span class="pre">/</span></span><span class="name"><span class="pre">drivify</span></span></code>.</p>
+<p>Il doit être possible d’écrire dans ce fichier les informations d’une musique qui sera alors ajoutée dans la liste de lecture.
+Une seule écriture doit permettre le passage de toutes les informations d’une musique et la durée doit être sous forme d’un entier 32 bits.
+Les détails exacts pour la communication entre l’espace kernel et utilisateur sont laissés libres, le plus simple étant de définir une structure commune.</p>
+<p>La liste de lecture est limitée à 16 musiques au maximum.</p>
+<p>La lecture du <em>device node</em> en fait rien.</p>
+<p>La musique est ensuite contrôlable à l’aide des boutons :</p>
+<ul class="simple">
+<li><p><code class="code c docutils literal notranslate"><span class="name"><span class="pre">KEY0</span></span></code> : Play/Pause (par défaut la musique est en pause)</p></li>
+<li><p><code class="code c docutils literal notranslate"><span class="name"><span class="pre">KEY1</span></span></code> : Remise à zéro de l’avancée de la musique actuelle (l’état play/pause est conservé après la remise à zéro)</p></li>
+<li><p><code class="code c docutils literal notranslate"><span class="name"><span class="pre">KEY2</span></span></code> : Passer à la musique suivante</p></li>
+</ul>
+<p>Les 7-segment affiches en continus le temps déjà écouté de la musique en cours (<code class="code c docutils literal notranslate"><span class="name"><span class="pre">HEX3</span></span><span class="literal number integer"><span class="pre">-2</span></span></code> pour les minutes et <code class="code c docutils literal notranslate"><span class="name"><span class="pre">HEX1</span></span><span class="literal number integer"><span class="pre">-0</span></span></code> pour les secondes).
+Si la liste de lecture est vide, l’affichage doit montrer <code class="code c docutils literal notranslate"><span class="literal number oct"><span class="pre">00</span></span><span class="operator"><span class="pre">:</span></span><span class="literal number oct"><span class="pre">00</span></span></code>.</p>
+<p>Lorsque la lecture d’une musique est en cours, la <code class="code c docutils literal notranslate"><span class="name"><span class="pre">LED9</span></span></code> s’allume et doit s’éteindre lors de la mise en pause.
+Les <code class="code c docutils literal notranslate"><span class="name"><span class="pre">LED4</span></span><span class="literal number integer"><span class="pre">-0</span></span></code> affiche le nombre de musiques actuellement dans la liste de lecture (celle en cours de lecture comprise)
+au format binaire.</p>
+<p>Quand une musique se termine, la suivante est alors lancée. S’il n’y a plus de musique, la lecture se met en pause
+(c.-à-d. que lors du prochain ajout d’une musique, il faudra appuyer sur <code class="code c docutils literal notranslate"><span class="name"><span class="pre">KEY0</span></span></code> pour la jouer).</p>
+<p>Ecrivez une application user-space permettant l’ajout de musique (à choix, à l’aide d’un tableau prédéfini ou via les arguments de l’application)</p>
+<div class="admonition warning">
+<p class="admonition-title">Avertissement</p>
+<p>Contraintes pour l’exercice :</p>
+<ul class="simple">
+<li><p>La liste de lecture utilise une <code class="code c docutils literal notranslate"><span class="name"><span class="pre">kfifo</span></span></code></p></li>
+<li><p>Un <code class="code c docutils literal notranslate"><span class="name"><span class="pre">kthread</span></span></code> est utilisé pour la gestion de l’affichage 7-segments et de la musique (temps restant, passage à la suivante)</p></li>
+<li><p>Un <code class="code c docutils literal notranslate"><span class="name"><span class="pre">timer</span></span></code> donne le <em>rythme</em> au thread</p>
+<ul>
+<li><p>Le thread est mis en attente et, chaque seconde, il se fait réveiller par le <code class="code c docutils literal notranslate"><span class="name"><span class="pre">timer</span></span></code>.</p></li>
+<li><p>Le <code class="code c docutils literal notranslate"><span class="name"><span class="pre">timer</span></span></code> doit tourner uniquement quand une musique est en cours de lecture.</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="admonition hint">
+<p class="admonition-title">Indication</p>
+<p>Ce module sera complété dans les prochains exercices, mais un seul fichier est demandé à la fin.
+Libre à vous de regarder les prochains exercices et de tout implémenter directement ou d’y aller
+exercice par exercice. P.ex. la gestion des accès concurrents sera à ajouter dans un autre exercice.</p>
+</div>
+</div>
+</section>
+<section id="sysfs">
+<h2>Sysfs<a class="headerlink" href="#sysfs" title="Lien permanent vers ce titre">#</a></h2>
+<p><em>Once upon a time…</em> une interface permettait aux utilisateurs d’interagir
+avec le noyau Linux.
+Le nom de cette interface était <strong>procfs</strong>, et consistait en un filesystem virtuel avec lequel
+le noyau pouvait montrer au user-space des informations sur son fonctionnement et il pouvait
+récupérer des paramètres de configuration.
+Malheureusement, avec le temps ce filesystem est devenu de plus en plus encombré par des
+informations non pertinentes, mais la <em>« peur de casser quelque chose »</em>
+empêchait de faire le ménage.
+Ainsi, il a été décidé de repartir de zéro, mais d’une façon plus structurée, avec <strong>sysfs</strong>,
+tout en gardant procfs pour le coeur du noyau.
+En tant que développeur driver, vous êtes donc censés utiliser sysfs !!</p>
+<p>Le répertoire du dispositif reds-adder v1.1 (voir <a class="reference internal" href="../tuto_02/tuto_02.html#tutoriel2"><span class="std std-ref">Tutoriel 2 —  REDS-adder driver v0.1 et v1.1</span></a>) dans <code class="file docutils literal notranslate"><span class="pre">/sys</span></code> existe déjà
+(grâce à l’appel à
+<code class="code c docutils literal notranslate"><span class="name"><span class="pre">misc_register</span></span><span class="punctuation"><span class="pre">()</span></span></code>). On peut le voir dans <code class="file docutils literal notranslate"><span class="pre">/sys/class/misc/</span></code> (car il
+s’agit d’un miscellaneous device, c.-à-d., il appartient au miscellaneous
+framework). En regardant les liens symboliques dans ce répertoire, on voit qu’il
+est aussi enregistré en tant que platform device (et donc il a son propre
+répertoire <code class="file docutils literal notranslate"><span class="pre">/sys/devices/platform/ff205000.reds-adder</span></code>).
+Si l’on veut exposer des informations (soit pour nous aider dans le
+debugging, soit pour nous permettre de configurer notre dispositif), on peut
+créer des fichiers. Ces fichiers peuvent être de trois types :</p>
+<ul class="simple">
+<li><p>en lecture seule (<code class="code c docutils literal notranslate"><span class="name"><span class="pre">DEVICE_ATTR_RO</span></span></code>)</p></li>
+<li><p>en écriture seule (<code class="code c docutils literal notranslate"><span class="name"><span class="pre">DEVICE_ATTR_WO</span></span></code>)</p></li>
+<li><p>en lecture/écriture (<code class="code c docutils literal notranslate"><span class="name"><span class="pre">DEVICE_ATTR_RW</span></span></code>)</p></li>
+</ul>
+<p>Le noyau nous offre des macros pour nous aider dans la création de ces fichiers.
+Par exemple, <code class="code c docutils literal notranslate"><span class="name"><span class="pre">DEVICE_ATTR_RW</span></span><span class="punctuation"><span class="pre">(</span></span><span class="operator"><span class="pre">&lt;</span></span><span class="name"><span class="pre">name</span></span><span class="operator"><span class="pre">&gt;</span></span><span class="punctuation"><span class="pre">)</span></span></code> permet d’instancier une structure <code class="code c docutils literal notranslate"><span class="name"><span class="pre">device_attribute</span></span></code>
+et de l’associer aux deux fonctions <code class="code c docutils literal notranslate"><span class="operator"><span class="pre">&lt;</span></span><span class="name"><span class="pre">name</span></span><span class="operator"><span class="pre">&gt;</span></span><span class="name"><span class="pre">_store</span></span><span class="punctuation"><span class="pre">()</span></span></code> (écriture) et <code class="code c docutils literal notranslate"><span class="operator"><span class="pre">&lt;</span></span><span class="name"><span class="pre">name</span></span><span class="operator"><span class="pre">&gt;</span></span><span class="name"><span class="pre">_show</span></span><span class="punctuation"><span class="pre">()</span></span></code> (lecture).
+La macro <code class="code c docutils literal notranslate"><span class="name"><span class="pre">DEVICE_ATTR</span></span><span class="punctuation"><span class="pre">()</span></span></code> permet d’instancier la structure de manière plus générique,
+en donnant explicitement les permissions d’accès aux fichiers et les fonctions <code class="code c docutils literal notranslate"><span class="name"><span class="pre">store</span></span></code> et <code class="code c docutils literal notranslate"><span class="name"><span class="pre">show</span></span></code>.
+D’autres macros sont également disponibles, <a class="reference external" href="https://www.kernel.org/doc/html/latest/driver-api/infrastructure.html#c.DEVICE_ATTR">voir la documentation</a></p>
+<p>On n’aura ensuite qu’à appeler <code class="code c docutils literal notranslate"><span class="name"><span class="pre">device_create_file</span></span><span class="punctuation"><span class="pre">()</span></span></code> en lui passant notre
+dispositif et un pointeur à la structure <code class="code c docutils literal notranslate"><span class="name"><span class="pre">dev_attr_</span></span><span class="operator"><span class="pre">&lt;</span></span><span class="name"><span class="pre">name</span></span><span class="operator"><span class="pre">&gt;</span></span></code> créée par l’une des macros
+ci-dessus, et on obtiendra notre fichier dans sysfs.
+Cette procédure est présentée dans le driver reds-adder v2.1 (voir <a class="reference internal" href="../tuto_03/tuto_03.html#tutoriel3"><span class="std std-ref">Tutoriel 3 —  REDS-adder driver v2.1 et v3.1</span></a>).</p>
+<p>Dans la fonction <code class="code c docutils literal notranslate"><span class="punctuation"><span class="pre">...</span></span><span class="name"><span class="pre">_store</span></span><span class="punctuation"><span class="pre">()</span></span></code>, on est censé lire une valeur venant l’utilisateur,
+par exemple en utilisant la fonction <code class="code c docutils literal notranslate"><span class="name"><span class="pre">kstrtoint</span></span><span class="punctuation"><span class="pre">()</span></span></code>
+(voir <a class="reference external" href="https://www.kernel.org/doc/htmldocs/kernel-api/API-kstrtoint.html">ici</a>)
+ou avec <code class="code c docutils literal notranslate"><span class="name"><span class="pre">sscanf</span></span><span class="punctuation"><span class="pre">()</span></span></code>.
+Dans la fonction <code class="code c docutils literal notranslate"><span class="punctuation"><span class="pre">...</span></span><span class="name"><span class="pre">_show</span></span><span class="punctuation"><span class="pre">()</span></span></code>, on retourne à l’utilisateur une valeur,
+les fonctions <code class="code c docutils literal notranslate"><span class="name"><span class="pre">sysfs_emit</span></span><span class="punctuation"><span class="pre">()</span></span></code> et <code class="code c docutils literal notranslate"><span class="name"><span class="pre">sysfs_emit_at</span></span><span class="punctuation"><span class="pre">()</span></span></code>
+(même fonctionnement que <code class="code c docutils literal notranslate"><span class="name"><span class="pre">scnprintf</span></span><span class="punctuation"><span class="pre">()</span></span></code> voir <a class="reference external" href="https://www.kernel.org/doc/html/latest/filesystems/api-summary.html#c.sysfs_emit">ici</a>)</p>
+<p>Voici un exemple d’utilisation :</p>
+<div class="highlight-c notranslate"><div class="highlight"><pre><span></span><span class="k">static</span><span class="w"> </span><span class="kt">ssize_t</span><span class="w"> </span><span class="nf">my_nice_name_store</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">device</span><span class="w"> </span><span class="o">*</span><span class="n">dev</span><span class="p">,</span><span class="w"></span>
+<span class="w">                                  </span><span class="k">struct</span><span class="w"> </span><span class="nc">device_attribute</span><span class="w"> </span><span class="o">*</span><span class="n">attr</span><span class="p">,</span><span class="w"></span>
+<span class="w">                                  </span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">buf</span><span class="p">,</span><span class="w"></span>
+<span class="w">                                  </span><span class="kt">size_t</span><span class="w"> </span><span class="n">count</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">rc</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">struct</span><span class="w"> </span><span class="nc">priv</span><span class="w"> </span><span class="o">*</span><span class="n">priv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dev_get_drvdata</span><span class="p">(</span><span class="n">dev</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">rc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">kstrtoint</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">my_internal_variable</span><span class="p">);</span><span class="w"></span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">rc</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">rc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">EINVAL</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">                </span><span class="n">rc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">count</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="p">}</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">rc</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="k">static</span><span class="w"> </span><span class="kt">ssize_t</span><span class="w"> </span><span class="nf">my_nice_name_show</span><span class="p">(</span><span class="k">struct</span><span class="w"> </span><span class="nc">device</span><span class="w"> </span><span class="o">*</span><span class="n">dev</span><span class="p">,</span><span class="w"></span>
+<span class="w">                                 </span><span class="k">struct</span><span class="w"> </span><span class="nc">device_attribute</span><span class="w"> </span><span class="o">*</span><span class="n">attr</span><span class="p">,</span><span class="w"></span>
+<span class="w">                                 </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">buf</span><span class="p">)</span><span class="w"></span>
+<span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">rc</span><span class="p">;</span><span class="w"></span>
+<span class="w">        </span><span class="k">struct</span><span class="w"> </span><span class="nc">priv</span><span class="w"> </span><span class="o">*</span><span class="n">priv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dev_get_drvdata</span><span class="p">(</span><span class="n">dev</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">        </span><span class="n">rc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sysfs_emit</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span><span class="w"> </span><span class="mi">8</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;%d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">priv</span><span class="o">-&gt;</span><span class="n">my_internal_variable</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">rc</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="k">static</span><span class="w"> </span><span class="n">DEVICE_ATTR_RW</span><span class="p">(</span><span class="n">my_nice_name</span><span class="p">);</span><span class="w"></span>
+
+<span class="cm">/* Then in the probe() function */</span><span class="w"></span>
+<span class="cm">/* ... */</span><span class="w"></span>
+<span class="n">rc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">device_create_file</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pdev</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">dev_attr_my_nice_name</span><span class="p">);</span><span class="w"></span>
+<span class="cm">/* ... */</span><span class="w"></span>
+<span class="cm">/* In the remove() function */</span><span class="w"></span>
+<span class="cm">/* ... */</span><span class="w"></span>
+<span class="n">device_remove_file</span><span class="p">(</span><span class="o">&amp;</span><span class="n">pdev</span><span class="o">-&gt;</span><span class="n">dev</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">dev_attr_my_nice_name</span><span class="p">);</span><span class="w"></span>
+<span class="cm">/* ... */</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Bien sûr, dans la fonction <code class="code c docutils literal notranslate"><span class="punctuation"><span class="pre">...</span></span><span class="name"><span class="pre">_store</span></span><span class="punctuation"><span class="pre">()</span></span></code>, on pourrait aussi modifier le
+comportement du dispositif, en ajoutant une <code class="code c docutils literal notranslate"><span class="name"><span class="pre">iowrite32</span></span><span class="punctuation"><span class="pre">()</span></span></code> sur le dispositif…</p>
+<p>L’entrée <strong>sysfs</strong> créée par cet exemple est disponible dans <code class="file docutils literal notranslate"><span class="pre">/sys/devices/platform/ff200000.drv2024/my_nice_name</span></code>
+en utilisant le même platform device que les labos.</p>
+<div class="admonition warning">
+<p class="admonition-title">Avertissement</p>
+<p>sysfs a deux limitations :</p>
+<ul class="simple">
+<li><p>on ne peut pas utiliser plus qu’une page de mémoire (normalement 4096 bytes)</p></li>
+<li><p>idéalement un fichier sysfs = une valeur (plus de détail sur cette règle <a class="reference external" href="https://lwn.net/Articles/378884/">dans cet article</a>)</p></li>
+</ul>
+<p>Si vous voulez sortir plus d’une valeur, il y a d’autres mécanismes
+prévus pour cela (p. ex., <em>debugfs</em>), mais qui vont au-delà des
+objectifs de ce cours…</p>
+</div>
+<div class="admonition-exercice-2-sysfs admonition">
+<p class="admonition-title"><strong>Exercice 2 : sysfs</strong></p>
+<p>Ajoutez, à l’aide de <code class="code c docutils literal notranslate"><span class="name"><span class="pre">sysfs</span></span></code>, les fonctionnalités suivantes dans le module de l’exercice précédent :</p>
+<ul class="simple">
+<li><p>Récupérer du titre de la musique courante</p></li>
+<li><p>Récupérer du nom de l’artiste de la musique courante</p></li>
+<li><p>Récupérer du nombre de musiques dans la liste de lecture</p></li>
+<li><p>Récupérer et changer l’état play/pause</p></li>
+<li><p>Récupérer et changer le temps déjà passé de la musique actuelle</p></li>
+<li><p>Récupérer la durée de la musique actuelle</p></li>
+<li><p>Récupérer la durée totale de toutes les musiques de la liste de lecture</p></li>
+</ul>
+<p>Complétez simplement le fichier de l’exercice précédent, pas besoin d’en faire une copie.</p>
+</div>
+</section>
+<section id="synchronisation">
+<h2>Synchronisation<a class="headerlink" href="#synchronisation" title="Lien permanent vers ce titre">#</a></h2>
+<p>Le noyau Linux est un logiciel multithreadé et multiprocesseur qui est particulièrement sensible
+aux problèmes de concurrence, car il doit, par sa nature, s’adapter aux événements générés par
+le hardware sous-jacent.
+Pour cette raison, il dispose d’un riche ensemble de primitives de synchronisation :</p>
+<ul class="simple">
+<li><p>mutex</p></li>
+<li><p>semaphores (déconseillés)</p></li>
+<li><p>spin locks</p></li>
+<li><p>refcounts</p></li>
+<li><p>…</p></li>
+</ul>
+<p>qu’on peut
+voir dans le chapitre 5 de <a class="reference external" href="https://lwn.net/Kernel/LDD3">Linux Device Drivers, 3rd edition</a>.</p>
+<div class="admonition-exercice-3-synchronisation admonition">
+<p class="admonition-title"><strong>Exercice 3: synchronisation</strong></p>
+<p>Ajouter la gestion des accès concurrents aux différentes variables de votre module.
+Une seule contrainte, la variable permettant la gestion de l’état play/pause doit être atomique.</p>
+<p>Complétez simplement le fichier, pas besoin d’en faire une copie.</p>
+</div>
+</section>
+<section id="travail-a-rendre-et-criteres-d-evaluation">
+<h2>Travail à rendre et critères d’évaluation<a class="headerlink" href="#travail-a-rendre-et-criteres-d-evaluation" title="Lien permanent vers ce titre">#</a></h2>
+<p>S’il est demandé d’écrire du code, ce code doit se trouver dans un fichier <em>ex&lt;n&gt;.c</em>, où &lt;n&gt; correspond au numéro de l’exercice.
+Si un exercice contient plusieurs variantes, alors le fichier sera nommé <em>ex&lt;n&gt;_&lt;variante&gt;.c</em>, où &lt;variante&gt; correspond à la variante.
+Par exemple : <em>ex2.c</em>, <em>ex6_poll.c</em>.
+Il n’est pas nécessaire de renommer les fichiers déjà existants.
+Si un exercice réutilise un fichier précédent, celui-ci doit être dupliqué pour le nouvel exercice, sauf indication contraire.</p>
+<p>Si le code a pour but d’être exécuté sur la DE1-SoC, il doit être compilé en « compilation croisée »,
+c.-à-d. en utilisant la toolchain mentionnée dans le <a class="reference internal" href="../lab_01/lab_01.html#laboratoire1"><span class="std std-ref">Laboratoire 1 — Introduction</span></a>.</p>
+<p>N’oubliez pas de mettre votre prénom et nom !</p>
+<p>Les exercices sont à faire <strong>individuellement</strong>.
+Copier la solution d’un autre et changer le nom/l’ordre des variables n’est pas toléré.</p>
+<p>La date limite est celle communiquée dans l’annonce sur Moodle.
+Vous devez rendre une archive <code class="file docutils literal notranslate"><span class="pre">.tar.gz</span></code> contenant :</p>
+<ul class="simple">
+<li><p>le code source de vos solutions et tous les fichiers nécessaires,</p></li>
+<li><dl class="simple">
+<dt>un fichier <code class="file docutils literal notranslate"><span class="pre">README.md</span></code></dt><dd><ul>
+<li><p>contenant les réponses aux questions posées dans les exercices.</p></li>
+<li><p>les éventuels soucis rencontrés qui péjore le rendu</p></li>
+<li><p>les choix d’implémentation « spéciaux » (si trop long pour expliquer en commentaire)</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p>Les notes seront réparties comme suit :</p>
+<ul class="simple">
+<li><p>80% de la note si l’exercice est correct (c.-à-d., <em>« fonctionne »</em>).
+Il doit bien sûr « fonctionner » sur d’autres PCs que votre PC personnel, et de façon déterministe.
+Il est donc impératif que tout ce qui est nécessaire pour compiler et tester le fonctionnement de la solution soit rendu.</p></li>
+<li><p>20% de la note si l’exercice est « bien fait », c.-à-d. :</p>
+<ul>
+<li><p>Respect des <a class="reference external" href="https://www.kernel.org/doc/html/latest/process/coding-style.html">Linux kernel coding style</a>,
+particulièrement les points suivants :</p>
+<ul>
+<li><ol class="arabic simple">
+<li><p>Indentation</p></li>
+</ol>
+</li>
+<li><ol class="arabic simple" start="2">
+<li><p>Breaking long lines and strings</p></li>
+</ol>
+</li>
+<li><ol class="arabic simple" start="3">
+<li><p>Placing Braces and Spaces</p></li>
+</ol>
+</li>
+<li><ol class="arabic simple" start="4">
+<li><p>Naming</p></li>
+</ol>
+</li>
+<li><ol class="arabic simple" start="6">
+<li><p>Functions</p></li>
+</ol>
+</li>
+<li><ol class="arabic simple" start="8">
+<li><p>Commenting</p></li>
+</ol>
+</li>
+</ul>
+</li>
+<li><p><strong>code lisible</strong></p></li>
+<li><p><strong>documenté/commenté</strong></p></li>
+<li><p><strong>bien structuré</strong></p></li>
+</ul>
+</li>
+</ul>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../tuto_03/tuto_03.html"
+       title="page précédente">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">précédent</p>
+        <p class="prev-next-title">Tutoriel 3 —  REDS-adder driver v2.1 et v3.1</p>
+      </div>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contenu
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#objectifs">Objectifs</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#materiel-necessaire">Matériel nécessaire</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#kthreads-et-timers">KThreads et timers</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#queues-kfifos">Queues (KFIFOs)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sysfs">Sysfs</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#synchronisation">Synchronisation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#travail-a-rendre-et-criteres-d-evaluation">Travail à rendre et critères d’évaluation</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+Par REDS institute
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2024, REDS institute.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

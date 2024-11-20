@@ -385,7 +385,7 @@ façon un peu "primitive").
 
     Il y a au moins 3 façons pour attendre une interruption au moyen de :file:`/dev/uio0` (voir dans le tutoriel). Lesquelles ?
 
-    Écrivez une version du logiciel user-space de l'exercice 5 pour
+    Écrivez une version du logiciel user-space de l'exercice 4 pour
     chacune de ces façons et détaillez par écrit leurs
     différences/avantages/inconvénients.
 

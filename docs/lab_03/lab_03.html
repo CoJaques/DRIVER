@@ -1,12 +1,13 @@
 
+
 <!DOCTYPE html>
 
 
-<html lang="fr" data-content_root="../" >
+<html lang="fr" data-content_root="" >
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
     <title>Laboratoire 3 — Introduction aux drivers kernel-space &#8212; Documentation DRV 2024 </title>
   
@@ -28,20 +29,21 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
-    <link rel="stylesheet" type="text/css" href="../_static/color.css?v=8770e769" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/color.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../_static/documentation_options.js?v=72dce1d2"></script>
-    <script src="../_static/doctools.js?v=9a2dae69"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
-    <script src="../_static/translations.js?v=041d0952"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js"></script>
+    <script src="../_static/translations.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'lab_03/lab_03';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Recherche" href="../search.html" />
@@ -167,6 +169,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../tuto_02/tuto_02.html">Tuto 2</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Laboratoire 3</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../lab_04/lab_04.html">Laboratoire 4</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tuto_03/tuto_03.html">Tuto 3</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lab_05/lab_05.html">Laboratoire 5</a></li>
 </ul>
 
     </div>
@@ -336,13 +340,12 @@ document.write(`
                 <article class="bd-article">
                   
   <section id="laboratoire-3-introduction-aux-drivers-kernel-space">
-<span id="laboratoire3"></span><h1>Laboratoire 3 — Introduction aux drivers kernel-space<a class="headerlink" href="#laboratoire-3-introduction-aux-drivers-kernel-space" title="Lien vers cette rubrique">#</a></h1>
+<span id="laboratoire3"></span><h1>Laboratoire 3 — Introduction aux drivers kernel-space<a class="headerlink" href="#laboratoire-3-introduction-aux-drivers-kernel-space" title="Lien permanent vers ce titre">#</a></h1>
 <figure class="align-right">
-<a class="reference internal image-reference" href="../_images/logo_drv.png"><img alt="../_images/logo_drv.png" src="../_images/logo_drv.png" style="width: 6cm;" />
-</a>
+<a class="reference internal image-reference" href="../_images/logo_drv.png"><img alt="../_images/logo_drv.png" src="../_images/logo_drv.png" style="width: 6cm;" /></a>
 </figure>
 <section id="objectifs">
-<h2>Objectifs<a class="headerlink" href="#objectifs" title="Lien vers cette rubrique">#</a></h2>
+<h2>Objectifs<a class="headerlink" href="#objectifs" title="Lien permanent vers ce titre">#</a></h2>
 <ul class="simple">
 <li><p>Connaître les interfaces disponibles sous Linux pour communiquer avec un driver</p></li>
 <li><p>Connaître l’API de programmation des drivers</p></li>
@@ -350,19 +353,19 @@ document.write(`
 </ul>
 </section>
 <section id="consignes">
-<h2>Consignes<a class="headerlink" href="#consignes" title="Lien vers cette rubrique">#</a></h2>
+<h2>Consignes<a class="headerlink" href="#consignes" title="Lien permanent vers ce titre">#</a></h2>
 <p>Ce laboratoire consiste en une marche à suivre illustrée d’exemples.
 À la fin de chaque section, un travail pratique sous forme de questions à
 répondre ou de code à écrire doit être réalisé. Notez bien toutes vos étapes et
 constatations dans votre rapport final.</p>
 </section>
 <section id="materiel-necessaire">
-<h2>Matériel nécessaire<a class="headerlink" href="#materiel-necessaire" title="Lien vers cette rubrique">#</a></h2>
+<h2>Matériel nécessaire<a class="headerlink" href="#materiel-necessaire" title="Lien permanent vers ce titre">#</a></h2>
 <p>Pour ce laboratoire vous avez besoin de la même configuration que pour le laboratoire 2 (tout
 simplement on ne chargera pas le module pour les drivers user-space).</p>
 </section>
 <section id="introductions-aux-peripheriques-sous-linux">
-<h2>Introductions aux périphériques sous Linux<a class="headerlink" href="#introductions-aux-peripheriques-sous-linux" title="Lien vers cette rubrique">#</a></h2>
+<h2>Introductions aux périphériques sous Linux<a class="headerlink" href="#introductions-aux-peripheriques-sous-linux" title="Lien permanent vers ce titre">#</a></h2>
 <p>Linux définit plusieurs classes de périphériques :</p>
 <ul class="simple">
 <li><p>Les périphériques de type <strong>char</strong>, dans lesquels on lit et/ou
@@ -391,10 +394,10 @@ module séparé ne dispense pas de posséder une partie du code source du noyau
 <p>Un périphérique sous Linux est considéré comme un fichier (voir
 <a class="reference external" href="https://en.wikipedia.org/wiki/Everything_is_a_file">Everything is a file</a>).</p>
 <p>Le système offre la possibilité d’interagir avec lui via les mêmes appels
-systèmes que ceux utilisés avec les fichiers conventionnels : <code class="code highlight c docutils literal highlight-c"><span class="n">read</span><span class="p">()</span></code>,
-<code class="code highlight c docutils literal highlight-c"><span class="n">write</span><span class="p">()</span></code>.
+systèmes que ceux utilisés avec les fichiers conventionnels : <code class="code c docutils literal notranslate"><span class="name"><span class="pre">read</span></span><span class="punctuation"><span class="pre">()</span></span></code>,
+<code class="code c docutils literal notranslate"><span class="name"><span class="pre">write</span></span><span class="punctuation"><span class="pre">()</span></span></code>.
 Les périphériques de type char possèdent également certains appels
-spéciaux, comme <code class="code highlight c docutils literal highlight-c"><span class="n">ioctl</span><span class="p">()</span></code> (<em>In-Out ConTroL</em>) qui permet de configurer le
+spéciaux, comme <code class="code c docutils literal notranslate"><span class="name"><span class="pre">ioctl</span></span><span class="punctuation"><span class="pre">()</span></span></code> (<em>In-Out ConTroL</em>) qui permet de configurer le
 périphérique.
 Ces fonctionnalités, pour les drivers char et block, sont exposées sous forme de
 fichier virtuel, appelé <em>device node</em> (ou <em>device file</em>), situé dans
@@ -402,8 +405,8 @@ fichier virtuel, appelé <em>device node</em> (ou <em>device file</em>), situé 
 Pour identifier à quel driver est associé quel fichier virtuel, deux numéros
 sont attribués à chacun de ces fichiers.
 Ces numéros d’identification sont visibles dans la cinquième et sixième
-colonne de la sortie de la commande <code class="code highlight bash docutils literal highlight-bash">ls<span class="w"> </span>-la</code>.</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">HOST:~$ </span>ls<span class="w"> </span>-la<span class="w"> </span>/dev
+colonne de la sortie de la commande <code class="code bash docutils literal notranslate"><span class="pre">ls</span> <span class="pre">-la</span></code>.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">HOST:~$ </span>ls -la /dev
 <span class="go">total 4</span>
 <span class="go">drwxr-xr-x  17 root     root          4440 Nov  1 07:13 .</span>
 <span class="go">drwxr-xr-x  26 redsuser redsuser      4096 Sep 14 11:30 ..</span>
@@ -429,18 +432,18 @@ Ces fichiers sont créés au démarrage par le gestionnaire de périphérique
 (<code class="file docutils literal notranslate"><span class="pre">udev</span></code>, <code class="file docutils literal notranslate"><span class="pre">mdev</span></code>, …) après l’énumération des bus, ou lors de
 l’insertion d’un périphérique (hot-plug).
 Il est également possible de créer manuellement des device nodes en
-précisant le type et le numéro majeur et mineur via la commande <code class="code highlight bash docutils literal highlight-bash">mknod</code>.</p>
+précisant le type et le numéro majeur et mineur via la commande <code class="code bash docutils literal notranslate"><span class="pre">mknod</span></code>.</p>
 <div class="admonition-exercice-1-mknod admonition">
 <p class="admonition-title"><strong>Exercice 1 : mknod</strong></p>
-<p>Utilisez la page de manuel de la commande <code class="code highlight bash docutils literal highlight-bash">mknod</code> pour en comprendre le
+<p>Utilisez la page de manuel de la commande <code class="code bash docutils literal notranslate"><span class="pre">mknod</span></code> pour en comprendre le
 fonctionnement.
 Créez ensuite un fichier virtuel de type caractère avec le même couple
 majeur/mineur que le fichier <code class="file docutils literal notranslate"><span class="pre">/dev/random</span></code>.
 Qu’est-ce qui se passe lorsque vous lisez son contenu avec la commande
-<code class="code highlight bash docutils literal highlight-bash">cat</code> ?</p>
+<code class="code bash docutils literal notranslate"><span class="pre">cat</span></code> ?</p>
 </div>
 <section id="exemple">
-<h3>Exemple<a class="headerlink" href="#exemple" title="Lien vers cette rubrique">#</a></h3>
+<h3>Exemple<a class="headerlink" href="#exemple" title="Lien permanent vers ce titre">#</a></h3>
 <p>Le périphérique <code class="file docutils literal notranslate"><span class="pre">/dev/ttyUSB0</span></code> (sur la machine hôte) a un majeur 188 qui correspond à un matériel
 bien réel : c’est le convertisseur USB/série de la DE1-SoC, visible sur votre
 machine si le câble USB est branché au connecteur console de la carte.
@@ -458,7 +461,7 @@ caractère.</p>
 <p><code class="file docutils literal notranslate"><span class="pre">sysfs</span></code> contient davantage d’informations sur le périphérique.
 Retrouvez-le dans l’arborescence de <code class="file docutils literal notranslate"><span class="pre">sysfs</span></code>, en particulier
 pour ce qui concerne le nom du driver utilisé et le type de connexion.
-Ensuite, utilisez la commande <code class="code highlight bash docutils literal highlight-bash">lsmod</code> pour confirmer que le
+Ensuite, utilisez la commande <code class="code bash docutils literal notranslate"><span class="pre">lsmod</span></code> pour confirmer que le
 driver utilisé est bien celui identifié auparavant et cherchez si
 d’autres modules plus génériques sont impliqués.
 (en fonction de la distribution Linux, il se peut qu’aucuns modules
@@ -468,7 +471,7 @@ lors de la compilation du kernel)</p>
 </section>
 </section>
 <section id="compilation-de-modules">
-<h2>Compilation de modules<a class="headerlink" href="#compilation-de-modules" title="Lien vers cette rubrique">#</a></h2>
+<h2>Compilation de modules<a class="headerlink" href="#compilation-de-modules" title="Lien permanent vers ce titre">#</a></h2>
 <p>En général, un driver simple se présente sous la forme d’un fichier C unique.
 Dans l’arborescence du noyau, les drivers compatibles avec toutes les
 architectures se situent dans le répertoire <code class="file docutils literal notranslate"><span class="pre">drivers</span></code> à la racine du code
@@ -482,28 +485,28 @@ pas.</p>
 <p>Pour nos tests, il est plus simple de compiler un driver séparément. Pour faire
 ceci, il est nécessaire d’avoir les sources du noyau pour lequel le driver doit
 être compilé, et ces sources doivent déjà être configurées et un
-<code class="code highlight bash docutils literal highlight-bash">make<span class="w"> </span>modules</code> doit avoir été préalablement effectué (ce qui est déjà le cas
+<code class="code bash docutils literal notranslate"><span class="pre">make</span> <span class="pre">modules</span></code> doit avoir été préalablement effectué (ce qui est déjà le cas
 si les sources ont déjà été compilées une fois).</p>
 <p>Si vous êtes sous une distribution de type Debian ou dérivée, pour compiler des
 modules pour votre machine vous devez installer le paquet <code class="file docutils literal notranslate"><span class="pre">linux-headers</span></code>
 correspondant à votre version du noyau (déjà installé sur la machine de
 laboratoire).</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>linux-headers-<span class="k">$(</span>uname<span class="w"> </span>-r<span class="k">)</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>sudo apt install linux-headers-<span class="k">$(</span>uname -r<span class="k">)</span>
 </pre></div>
 </div>
 <p>Les sources déjà préparées seront installées dans le dossier
 <code class="file docutils literal notranslate"><span class="pre">/lib/modules/$(uname</span> <span class="pre">-r)/build</span></code>.</p>
 <p>Vous pouvez ensuite utiliser le <code class="file docutils literal notranslate"><span class="pre">Makefile</span></code> suivant pour compiler un module
 (dans cet exemple, le module <em>empty</em>).</p>
-<div class="highlight-Makefile notranslate"><div class="highlight"><pre><span></span><span class="nv">obj-m</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>empty.o
+<div class="highlight-Makefile notranslate"><div class="highlight"><pre><span></span><span class="nv">obj-m</span> <span class="o">=</span> empty.o
 
-<span class="nv">KVERSION</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">$(</span>shell<span class="w"> </span>uname<span class="w"> </span>-r<span class="k">)</span>
-<span class="nv">KERNELSRC</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>/lib/modules/<span class="k">$(</span>KVERSION<span class="k">)</span>/build/
+<span class="nv">KVERSION</span> <span class="o">=</span> <span class="k">$(</span>shell uname -r<span class="k">)</span>
+<span class="nv">KERNELSRC</span> <span class="o">=</span> /lib/modules/<span class="k">$(</span>KVERSION<span class="k">)</span>/build/
 
 <span class="nf">all</span><span class="o">:</span>
-<span class="w">	</span>make<span class="w"> </span>-C<span class="w"> </span><span class="k">$(</span>KERNELSRC<span class="k">)</span><span class="w"> </span><span class="nv">M</span><span class="o">=</span><span class="k">$(</span>PWD<span class="k">)</span><span class="w"> </span>modules
+	make -C <span class="k">$(</span>KERNELSRC<span class="k">)</span> <span class="nv">M</span><span class="o">=</span><span class="k">$(</span>PWD<span class="k">)</span> modules
 <span class="nf">clean</span><span class="o">:</span>
-<span class="w">	</span>make<span class="w"> </span>-C<span class="w"> </span><span class="k">$(</span>KERNELSRC<span class="k">)</span><span class="w"> </span><span class="nv">M</span><span class="o">=</span><span class="k">$(</span>PWD<span class="k">)</span><span class="w"> </span>clean
+	make -C <span class="k">$(</span>KERNELSRC<span class="k">)</span> <span class="nv">M</span><span class="o">=</span><span class="k">$(</span>PWD<span class="k">)</span> clean
 </pre></div>
 </div>
 <div class="admonition warning">
@@ -521,29 +524,29 @@ d’indiquer le chemin.
 Le <code class="file docutils literal notranslate"><span class="pre">Makefile</span></code> pour votre module <em>empty</em> à cross-compiler deviendra
 donc :</p>
 <div class="highlight-Makefile notranslate"><div class="highlight"><pre><span></span><span class="c">### Put here the path to kernel sources! ###</span>
-<span class="nv">KERNELDIR</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span>/home/reds/linux-socfpga/
-<span class="nv">TOOLCHAIN</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span>/opt/toolchains/arm-linux-gnueabihf_6.4.1/bin/arm-linux-gnueabihf-
+<span class="nv">KERNELDIR</span> <span class="o">:=</span> /home/reds/linux-socfpga/
+<span class="nv">TOOLCHAIN</span> <span class="o">:=</span> /opt/toolchains/arm-linux-gnueabihf_6.4.1/bin/arm-linux-gnueabihf-
 
-<span class="nv">obj-m</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span>empty.o
+<span class="nv">obj-m</span> <span class="o">:=</span> empty.o
 
-<span class="nv">PWD</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="k">$(</span>shell<span class="w"> </span><span class="nb">pwd</span><span class="k">)</span>
-<span class="nv">WARN</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span>-W<span class="w"> </span>-Wall<span class="w"> </span>-Wstrict-prototypes<span class="w"> </span>-Wmissing-prototypes
+<span class="nv">PWD</span> <span class="o">:=</span> <span class="k">$(</span>shell <span class="nb">pwd</span><span class="k">)</span>
+<span class="nv">WARN</span> <span class="o">:=</span> -W -Wall -Wstrict-prototypes -Wmissing-prototypes
 
-<span class="nf">all</span><span class="o">:</span><span class="w"> </span><span class="n">empty</span>
+<span class="nf">all</span><span class="o">:</span> <span class="n">empty</span>
 
 <span class="nf">empty</span><span class="o">:</span>
-<span class="w">	</span>@echo<span class="w"> </span><span class="s2">&quot;Building with kernel sources in </span><span class="k">$(</span>KERNELDIR<span class="k">)</span><span class="s2">&quot;</span>
-<span class="w">	</span><span class="k">$(</span>MAKE<span class="k">)</span><span class="w"> </span><span class="nv">ARCH</span><span class="o">=</span>arm<span class="w"> </span><span class="nv">CROSS_COMPILE</span><span class="o">=</span><span class="k">$(</span>TOOLCHAIN<span class="k">)</span><span class="w"> </span>-C<span class="w"> </span><span class="k">$(</span>KERNELDIR<span class="k">)</span><span class="w"> </span><span class="nv">M</span><span class="o">=</span><span class="k">$(</span>PWD<span class="k">)</span><span class="w"> </span><span class="si">${</span><span class="nv">WARN</span><span class="si">}</span>
+	@echo <span class="s2">&quot;Building with kernel sources in </span><span class="k">$(</span>KERNELDIR<span class="k">)</span><span class="s2">&quot;</span>
+	<span class="k">$(</span>MAKE<span class="k">)</span> <span class="nv">ARCH</span><span class="o">=</span>arm <span class="nv">CROSS_COMPILE</span><span class="o">=</span><span class="k">$(</span>TOOLCHAIN<span class="k">)</span> -C <span class="k">$(</span>KERNELDIR<span class="k">)</span> <span class="nv">M</span><span class="o">=</span><span class="k">$(</span>PWD<span class="k">)</span> <span class="si">${</span><span class="nv">WARN</span><span class="si">}</span>
 
 <span class="nf">clean</span><span class="o">:</span>
-<span class="w">	</span>rm<span class="w"> </span>-rf<span class="w"> </span>*.o<span class="w"> </span>*~<span class="w"> </span>core<span class="w"> </span>.depend<span class="w"> </span>.*.cmd<span class="w"> </span>*.ko<span class="w"> </span>*.mod.c<span class="w"> </span>.tmp_versions<span class="w"> </span>modules.order<span class="w"> </span>Module.symvers
+	rm -rf *.o *~ core .depend .*.cmd *.ko *.mod.c .tmp_versions modules.order Module.symvers
 </pre></div>
 </div>
 <p>C’est d’ailleurs tout ce qui a besoin d’être précisé dans le <code class="file docutils literal notranslate"><span class="pre">Makefile</span></code>,
 hormis le nom du module, si l’on exclut les paramètres à donner à GCC.
 Il est également possible de passer les paramètres de GCC à l’appel de make, ce
 qui évite de devoir modifier le <code class="file docutils literal notranslate"><span class="pre">Makefile</span></code> :</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>make<span class="w"> </span><span class="nv">ARCH</span><span class="o">=</span>arm<span class="w"> </span><span class="nv">CROSS_COMPILE</span><span class="o">=</span>arm-linux-gnueabihf-
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>make <span class="nv">ARCH</span><span class="o">=</span>arm <span class="nv">CROSS_COMPILE</span><span class="o">=</span>arm-linux-gnueabihf-
 </pre></div>
 </div>
 <p>La cible <em>all</em> du <code class="file docutils literal notranslate"><span class="pre">Makefile</span></code> du module appelle la cible <em>modules</em> du
@@ -551,7 +554,7 @@ qui évite de devoir modifier le <code class="file docutils literal notranslate"
 variable <em>obj-m</em> avec le nom du driver à compiler.</p>
 <p>Une fois le module compilé, un fichier portant l’extension <code class="file docutils literal notranslate"><span class="pre">ko</span></code> est généré
 dans le répertoire du module.
-La commande <code class="code highlight bash docutils literal highlight-bash">insmod</code> permet de charger le module dans le noyau.</p>
+La commande <code class="code bash docutils literal notranslate"><span class="pre">insmod</span></code> permet de charger le module dans le noyau.</p>
 <div class="admonition warning">
 <p class="admonition-title">Avertissement</p>
 <p>Les modules sont des parties sensibles du système.
@@ -562,21 +565,21 @@ insérez un de vos modules et sauvegardez vos fichiers !</p>
 </div>
 <div class="admonition hint">
 <p class="admonition-title">Indication</p>
-<p><code class="code highlight bash docutils literal highlight-bash">strace</code> est un utilitaire permettant de lister tous les
-syscalls (appels à <code class="code highlight c docutils literal highlight-c"><span class="n">read</span><span class="p">()</span></code>/<code class="code highlight c docutils literal highlight-c"><span class="n">write</span><span class="p">()</span></code>/<code class="code highlight c docutils literal highlight-c"><span class="n">ioctl</span><span class="p">()</span></code> et autres)
+<p><code class="code bash docutils literal notranslate"><span class="pre">strace</span></code> est un utilitaire permettant de lister tous les
+syscalls (appels à <code class="code c docutils literal notranslate"><span class="name"><span class="pre">read</span></span><span class="punctuation"><span class="pre">()</span></span></code>/<code class="code c docutils literal notranslate"><span class="name"><span class="pre">write</span></span><span class="punctuation"><span class="pre">()</span></span></code>/<code class="code c docutils literal notranslate"><span class="name"><span class="pre">ioctl</span></span><span class="punctuation"><span class="pre">()</span></span></code> et autres)
 effectués par un processus.
 Cela est très utile pour contrôler les paramètres passés lors de la
 lecture/écriture/configuration de node devices.</p>
 </div>
-<p>La commande <code class="code highlight bash docutils literal highlight-bash">rmmod</code> permet d’enlever un module.
+<p>La commande <code class="code bash docutils literal notranslate"><span class="pre">rmmod</span></code> permet d’enlever un module.
 Souvent, lors de l’insertion et du démontage du module, celui-ci affiche un
 message d’information dans le log du noyau.
 Ce log, stocké dans <code class="file docutils literal notranslate"><span class="pre">/var/log/kern.log</span></code>, peut être affiché directement via
-la commande <code class="code highlight bash docutils literal highlight-bash">dmesg</code>. L’option <code class="code highlight bash docutils literal highlight-bash">-w</code> permet de <cite>suivre</cite> les nouveaux messages.
+la commande <code class="code bash docutils literal notranslate"><span class="pre">dmesg</span></code>. L’option <code class="code bash docutils literal notranslate"><span class="pre">-w</span></code> permet de <cite>suivre</cite> les nouveaux messages.
 Si cette option n’est pas disponible (sur la carte p. ex.),
-la commande <code class="code highlight bash docutils literal highlight-bash">tail</code> permet de filtrer la fin d’un fichier, et avec la
-commande <code class="code highlight bash docutils literal highlight-bash">tail<span class="w"> </span>-f</code> vous pouvez observer en continu un fichier de texte pour
-des lignes ajoutées à sa fin. (donc <code class="code highlight bash docutils literal highlight-bash">tail<span class="w"> </span>-<span class="w"> </span>f<span class="w"> </span>/var/log/kern.log</code> étant plus ou moins équivalent à <code class="code highlight bash docutils literal highlight-bash">dmesg<span class="w"> </span>-w</code>)</p>
+la commande <code class="code bash docutils literal notranslate"><span class="pre">tail</span></code> permet de filtrer la fin d’un fichier, et avec la
+commande <code class="code bash docutils literal notranslate"><span class="pre">tail</span> <span class="pre">-f</span></code> vous pouvez observer en continu un fichier de texte pour
+des lignes ajoutées à sa fin. (donc <code class="code bash docutils literal notranslate"><span class="pre">tail</span> <span class="pre">-</span> <span class="pre">f</span> <span class="pre">/var/log/kern.log</span></code> étant plus ou moins équivalent à <code class="code bash docutils literal notranslate"><span class="pre">dmesg</span> <span class="pre">-w</span></code>)</p>
 <div class="admonition-exercice-4-empty-module admonition">
 <p class="admonition-title"><strong>Exercice 4 : empty module</strong></p>
 <p><strong>Sur votre machine hôte (laptop, machine de labo), pas sur la DE1-SoC</strong>.
@@ -586,7 +589,7 @@ Ensuite, montez-le dans le noyau, démontez-le, et analysez les
 messages enregistrés dans les logs.</p>
 </div>
 <p>Lorsqu’on désire insérer un module ayant été compilé avec le noyau, la commande
-<code class="code highlight bash docutils literal highlight-bash">modprobe</code> est préférée à la commande <code class="code highlight bash docutils literal highlight-bash">insmod</code>, car elle va
+<code class="code bash docutils literal notranslate"><span class="pre">modprobe</span></code> est préférée à la commande <code class="code bash docutils literal notranslate"><span class="pre">insmod</span></code>, car elle va
 directement chercher le module dans le bon sous-répertoire de
 <code class="file docutils literal notranslate"><span class="pre">/lib/modules/</span></code> suivant la version du noyau démarré.
 Cette commande prend comme paramètres le nom du module (pas le chemin complet
@@ -599,18 +602,18 @@ un driver minimal de périphérique virtuel de type caractère.
 Il possède un majeur de 97.
 Une fois un <strong>device node</strong> associé à ce module, il est possible d’y écrire une chaîne de caractère et de la relire
 par la suite.
-A l’aide d’un appel à <code class="code highlight c docutils literal highlight-c"><span class="n">ioctl</span><span class="p">()</span></code> sur le device node, il est possible d’agir sur la chaîne en la mettant
+A l’aide d’un appel à <code class="code c docutils literal notranslate"><span class="name"><span class="pre">ioctl</span></span><span class="punctuation"><span class="pre">()</span></span></code> sur le device node, il est possible d’agir sur la chaîne en la mettant
 en majuscule/minuscule ou inversant la casse.</p>
-<p>Un appel <code class="code highlight c docutils literal highlight-c"><span class="n">ioctl</span><span class="p">()</span></code> prends deux paramètres entiers et renvoie un entier.
+<p>Un appel <code class="code c docutils literal notranslate"><span class="name"><span class="pre">ioctl</span></span><span class="punctuation"><span class="pre">()</span></span></code> prends deux paramètres entiers et renvoie un entier.
 Le programme <code class="file docutils literal notranslate"><span class="pre">ioctl.c</span></code> permet d’effectuer ces appels facilement.
 Afin d’utiliser les bonnes pratiques, les macros <cite>_IO</cite> et <cite>_IOW</cite> ont été utilisées pour générer la valeur du premier
-paramètre (= numéro de l”<code class="code highlight c docutils literal highlight-c"><span class="n">ioctl</span></code>). Pour ce module, ces valeurs sont écrites dans les logs à l’insertion.
+paramètre (= numéro de l”<code class="code c docutils literal notranslate"><span class="name"><span class="pre">ioctl</span></span></code>). Pour ce module, ces valeurs sont écrites dans les logs à l’insertion.
 Plus d’information sur ces macros sont disponibles <a class="reference external" href="https://www.kernel.org/doc/html/latest/userspace-api/ioctl/ioctl-number.html">sur la doc officiel</a>
 ainsi que dans le chapitre 6 de <a class="reference external" href="https://lwn.net/Kernel/LDD3/">Linux Device Drivers, Third Edition</a> (dans les premières pages du PDF correspondant).</p>
-<p>Le module fonctionne de la façon suivante lors des appels <code class="code highlight c docutils literal highlight-c"><span class="n">ioctl</span></code> :</p>
+<p>Le module fonctionne de la façon suivante lors des appels <code class="code c docutils literal notranslate"><span class="name"><span class="pre">ioctl</span></span></code> :</p>
 <ul class="simple">
-<li><p>Si le premier paramètre vaux la valeur de <code class="code highlight c docutils literal highlight-c"><span class="n">PARROT_CMD_TOGGLE</span></code>, la casse des lettres est inversée (majuscule en minuscule et inverse)</p></li>
-<li><p>Si le premier paramètre vaux la valeur de <code class="code highlight c docutils literal highlight-c"><span class="n">PARROT_CMD_ALLCASE</span></code>, toutes les lettres sont mises en majuscule/minuscule en fonction du second argument (<code class="code highlight c docutils literal highlight-c"><span class="n">TO_UPPERCASE</span></code> et <code class="code highlight c docutils literal highlight-c"><span class="n">TO_LOWERCASE</span></code>).</p></li>
+<li><p>Si le premier paramètre vaux la valeur de <code class="code c docutils literal notranslate"><span class="name"><span class="pre">PARROT_CMD_TOGGLE</span></span></code>, la casse des lettres est inversée (majuscule en minuscule et inverse)</p></li>
+<li><p>Si le premier paramètre vaux la valeur de <code class="code c docutils literal notranslate"><span class="name"><span class="pre">PARROT_CMD_ALLCASE</span></span></code>, toutes les lettres sont mises en majuscule/minuscule en fonction du second argument (<code class="code c docutils literal notranslate"><span class="name"><span class="pre">TO_UPPERCASE</span></span></code> et <code class="code c docutils literal notranslate"><span class="name"><span class="pre">TO_LOWERCASE</span></span></code>).</p></li>
 </ul>
 <p>Pour cet exercice :</p>
 <ul class="simple">
@@ -620,28 +623,28 @@ et récupérez un maximum d’informations sur ce périphérique grâce aux
 outils précédemment vus.</p></li>
 <li><p>Créez un device node afin de communiquer avec le driver (à choix sur votre machine ou sur la carte).
 Donnez les bons droits sur ce fichier afin que l’utilisateur courant puisse y accéder.
-Rendez un listing du device node. (c.-à-d. <code class="code highlight bash docutils literal highlight-bash">ls<span class="w"> </span>-la<span class="w"> </span>/dev/mynode</code>).</p></li>
-<li><p>Effectuez une écriture (<code class="code highlight bash docutils literal highlight-bash"><span class="nb">echo</span></code>) et une lecture (<code class="code highlight bash docutils literal highlight-bash">cat</code>) sur ce device node.
+Rendez un listing du device node. (c.-à-d. <code class="code bash docutils literal notranslate"><span class="pre">ls</span> <span class="pre">-la</span> <span class="pre">/dev/mynode</span></code>).</p></li>
+<li><p>Effectuez une écriture (<code class="code bash docutils literal notranslate"><span class="name builtin"><span class="pre">echo</span></span></code>) et une lecture (<code class="code bash docutils literal notranslate"><span class="pre">cat</span></code>) sur ce device node.
 Grâce à <code class="file docutils literal notranslate"><span class="pre">ioctl.c</span></code>, testez la configuration du périphérique, puis démontez-le.
 Vérifiez également que le démontage du noyau ait bien été effectué.
 Rendez une copie texte de votre console.</p></li>
 <li><p>Ce driver a été écrit par un ingénieur pressé qui n’a pas trop bien fait son boulot :
 les valeurs de retour ne sont pas contrôlées ! Aidez-le en rajoutant ces vérifications !</p></li>
 <li><p>L’ingénieur qui a écrit ce driver doit se croire à l’âge de la pierre, car il a
-utilisé la fonction <code class="code highlight c docutils literal highlight-c"><span class="n">register_chrdev</span><span class="p">()</span></code> qui ne devrait pas être utilisée à
+utilisé la fonction <code class="code c docutils literal notranslate"><span class="name"><span class="pre">register_chrdev</span></span><span class="punctuation"><span class="pre">()</span></span></code> qui ne devrait pas être utilisée à
 partir du noyau 2.6…  Modernisez ce driver et rendez-le plus agréable à utiliser
 (p. ex., ce serait très bien de ne pas devoir créer à la main le fichier du dispositif…).
 Vous pouvez vous référer à <a class="reference external" href="https://olegkutkov.me/2018/03/14/simple-linux-character-device-driver/">cet article</a>
-pour une utilisation de <code class="code highlight c docutils literal highlight-c"><span class="n">alloc_chrdev_region</span></code>, il est également possible d’utiliser <code class="code highlight c docutils literal highlight-c"><span class="n">register_chrdev_region</span></code>
-avec un major connu (généralement, on va préférer <code class="code highlight c docutils literal highlight-c"><span class="n">alloc</span></code> pour éviter d’avoir le même major qu’un autre driver).
-Il est également possible d’utiliser les misc device donc un exemple est donné par la V1 de <code class="code highlight c docutils literal highlight-c"><span class="n">reds_adder</span></code> dans les tutoriels.</p></li>
-<li><p>Modifiez ensuite le module pour ajouter la commande <code class="code highlight c docutils literal highlight-c"><span class="n">ioctl</span></code> <code class="code highlight c docutils literal highlight-c"><span class="n">PARROT_CMD_RESET</span></code> qui permet de retourner à
+pour une utilisation de <code class="code c docutils literal notranslate"><span class="name"><span class="pre">alloc_chrdev_region</span></span></code>, il est également possible d’utiliser <code class="code c docutils literal notranslate"><span class="name"><span class="pre">register_chrdev_region</span></span></code>
+avec un major connu (généralement, on va préférer <code class="code c docutils literal notranslate"><span class="name"><span class="pre">alloc</span></span></code> pour éviter d’avoir le même major qu’un autre driver).
+Il est également possible d’utiliser les misc device donc un exemple est donné par la V1 de <code class="code c docutils literal notranslate"><span class="name"><span class="pre">reds_adder</span></span></code> dans les tutoriels.</p></li>
+<li><p>Modifiez ensuite le module pour ajouter la commande <code class="code c docutils literal notranslate"><span class="name"><span class="pre">ioctl</span></span></code> <code class="code c docutils literal notranslate"><span class="name"><span class="pre">PARROT_CMD_RESET</span></span></code> qui permet de retourner à
 l’état des majuscules/minuscules originales (= valeur écrite par l’utilisateur).</p></li>
 </ul>
 </div>
 </section>
 <section id="travail-a-rendre-et-criteres-d-evaluation">
-<h2>Travail à rendre et critères d’évaluation<a class="headerlink" href="#travail-a-rendre-et-criteres-d-evaluation" title="Lien vers cette rubrique">#</a></h2>
+<h2>Travail à rendre et critères d’évaluation<a class="headerlink" href="#travail-a-rendre-et-criteres-d-evaluation" title="Lien permanent vers ce titre">#</a></h2>
 <p>S’il est demandé d’écrire du code, ce code doit se trouver dans un fichier <em>ex&lt;n&gt;.c</em>, où &lt;n&gt; correspond au numéro de l’exercice.
 Si un exercice contient plusieurs variantes, alors le fichier sera nommé <em>ex&lt;n&gt;_&lt;variante&gt;.c</em>, où &lt;variante&gt; correspond à la variante.
 Par exemple : <em>ex2.c</em>, <em>ex6_poll.c</em>.

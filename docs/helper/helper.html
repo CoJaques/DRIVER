@@ -1,12 +1,13 @@
 
+
 <!DOCTYPE html>
 
 
-<html lang="fr" data-content_root="../" >
+<html lang="fr" data-content_root="" >
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
     <title>Helper &#8212; Documentation DRV 2024 </title>
   
@@ -28,20 +29,21 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
-    <link rel="stylesheet" type="text/css" href="../_static/color.css?v=8770e769" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/color.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../_static/documentation_options.js?v=72dce1d2"></script>
-    <script src="../_static/doctools.js?v=9a2dae69"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
-    <script src="../_static/translations.js?v=041d0952"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js"></script>
+    <script src="../_static/translations.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'helper/helper';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Recherche" href="../search.html" />
@@ -167,6 +169,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../tuto_02/tuto_02.html">Tuto 2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../lab_03/lab_03.html">Laboratoire 3</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../lab_04/lab_04.html">Laboratoire 4</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tuto_03/tuto_03.html">Tuto 3</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lab_05/lab_05.html">Laboratoire 5</a></li>
 </ul>
 
     </div>
@@ -328,20 +332,20 @@ document.write(`
                 <article class="bd-article">
                   
   <section id="helper">
-<span id="id1"></span><h1>Helper<a class="headerlink" href="#helper" title="Lien vers cette rubrique">#</a></h1>
+<span id="id1"></span><h1>Helper<a class="headerlink" href="#helper" title="Lien permanent vers ce titre">#</a></h1>
 <section id="verification-du-style-de-code">
-<h2>Vérification du style de code<a class="headerlink" href="#verification-du-style-de-code" title="Lien vers cette rubrique">#</a></h2>
-<p>Afin de vérifier le respect du style de code du kernel Linux, le script <code class="code highlight bash docutils literal highlight-bash">style_check</code> est mis à disposition.
-Celui-ci se trouve dans le dossier <code class="code highlight bash docutils literal highlight-bash">material/helper</code>. Il prend comme unique argument le fichier à contrôler.
-Avant utilisation, il faut installer les outils <code class="code highlight bash docutils literal highlight-bash">meld</code> et <code class="code highlight bash docutils literal highlight-bash">clang-format</code> (<code class="code highlight bash docutils literal highlight-bash">sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>meld<span class="w"> </span>clang-format</code>).</p>
-<p>L’outil <code class="code highlight bash docutils literal highlight-bash">meld</code> est une interface graphique montrant les différences entre deux fichiers côte à côte et d’appliquer les changements directement dans le fichier voulu.
+<h2>Vérification du style de code<a class="headerlink" href="#verification-du-style-de-code" title="Lien permanent vers ce titre">#</a></h2>
+<p>Afin de vérifier le respect du style de code du kernel Linux, le script <code class="code bash docutils literal notranslate"><span class="pre">style_check</span></code> est mis à disposition.
+Celui-ci se trouve dans le dossier <code class="code bash docutils literal notranslate"><span class="pre">material/helper</span></code>. Il prend comme unique argument le fichier à contrôler.
+Avant utilisation, il faut installer les outils <code class="code bash docutils literal notranslate"><span class="pre">meld</span></code> et <code class="code bash docutils literal notranslate"><span class="pre">clang-format</span></code> (<code class="code bash docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt</span> <span class="pre">install</span> <span class="pre">meld</span> <span class="pre">clang-format</span></code>).</p>
+<p>L’outil <code class="code bash docutils literal notranslate"><span class="pre">meld</span></code> est une interface graphique montrant les différences entre deux fichiers côte à côte et d’appliquer les changements directement dans le fichier voulu.
 Il est très utile lors de merge ou pour voir ce qui à changer dans le code avec Git.
-Les commandes <code class="code highlight bash docutils literal highlight-bash">git<span class="w"> </span>difftool</code> et <code class="code highlight bash docutils literal highlight-bash">git<span class="w"> </span>mergetool</code> dans un repo Git permet de l’utiliser pour ces cas-là.</p>
-<p>Le script fourni fait en sorte que le fichier de gauche soit l’original et celui de droite la version formatée par <code class="code highlight bash docutils literal highlight-bash">clang-format</code>.
+Les commandes <code class="code bash docutils literal notranslate"><span class="pre">git</span> <span class="pre">difftool</span></code> et <code class="code bash docutils literal notranslate"><span class="pre">git</span> <span class="pre">mergetool</span></code> dans un repo Git permet de l’utiliser pour ces cas-là.</p>
+<p>Le script fourni fait en sorte que le fichier de gauche soit l’original et celui de droite la version formatée par <code class="code bash docutils literal notranslate"><span class="pre">clang-format</span></code>.
 Ce dernier est en fichier temporaire et sera supprimé après fermeture de l’outil. Vous pouvez cependant appliquer les différences sur le fichier original !
-<code class="code highlight bash docutils literal highlight-bash">clang-format</code> est un bon outil de formatage automatique, mais ne permet pas de tout faire, garder un oeil critique sur les changements proposés.</p>
-<p>Pour simplifier son utilisation, un lien symbolique peut être créé vers le script dans le dossier <code class="code highlight bash docutils literal highlight-bash">/usr/bin/local</code></p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>sudo<span class="w"> </span>ln<span class="w"> </span>-s<span class="w"> </span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/material/helper/style_check.sh<span class="w"> </span>/usr/local/bin/style_check
+<code class="code bash docutils literal notranslate"><span class="pre">clang-format</span></code> est un bon outil de formatage automatique, mais ne permet pas de tout faire, garder un oeil critique sur les changements proposés.</p>
+<p>Pour simplifier son utilisation, un lien symbolique peut être créé vers le script dans le dossier <code class="code bash docutils literal notranslate"><span class="pre">/usr/bin/local</span></code></p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>sudo ln -s <span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/material/helper/style_check.sh /usr/local/bin/style_check
 </pre></div>
 </div>
 <figure class="align-center" id="id2">
@@ -349,7 +353,7 @@ Ce dernier est en fichier temporaire et sera supprimé après fermeture de l’o
 <figcaption>
 <p><span class="caption-number">Fig. 1 </span><span class="caption-text">Exemple de meld sur un fichier, avec à gauche le fichier original et à droite les corrections proposées automatiquement.
 Ici, certaines indentations était faite avec des espaces et sont donc corrigées en tabulation, également certains espacements
-n’étaient pas correctement respecté.</span><a class="headerlink" href="#id2" title="Lien vers cette image">#</a></p>
+n’étaient pas correctement respecté.</span><a class="headerlink" href="#id2" title="Lien permanent vers cette image">#</a></p>
 </figcaption>
 </figure>
 </section>
