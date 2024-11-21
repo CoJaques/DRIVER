@@ -1,12 +1,13 @@
 
+
 <!DOCTYPE html>
 
 
-<html lang="fr" data-content_root="../" >
+<html lang="fr" data-content_root="" >
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
     <title>Mise en place de SSH sur la carte &#8212; Documentation DRV 2024 </title>
   
@@ -28,20 +29,21 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
-    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
-    <link rel="stylesheet" type="text/css" href="../_static/color.css?v=8770e769" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/color.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
   <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
-    <script src="../_static/documentation_options.js?v=72dce1d2"></script>
-    <script src="../_static/doctools.js?v=9a2dae69"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
-    <script src="../_static/translations.js?v=041d0952"></script>
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js"></script>
+    <script src="../_static/translations.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'helper/ssh';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Recherche" href="../search.html" />
@@ -167,6 +169,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../tuto_02/tuto_02.html">Tuto 2</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../lab_03/lab_03.html">Laboratoire 3</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../lab_04/lab_04.html">Laboratoire 4</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tuto_03/tuto_03.html">Tuto 3</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../lab_05/lab_05.html">Laboratoire 5</a></li>
 </ul>
 
     </div>
@@ -329,7 +333,7 @@ document.write(`
                 <article class="bd-article">
                   
   <section id="mise-en-place-de-ssh-sur-la-carte">
-<span id="ssh"></span><h1>Mise en place de SSH sur la carte<a class="headerlink" href="#mise-en-place-de-ssh-sur-la-carte" title="Lien vers cette rubrique">#</a></h1>
+<span id="ssh"></span><h1>Mise en place de SSH sur la carte<a class="headerlink" href="#mise-en-place-de-ssh-sur-la-carte" title="Lien permanent vers ce titre">#</a></h1>
 <p>Cette page vous présente comment configurer les connexions SSH sur la carte.
 Ceci permet d’avoir plusieurs terminaux ouverts simultanément,
 ainsi qu’un meilleur support de ceux-ci (détection de la taille, …)
@@ -337,25 +341,25 @@ Attention, il est possible que la connexion prenne un peu de temps !</p>
 <p>Les deux méthodes, via mot de passe ou clé SSH sont présentées.
 Seul l’une des deux méthodes a besoin d’être faite, de préférence avec les clés SSH.</p>
 <section id="connexion-par-mot-de-passe">
-<h2>Connexion par mot de passe<a class="headerlink" href="#connexion-par-mot-de-passe" title="Lien vers cette rubrique">#</a></h2>
+<h2>Connexion par mot de passe<a class="headerlink" href="#connexion-par-mot-de-passe" title="Lien permanent vers ce titre">#</a></h2>
 <p>La méthode la plus simple est de configurer un mot de passe pour l’utilisateur root.
-Pour cela, exécuter la commande <code class="code highlight bash docutils literal highlight-bash">passwd</code> sur la carte (via l’UART) pour modifier
+Pour cela, exécuter la commande <code class="code bash docutils literal notranslate"><span class="pre">passwd</span></code> sur la carte (via l’UART) pour modifier
 le mot de passe de l’utilisateur root.</p>
 <p>Vérifiez également que l’option <cite>PasswordAuthentication</cite> dans le fichier <cite>/etc/ssh/sshd_config</cite>
 soit mise à <cite>yes</cite> ou en commentaire. Si ce n’est pas le cas, modifier la ligne et redémarrer le service ssh :</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>service<span class="w"> </span>ssh<span class="w"> </span>restart
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>service ssh restart
 </pre></div>
 </div>
 <p>Après avoir choisi un mot de passe, vous pouvez vous connecter à l’aide de :</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ssh<span class="w"> </span>root@192.168.0.2
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ssh root@192.168.0.2
 </pre></div>
 </div>
 </section>
 <section id="connexion-par-cle">
-<h2>Connexion par clé<a class="headerlink" href="#connexion-par-cle" title="Lien vers cette rubrique">#</a></h2>
+<h2>Connexion par clé<a class="headerlink" href="#connexion-par-cle" title="Lien permanent vers ce titre">#</a></h2>
 <p>Pour se connecter à l’aide d’une clé SSH,
 il faut d’abord générer une clé SSH, si elle n’a pas déjà été créée, sur l’ordinateur hôte/VM à l’aide de :</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ssh-keygen<span class="w"> </span>-t<span class="w"> </span>ecdsa
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ssh-keygen -t ecdsa
 </pre></div>
 </div>
 <p>Vous pouvez généralement faire trois fois <em>enter</em> pour créer la clé.</p>
@@ -365,20 +369,20 @@ la connexion par défaut avec <em>RSA</em>. Utilisé l’algorithme <em>ECDSA</e
 les versions récentes du client.
 <a class="reference external" href="https://security.stackexchange.com/questions/270349/understanding-ssh-rsa-not-in-pubkeyacceptedalgorithms">Voir ici pour plus d’info</a></p>
 <p>Ensuite, si la connexion par mot de passe a été activée, effectuez :</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ssh-copy-id<span class="w"> </span>root@192.168.0.2
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ssh-copy-id root@192.168.0.2
 </pre></div>
 </div>
 <p>Si la connexion par mot de passe n’est pas activée, créez le fichier <code class="file docutils literal notranslate"><span class="pre">.ssh/authorized_keys</span></code> avec les bonnes permissions :</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>mkdir<span class="w"> </span>.ssh
-<span class="gp">$ </span>touch<span class="w"> </span>.ssh/authorized_keys
-<span class="gp">$ </span>chmod<span class="w"> </span><span class="m">700</span><span class="w"> </span>.ssh
-<span class="gp">$ </span>chmod<span class="w"> </span><span class="m">600</span><span class="w"> </span>.ssh/authorized_keys
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>mkdir .ssh
+<span class="gp">$ </span>touch .ssh/authorized_keys
+<span class="gp">$ </span>chmod <span class="m">700</span> .ssh
+<span class="gp">$ </span>chmod <span class="m">600</span> .ssh/authorized_keys
 </pre></div>
 </div>
 <p>Puis copiez le contenu du fichier <code class="file docutils literal notranslate"><span class="pre">~/.ssh/id_ecdsa.pub</span></code> sur l’hôte/VM
 et coller dans le fichier <code class="file docutils literal notranslate"><span class="pre">~/.ssh/authorized_keys</span></code> sur la carte à l’aide de vi/vim ou nano.</p>
 <p>Vous devriez pouvoir vous connecter à l’aide de :</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ssh<span class="w"> </span>root@192.168.0.2
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ssh root@192.168.0.2
 </pre></div>
 </div>
 </section>
