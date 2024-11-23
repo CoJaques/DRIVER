@@ -22,6 +22,7 @@
 #define EDGE_CAPTURE_OFFSET   0x5C
 #define SEGMENT_VOID_OFFSET   0x08
 #define MAX_VALUE_SEGMENT     9999
+#define RUNNING_LED_OFFSET    0x08
 
 // Enumeration for button masks to improve readability
 typedef enum {
@@ -45,10 +46,17 @@ struct time_management {
 	struct task_struct *display_thread;
 };
 
+struct music_data {
+	uint16_t duration;
+	char title[25];
+	char artist[25];
+};
+
 struct priv {
 	struct io_registers io;
 	struct time_management time;
 	struct device *dev;
+	struct KFIFO *playlist;
 	bool is_playing;
 };
 
@@ -89,6 +97,14 @@ static void set_time_segment(uint32_t seconds, struct priv *priv)
 	set_7_segment(minutes * 100 + seconds, priv);
 }
 
+static void set_running_led(bool value, struct priv *priv)
+{
+	uint16_t led_value = ioread16(priv->io.led);
+	uint16_t mask = 0x01 << RUNNING_LED_OFFSET;
+	led_value = value ? led_value | mask : led_value & ~mask;
+	iowrite8(led_value, priv->io.led);
+}
+
 static irqreturn_t irq_handler(int irq, void *dev_id)
 {
 	struct priv *priv = (struct priv *)dev_id;
@@ -97,20 +113,19 @@ static irqreturn_t irq_handler(int irq, void *dev_id)
 	// TODO CJS -> Add behaviour for key
 	switch (last_pressed_button) {
 	case KEY_0:
-		priv->is_playing = !priv->is_playing; // Alterne Play/Pause
+		priv->is_playing = !priv->is_playing;
 		if (priv->is_playing) {
 			hrtimer_start(&priv->time.music_timer, ktime_set(1, 0),
 				      HRTIMER_MODE_REL);
+			set_running_led(true, priv);
 		} else {
 			hrtimer_cancel(&priv->time.music_timer);
+			set_running_led(false, priv);
 		}
-		// add play/pause
 		break;
 	case KEY_1:
 		priv->time.current_time = 0;
 		set_7_segment(0, priv);
-		break;
-		// add reset
 		break;
 	case KEY_2:
 		priv->time.current_time = 600;
@@ -132,6 +147,7 @@ static int display_thread_func(void *data)
 
 	while (!kthread_should_stop()) {
 		if (priv->is_playing) {
+			// Manage next song here
 			set_time_segment(priv->time.current_time, priv);
 			priv->time.current_time++;
 		}
@@ -150,6 +166,8 @@ static enum hrtimer_restart timer_callback(struct hrtimer *timer)
 		hrtimer_forward_now(timer, ktime_set(1, 0));
 		return HRTIMER_RESTART;
 	}
+
+	set_running_led(false, priv);
 	return HRTIMER_NORESTART;
 }
 
@@ -202,9 +220,9 @@ static int switch_copy_probe(struct platform_device *pdev)
 
 	// enable interrupts on hw
 	iowrite8(0xF, priv->io.button_interrupt_mask);
-
 	// rearm interrupts
 	iowrite8(0x0F, priv->io.button_edge);
+
 	set_7_segment(0, priv);
 
 	hrtimer_init(&priv->time.music_timer, CLOCK_MONOTONIC,
