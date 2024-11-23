@@ -17,7 +17,7 @@
 #define BUTTON_EDGE_OFFSET    0x5C
 #define BUTTON_INTERRUPT_MASK 0x58
 #define SEGMENT1_OFFSET	      0x20
-#define LED_OFFSET	      0x3A
+#define LED_OFFSET	      0x00
 #define INTERRUPT_MASK_OFFSET 0x58
 #define EDGE_CAPTURE_OFFSET   0x5C
 #define SEGMENT_VOID_OFFSET   0x08
@@ -101,8 +101,8 @@ static void set_running_led(bool value, struct priv *priv)
 {
 	uint16_t led_value = ioread16(priv->io.led);
 	uint16_t mask = 0x01 << RUNNING_LED_OFFSET;
-	led_value = value ? led_value | mask : led_value & ~mask;
-	iowrite8(led_value, priv->io.led);
+	led_value = value ? (led_value | mask) : (led_value & ~mask);
+	iowrite16(led_value, priv->io.led);
 }
 
 static irqreturn_t irq_handler(int irq, void *dev_id)
