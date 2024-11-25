@@ -76,6 +76,7 @@ struct playlist_data {
 	struct class *cl;
 	struct kfifo *playlist;
 	struct music_data *current_music;
+	bool next_music_requested;
 };
 
 struct priv {
@@ -182,12 +183,16 @@ static irqreturn_t irq_handler(int irq, void *dev_id)
 
 	switch (last_pressed_button) {
 	case KEY_0:
-		priv->is_playing = !priv->is_playing;
-		if (priv->is_playing) {
+		if (!priv->is_playing &&
+		    (priv->playlist_data.current_music != NULL ||
+		     !kfifo_is_empty(priv->playlist_data.playlist))) {
+			priv->is_playing = true;
+			priv->playlist_data.next_music_requested = false;
 			hrtimer_start(&priv->time.music_timer, ktime_set(1, 0),
 				      HRTIMER_MODE_REL);
 			set_running_led(true, priv);
 		} else {
+			priv->is_playing = false;
 			hrtimer_cancel(&priv->time.music_timer);
 			set_running_led(false, priv);
 		}
@@ -197,16 +202,7 @@ static irqreturn_t irq_handler(int irq, void *dev_id)
 		set_time_segment(priv->time.current_time, priv);
 		break;
 	case KEY_2:
-		// skip song
-		if (kfifo_is_empty(priv->playlist_data.playlist)) {
-			priv->is_playing = false;
-			set_running_led(false, priv);
-			if (priv->playlist_data.current_music != NULL) {
-				kfree(priv->playlist_data.current_music);
-				priv->playlist_data.current_music = NULL;
-			}
-		}
-		next_music(priv);
+		priv->playlist_data.next_music_requested = true;
 		break;
 	case KEY_3:
 		// add exit
@@ -226,17 +222,21 @@ static int display_thread_func(void *data)
 		if (priv->is_playing) {
 			if (priv->playlist_data.current_music == NULL ||
 			    priv->time.current_time >=
-				    priv->playlist_data.current_music->duration) {
+				    priv->playlist_data.current_music->duration ||
+			    priv->playlist_data.next_music_requested) {
 				if (kfifo_is_empty(
-					    priv->playlist_data.playlist)) {
+					    priv->playlist_data.playlist) ||
+				    next_music(priv) != 0) {
+					kfree(priv->playlist_data.current_music);
+					priv->playlist_data.current_music =
+						NULL;
+					priv->time.current_time = 0;
 					priv->is_playing = false;
 					set_running_led(false, priv);
 				}
 
-				if (next_music(priv) != 0) {
-					priv->is_playing = false;
-					set_running_led(false, priv);
-				}
+				priv->playlist_data.next_music_requested =
+					false;
 			}
 
 			set_time_segment(priv->time.current_time, priv);
