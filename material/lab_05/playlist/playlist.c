@@ -2,6 +2,7 @@
 
 #include "linux/hrtimer.h"
 #include "linux/printk.h"
+#include "linux/spinlock.h"
 #include <linux/kernel.h>
 #include <linux/module.h>
 #include <linux/init.h>
@@ -49,6 +50,12 @@ struct io_registers {
 	void __iomem *button;
 	void __iomem *button_edge;
 	void __iomem *button_interrupt_mask;
+
+	// Here we use spinlock in place of mutex
+	// because in some case it's necessary to be
+	// used in interrupt context
+	spinlock_t led_running_spinlock;
+	spinlock_t segments_spinlock;
 };
 
 struct time_management {
@@ -68,6 +75,7 @@ struct playlist_data {
 	struct cdev cdev;
 	struct class *cl;
 	struct kfifo *playlist;
+	struct music_data *current_music;
 };
 
 struct priv {
@@ -109,17 +117,62 @@ static void set_7_segment(uint32_t value, struct priv *priv)
 
 static void set_time_segment(uint32_t seconds, struct priv *priv)
 {
+	// We use spinlock to protect the access to the segment register
+	unsigned long flags;
+	spin_lock_irqsave(&priv->io.segments_spinlock, flags);
+
 	uint32_t minutes = seconds / 60;
 	seconds = seconds % 60;
 	set_7_segment(minutes * 100 + seconds, priv);
+
+	spin_unlock_irqrestore(&priv->io.segments_spinlock, flags);
 }
 
 static void set_running_led(bool value, struct priv *priv)
 {
+	// We use spinlock to protect the access to the led register
+	unsigned long flags;
+	spin_lock_irqsave(&priv->io.led_running_spinlock, flags);
+
 	uint16_t led_value = ioread16(priv->io.led);
 	uint16_t mask = 0x01 << RUNNING_LED_OFFSET;
 	led_value = value ? (led_value | mask) : (led_value & ~mask);
 	iowrite16(led_value, priv->io.led);
+
+	spin_unlock_irqrestore(&priv->io.led_running_spinlock, flags);
+}
+
+static int next_music(struct priv *priv)
+{
+	pr_info("Next music\n");
+	if (priv->playlist_data.current_music != NULL) {
+		kfree(priv->playlist_data.current_music);
+	}
+
+	priv->playlist_data.current_music =
+		kmalloc(sizeof(struct music_data), GFP_KERNEL);
+	if (priv->playlist_data.current_music == NULL) {
+		pr_err("Failed to allocate memory for music data\n");
+		return -1;
+	}
+
+	if (kfifo_out(priv->playlist_data.playlist,
+		      priv->playlist_data.current_music,
+		      sizeof(struct music_data)) != sizeof(struct music_data)) {
+		pr_err("Failed to get music data from playlist\n");
+		kfree(priv->playlist_data.current_music);
+		priv->playlist_data.current_music = NULL;
+		return -1;
+	}
+
+	pr_info("Playing music: '%s' by '%s', duration: %u seconds\n",
+		priv->playlist_data.current_music->title,
+		priv->playlist_data.current_music->artist,
+		priv->playlist_data.current_music->duration);
+
+	priv->time.current_time = 0;
+
+	return 0;
 }
 
 static irqreturn_t irq_handler(int irq, void *dev_id)
@@ -127,7 +180,6 @@ static irqreturn_t irq_handler(int irq, void *dev_id)
 	struct priv *priv = (struct priv *)dev_id;
 	uint8_t last_pressed_button = ioread8(priv->io.button_edge);
 
-	// TODO CJS -> Add behaviour for key
 	switch (last_pressed_button) {
 	case KEY_0:
 		priv->is_playing = !priv->is_playing;
@@ -142,11 +194,19 @@ static irqreturn_t irq_handler(int irq, void *dev_id)
 		break;
 	case KEY_1:
 		priv->time.current_time = 0;
-		set_7_segment(0, priv);
+		set_time_segment(priv->time.current_time, priv);
 		break;
 	case KEY_2:
-		priv->time.current_time = 600;
-		// add next
+		// skip song
+		if (kfifo_is_empty(priv->playlist_data.playlist)) {
+			priv->is_playing = false;
+			set_running_led(false, priv);
+			if (priv->playlist_data.current_music != NULL) {
+				kfree(priv->playlist_data.current_music);
+				priv->playlist_data.current_music = NULL;
+			}
+		}
+		next_music(priv);
 		break;
 	case KEY_3:
 		// add exit
@@ -164,7 +224,21 @@ static int display_thread_func(void *data)
 
 	while (!kthread_should_stop()) {
 		if (priv->is_playing) {
-			// Manage next song here
+			if (priv->playlist_data.current_music == NULL ||
+			    priv->time.current_time >=
+				    priv->playlist_data.current_music->duration) {
+				if (kfifo_is_empty(
+					    priv->playlist_data.playlist)) {
+					priv->is_playing = false;
+					set_running_led(false, priv);
+				}
+
+				if (next_music(priv) != 0) {
+					priv->is_playing = false;
+					set_running_led(false, priv);
+				}
+			}
+
 			set_time_segment(priv->time.current_time, priv);
 			priv->time.current_time++;
 		}
@@ -376,6 +450,9 @@ static int switch_copy_probe(struct platform_device *pdev)
 		ret = PTR_ERR(priv->playlist_data.dev);
 		goto REMOVE_CDEV;
 	}
+
+	spin_lock_init(&priv->io.led_running_spinlock);
+	spin_lock_init(&priv->io.segments_spinlock);
 
 	return 0;
 
