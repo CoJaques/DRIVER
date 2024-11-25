@@ -1,4 +1,4 @@
-// COLIN JAQUES
+// COLIN JAQUESpl
 
 #include "linux/hrtimer.h"
 #include "linux/printk.h"
@@ -18,6 +18,7 @@
 #include <linux/cdev.h>
 #include <linux/kfifo.h>
 #include <linux/fs.h>
+#include <linux/math.h>
 
 #define BUTTON_OFFSET	      0x50
 #define BUTTON_EDGE_OFFSET    0x5C
@@ -94,24 +95,20 @@ static const uint32_t number_representation_7segment[] = {
 // Set the 7-segment display based on the value to print
 static void set_7_segment(uint32_t value, struct priv *priv)
 {
+	uint32_t segment1_value = 0;
+
 	if (value > MAX_VALUE_SEGMENT) {
 		value = MAX_VALUE_SEGMENT;
 	}
 
-	// Extract digits from the value
-	uint8_t unit = value % 10;
-	uint8_t ten = (value / 10) % 10;
-	uint8_t hundred = (value / 100) % 10;
-	uint8_t thousand = (value / 1000) % 10;
-
 	// Set the values for the 7-segment registers
-	uint32_t segment1_value =
-		number_representation_7segment[unit] |
-		(number_representation_7segment[ten] << SEGMENT_VOID_OFFSET) |
-		(number_representation_7segment[hundred]
-		 << (SEGMENT_VOID_OFFSET * 2)) |
-		(number_representation_7segment[thousand]
-		 << (SEGMENT_VOID_OFFSET * 3));
+	// We use the modulo operator to get the unit, ten, hundred and thousand
+	for (unsigned i = 0; i < 4; i++) {
+		segment1_value |= number_representation_7segment[value % 10]
+				  << (SEGMENT_VOID_OFFSET * i);
+
+		value /= 10;
+	}
 
 	iowrite32(segment1_value, priv->io.segment1);
 }
