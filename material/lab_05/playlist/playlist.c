@@ -29,7 +29,8 @@
 #define EDGE_CAPTURE_OFFSET   0x5C
 #define SEGMENT_VOID_OFFSET   0x08
 #define MAX_VALUE_SEGMENT     9999
-#define RUNNING_LED_OFFSET    0x08
+#define RUNNING_LED_NUMBER    0x08
+#define RUNNING_LED_OFFSET    (1 << RUNNING_LED_NUMBER)
 
 #define DEVICE_NAME	      "drivify"
 #define MAJOR_NUM	      99
@@ -133,27 +134,29 @@ static void set_running_led(bool value, struct priv *priv)
 	spin_lock_irqsave(&priv->io.led_running_spinlock, flags);
 
 	uint16_t led_value = ioread16(priv->io.led);
-	uint16_t mask = 0x01 << RUNNING_LED_OFFSET;
-	led_value = value ? (led_value | mask) : (led_value & ~mask);
+	led_value = value ? (led_value | RUNNING_LED_OFFSET) :
+			    (led_value & ~RUNNING_LED_OFFSET);
 	iowrite16(led_value, priv->io.led);
 
 	spin_unlock_irqrestore(&priv->io.led_running_spinlock, flags);
 }
 
-static int next_music(struct priv *priv)
+static int instanciate_music_if_null(struct priv *priv)
 {
-	pr_info("Next music\n");
-	if (priv->playlist_data.current_music != NULL) {
-		kfree(priv->playlist_data.current_music);
-	}
-
-	priv->playlist_data.current_music =
-		kmalloc(sizeof(struct music_data), GFP_KERNEL);
 	if (priv->playlist_data.current_music == NULL) {
-		pr_err("Failed to allocate memory for music data\n");
-		return -1;
+		priv->playlist_data.current_music =
+			kmalloc(sizeof(struct music_data), GFP_KERNEL);
+		if (priv->playlist_data.current_music == NULL) {
+			pr_err("Failed to allocate memory for music data\n");
+			return -1;
+		}
 	}
 
+	return 0;
+}
+
+static int get_next_music_from_queue(struct priv *priv)
+{
 	if (kfifo_out(priv->playlist_data.playlist,
 		      priv->playlist_data.current_music,
 		      sizeof(struct music_data)) != sizeof(struct music_data)) {
@@ -162,6 +165,19 @@ static int next_music(struct priv *priv)
 		priv->playlist_data.current_music = NULL;
 		return -1;
 	}
+
+	return 0;
+}
+
+static int next_music(struct priv *priv)
+{
+	pr_info("Next music\n");
+
+	if (instanciate_music_if_null(priv))
+		return -ENOMEM;
+
+	if (get_next_music_from_queue(priv))
+		return -EINVAL;
 
 	pr_info("Playing music: '%s' by '%s', duration: %u seconds\n",
 		priv->playlist_data.current_music->title,
@@ -173,6 +189,13 @@ static int next_music(struct priv *priv)
 	return 0;
 }
 
+static bool shouldStartPlayMusic(struct priv *priv)
+{
+	return (!priv->is_playing &&
+		(priv->playlist_data.current_music != NULL ||
+		 !kfifo_is_empty(priv->playlist_data.playlist)));
+}
+
 static irqreturn_t irq_handler(int irq, void *dev_id)
 {
 	struct priv *priv = (struct priv *)dev_id;
@@ -180,11 +203,12 @@ static irqreturn_t irq_handler(int irq, void *dev_id)
 
 	switch (last_pressed_button) {
 	case KEY_0:
-		if (!priv->is_playing &&
-		    (priv->playlist_data.current_music != NULL ||
-		     !kfifo_is_empty(priv->playlist_data.playlist))) {
+		if (shouldStartPlayMusic(priv)) {
 			priv->is_playing = true;
+
+			// reset if a new music was requested
 			priv->playlist_data.next_music_requested = false;
+
 			hrtimer_start(&priv->time.music_timer, ktime_set(1, 0),
 				      HRTIMER_MODE_REL);
 			set_running_led(true, priv);
@@ -201,9 +225,6 @@ static irqreturn_t irq_handler(int irq, void *dev_id)
 	case KEY_2:
 		priv->playlist_data.next_music_requested = true;
 		break;
-	case KEY_3:
-		// add exit
-		break;
 	}
 
 	iowrite8(0x0F, priv->io.button_edge);
@@ -211,37 +232,50 @@ static irqreturn_t irq_handler(int irq, void *dev_id)
 	return IRQ_HANDLED;
 }
 
+static bool should_switch_music(struct priv *priv)
+{
+	return !priv->playlist_data.current_music || // No music is playing
+	       priv->time.current_time >=
+		       priv->playlist_data.current_music
+			       ->duration || // Current music finished
+	       priv->playlist_data.next_music_requested; // Next music requested
+}
+
+static void playlist_cycle(struct priv *priv)
+{
+	if (should_switch_music(priv)) {
+		// Attempt to load the next music, stop playing if none available
+		if (kfifo_is_empty(priv->playlist_data.playlist) ||
+		    next_music(priv) != 0) {
+			kfree(priv->playlist_data.current_music);
+			priv->playlist_data.current_music = NULL;
+			priv->time.current_time = 0;
+			priv->is_playing = false;
+			set_running_led(false, priv);
+		}
+
+		// Reset next music request flag
+		priv->playlist_data.next_music_requested = false;
+	}
+
+	// Update the time display
+	set_time_segment(priv->time.current_time, priv);
+	priv->time.current_time++;
+}
+
 static int display_thread_func(void *data)
 {
 	struct priv *priv = (struct priv *)data;
 
 	while (!kthread_should_stop()) {
-		if (priv->is_playing) {
-			if (priv->playlist_data.current_music == NULL ||
-			    priv->time.current_time >=
-				    priv->playlist_data.current_music->duration ||
-			    priv->playlist_data.next_music_requested) {
-				if (kfifo_is_empty(
-					    priv->playlist_data.playlist) ||
-				    next_music(priv) != 0) {
-					kfree(priv->playlist_data.current_music);
-					priv->playlist_data.current_music =
-						NULL;
-					priv->time.current_time = 0;
-					priv->is_playing = false;
-					set_running_led(false, priv);
-				}
+		if (priv->is_playing)
+			playlist_cycle(priv);
 
-				priv->playlist_data.next_music_requested =
-					false;
-			}
-
-			set_time_segment(priv->time.current_time, priv);
-			priv->time.current_time++;
-		}
+		// Put the thread to sleep until the next iteration
 		set_current_state(TASK_INTERRUPTIBLE);
 		schedule();
 	}
+
 	return 0;
 }
 
@@ -253,10 +287,10 @@ static enum hrtimer_restart timer_callback(struct hrtimer *timer)
 		wake_up_process(priv->time.display_thread);
 		hrtimer_forward_now(timer, ktime_set(1, 0));
 		return HRTIMER_RESTART;
+	} else {
+		set_running_led(false, priv);
+		return HRTIMER_NORESTART;
 	}
-
-	set_running_led(false, priv);
-	return HRTIMER_NORESTART;
 }
 
 static int setup_hw_irq(struct priv *priv, struct platform_device *pdev)
@@ -277,7 +311,6 @@ static int setup_hw_irq(struct priv *priv, struct platform_device *pdev)
 		return PTR_ERR(base_address);
 	}
 
-	dev_info(priv->io.dev, "Registering interrupt handler\n");
 	int irq_num = platform_get_irq(pdev, 0);
 	if (irq_num < 0) {
 		dev_err(priv->io.dev, "Failed to get IRQ number\n");
@@ -321,12 +354,6 @@ static int setup_timer_thread(struct priv *priv)
 	return 0;
 }
 
-/**
- * @brief uevent callback to set the permission on the device file
- *
- * @param dev pointer to the device
- * @param env uevent environnement corresponding to the device
- */
 static int playlist_uevent(struct device *dev, struct kobj_uevent_env *env)
 {
 	// Set the permissions of the device file
@@ -419,8 +446,7 @@ static int switch_copy_probe(struct platform_device *pdev)
 		goto UNREGISTER_KFIFO;
 	}
 
-	ret = register_chrdev_region(MAJMIN, 1, DEVICE_NAME);
-	if (ret != 0) {
+	if (register_chrdev_region(MAJMIN, 1, DEVICE_NAME)) {
 		pr_err("Failed to register char device region\n");
 		goto UNREGISTER_KFIFO;
 	}
