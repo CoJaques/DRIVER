@@ -37,6 +37,14 @@
 #define MAJMIN		      MKDEV(MAJOR_NUM, 0)
 #define MAX_PLAYLIST_SIZE     16
 
+#define CLEANUP_ON_ERROR(action, label, dev, message) \
+	do {                                          \
+		if ((ret = action) < 0) {             \
+			dev_err(dev, message);        \
+			goto label;                   \
+		}                                     \
+	} while (0)
+
 // Enumeration for button masks to improve readability
 typedef enum {
 	KEY_0 = 1 << 0,
@@ -417,18 +425,13 @@ static int switch_copy_probe(struct platform_device *pdev)
 	platform_set_drvdata(pdev, priv);
 
 	priv->io.dev = &pdev->dev;
-	ret = setup_hw_irq(priv, pdev);
-	if (ret != 0) {
-		dev_err(priv->io.dev, "Failed to setup hw irq\n");
-		return ret;
-	}
+	CLEANUP_ON_ERROR(setup_hw_irq(priv, pdev), UNREGISTER_TIMER,
+			 priv->io.dev, "Failed to setup hw irq\n");
 
 	set_7_segment(0, priv);
 
-	if (setup_timer_thread(priv) != 0) {
-		dev_err(priv->io.dev, "Failed to setup timer thread\n");
-		return -EINVAL;
-	}
+	CLEANUP_ON_ERROR(setup_timer_thread(priv), UNREGISTER_TIMER,
+			 priv->io.dev, "Failed to setup timer thread\n");
 
 	priv->playlist_data.playlist =
 		kmalloc(sizeof(struct kfifo), GFP_KERNEL);
@@ -438,18 +441,15 @@ static int switch_copy_probe(struct platform_device *pdev)
 		goto UNREGISTER_TIMER;
 	}
 
-	if (kfifo_alloc(priv->playlist_data.playlist,
-			MAX_PLAYLIST_SIZE * sizeof(struct music_data),
-			GFP_KERNEL)) {
-		pr_err("Failed to initialize kfifo\n");
-		ret = -ENOMEM;
-		goto UNREGISTER_KFIFO;
-	}
+	CLEANUP_ON_ERROR(
+		kfifo_alloc(priv->playlist_data.playlist,
+			    MAX_PLAYLIST_SIZE * sizeof(struct music_data),
+			    GFP_KERNEL),
+		UNREGISTER_KFIFO, priv->io.dev, "Failed to initialize kfifo\n");
 
-	if (register_chrdev_region(MAJMIN, 1, DEVICE_NAME)) {
-		pr_err("Failed to register char device region\n");
-		goto UNREGISTER_KFIFO;
-	}
+	CLEANUP_ON_ERROR(register_chrdev_region(MAJMIN, 1, DEVICE_NAME),
+			 UNREGISTER_KFIFO, priv->io.dev,
+			 "Failed to register char device region\n");
 
 	priv->playlist_data.cl = class_create(THIS_MODULE, DEVICE_NAME);
 	if (IS_ERR(priv->playlist_data.cl)) {
@@ -460,11 +460,9 @@ static int switch_copy_probe(struct platform_device *pdev)
 
 	priv->playlist_data.cl->dev_uevent = playlist_uevent;
 	cdev_init(&priv->playlist_data.cdev, &drivify_fops);
-	ret = cdev_add(&priv->playlist_data.cdev, MAJMIN, 1);
-	if (ret != 0) {
-		pr_err("Failed to add cdev\n");
-		goto UNREGISTER_CLASS;
-	}
+	CLEANUP_ON_ERROR(cdev_add(&priv->playlist_data.cdev, MAJMIN, 1),
+			 UNREGISTER_CLASS, priv->io.dev,
+			 "Failed to add cdev\n");
 
 	priv->playlist_data.dev = device_create(priv->playlist_data.cl, NULL,
 						MAJMIN, NULL, DEVICE_NAME);
