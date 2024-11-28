@@ -24,16 +24,16 @@ irqreturn_t irq_handler(int irq, void *dev_id)
 
 			hrtimer_start(&priv->time.music_timer, ktime_set(1, 0),
 				      HRTIMER_MODE_REL);
-			set_running_led(true, priv);
+			set_running_led(true, &priv->io);
 		} else {
 			priv->is_playing = false;
 			hrtimer_cancel(&priv->time.music_timer);
-			set_running_led(false, priv);
+			set_running_led(false, &priv->io);
 		}
 		break;
 	case KEY_1:
 		priv->time.current_time = 0;
-		set_time_segment(priv->time.current_time, priv);
+		set_time_segment(priv->time.current_time, &priv->io);
 		break;
 	case KEY_2:
 		priv->playlist_data.next_music_requested = true;
@@ -44,7 +44,8 @@ irqreturn_t irq_handler(int irq, void *dev_id)
 	return IRQ_HANDLED;
 }
 
-int setup_hw_irq(struct priv *priv, struct platform_device *pdev)
+int setup_hw_irq(struct priv *priv, struct platform_device *pdev,
+		 const char *name)
 {
 	struct resource *mem_info;
 	void __iomem *base_address;
@@ -62,8 +63,7 @@ int setup_hw_irq(struct priv *priv, struct platform_device *pdev)
 	if (irq_num < 0)
 		return -EINVAL;
 
-	ret = devm_request_irq(&pdev->dev, irq_num, irq_handler, 0, "drivify",
-			       priv);
+	ret = devm_request_irq(&pdev->dev, irq_num, irq_handler, 0, name, priv);
 	if (ret)
 		return ret;
 

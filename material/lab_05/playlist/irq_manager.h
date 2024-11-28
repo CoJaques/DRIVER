@@ -19,7 +19,8 @@ typedef enum {
 } Button;
 
 irqreturn_t irq_handler(int irq, void *dev_id);
-int setup_hw_irq(struct priv *priv, struct platform_device *pdev);
+int setup_hw_irq(struct priv *priv, struct platform_device *pdev,
+		 const char *name);
 void cleanup_irq(struct priv *priv);
 
 #endif // IRQ_MANAGER_H

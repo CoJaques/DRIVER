@@ -6,7 +6,9 @@
 #include <linux/cdev.h>
 #include <linux/platform_device.h>
 
-// Shared structures
+/*
+* This structure is used to store the address of i/o and the synchronization objects used to protect io access.
+*/
 struct io_registers {
 	struct device *dev;
 	void __iomem *segment1;
@@ -18,18 +20,27 @@ struct io_registers {
 	spinlock_t segments_spinlock;
 };
 
+/*
+* This structure is used to store the current time and the timer used to manage the music time.
+*/
 struct time_management {
 	uint32_t current_time;
 	struct hrtimer music_timer;
 	struct task_struct *display_thread;
 };
 
+/*
+* This structure is used to represent a music data.
+*/
 struct music_data {
 	uint16_t duration;
 	char title[25];
 	char artist[25];
 };
 
+/*
+* This structure is used to store all de structures used for playlist management and userspace communication.
+*/
 struct playlist_data {
 	struct device *dev;
 	struct cdev cdev;
@@ -39,6 +50,9 @@ struct playlist_data {
 	bool next_music_requested;
 };
 
+/*
+* This structure is used to store all the structures used for the driver management.
+*/
 struct priv {
 	struct io_registers io;
 	struct time_management time;

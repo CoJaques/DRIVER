@@ -1,13 +1,14 @@
 #include "playlist_manager.h"
+#include "driver_types.h"
 #include "io_manager.h"
 #include <linux/slab.h>
 
-int instanciate_music_if_null(struct priv *priv)
+static int instanciate_music_if_null(struct playlist_data *data)
 {
-	if (!priv->playlist_data.current_music) {
-		priv->playlist_data.current_music =
+	if (!data->current_music) {
+		data->current_music =
 			kmalloc(sizeof(struct music_data), GFP_KERNEL);
-		if (!priv->playlist_data.current_music) {
+		if (!data->current_music) {
 			pr_err("Failed to allocate memory for music data\n");
 			return -ENOMEM;
 		}
@@ -15,25 +16,24 @@ int instanciate_music_if_null(struct priv *priv)
 	return 0;
 }
 
-int get_next_music_from_queue(struct priv *priv)
+static int get_next_music_from_queue(struct playlist_data *data)
 {
-	if (kfifo_out(priv->playlist_data.playlist,
-		      priv->playlist_data.current_music,
+	if (kfifo_out(data->playlist, data->current_music,
 		      sizeof(struct music_data)) != sizeof(struct music_data)) {
 		pr_err("Failed to get music data from playlist\n");
-		kfree(priv->playlist_data.current_music);
-		priv->playlist_data.current_music = NULL;
+		kfree(data->current_music);
+		data->current_music = NULL;
 		return -EINVAL;
 	}
 	return 0;
 }
 
-int next_music(struct priv *priv)
+static int next_music(struct priv *priv)
 {
-	if (instanciate_music_if_null(priv))
+	if (instanciate_music_if_null(&priv->playlist_data))
 		return -ENOMEM;
 
-	if (get_next_music_from_queue(priv))
+	if (get_next_music_from_queue(&priv->playlist_data))
 		return -EINVAL;
 
 	pr_info("Playing music: '%s' by '%s', duration: %u seconds\n",
@@ -45,7 +45,7 @@ int next_music(struct priv *priv)
 	return 0;
 }
 
-bool should_switch_music(struct priv *priv)
+static bool should_switch_music(struct priv *priv)
 {
 	return !priv->playlist_data.current_music ||
 	       priv->time.current_time >=
@@ -62,10 +62,10 @@ void playlist_cycle(struct priv *priv)
 			priv->playlist_data.current_music = NULL;
 			priv->time.current_time = 0;
 			priv->is_playing = false;
-			set_running_led(false, priv);
+			set_running_led(false, &priv->io);
 		}
 		priv->playlist_data.next_music_requested = false;
 	}
-	set_time_segment(priv->time.current_time, priv);
+	set_time_segment(priv->time.current_time, &priv->io);
 	priv->time.current_time++;
 }

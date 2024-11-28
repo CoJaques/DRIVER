@@ -15,7 +15,7 @@ enum hrtimer_restart timer_callback(struct hrtimer *timer)
 	return HRTIMER_NORESTART;
 }
 
-int display_thread_func(void *data)
+int playlist_thread_func(void *data)
 {
 	struct priv *priv = (struct priv *)data;
 
@@ -36,7 +36,7 @@ int setup_timer_thread(struct priv *priv)
 	priv->time.music_timer.function = timer_callback;
 
 	priv->time.display_thread =
-		kthread_create(display_thread_func, priv, "display_thread");
+		kthread_create(playlist_thread_func, priv, "display_thread");
 	if (IS_ERR(priv->time.display_thread))
 		return PTR_ERR(priv->time.display_thread);
 

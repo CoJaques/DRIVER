@@ -18,11 +18,11 @@
 #include <linux/kfifo.h>
 #include <linux/fs.h>
 
-#include "irq_manager.h"
 #include "timer_thread_manager.h"
 #include "playlist.h"
 #include "driver_types.h"
 #include "io_manager.h"
+#include "irq_manager.h"
 
 #define CLEANUP_ON_ERROR(action, label, dev, message) \
 	do {                                          \
@@ -95,10 +95,11 @@ static int switch_copy_probe(struct platform_device *pdev)
 	platform_set_drvdata(pdev, priv);
 
 	priv->io.dev = &pdev->dev;
-	CLEANUP_ON_ERROR(setup_hw_irq(priv, pdev), UNREGISTER_TIMER,
-			 priv->io.dev, "Failed to setup hw irq\n");
+	CLEANUP_ON_ERROR(setup_hw_irq(priv, pdev, DEVICE_NAME),
+			 UNREGISTER_TIMER, priv->io.dev,
+			 "Failed to setup hw irq\n");
 
-	set_7_segment(0, priv);
+	set_time_segment(0, &priv->io);
 
 	CLEANUP_ON_ERROR(setup_timer_thread(priv), UNREGISTER_TIMER,
 			 priv->io.dev, "Failed to setup timer thread\n");
