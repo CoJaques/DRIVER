@@ -1,14 +1,7 @@
 #ifndef IRQ_MANAGER_H
 #define IRQ_MANAGER_H
 
-#include "linux/irqreturn.h"
 #include "driver_types.h"
-
-#define SEGMENT1_OFFSET	      0x20
-#define LED_OFFSET	      0x00
-#define BUTTON_OFFSET	      0x50
-#define BUTTON_EDGE_OFFSET    0x5C
-#define BUTTON_INTERRUPT_MASK 0x58
 
 // Button Masks
 typedef enum {
@@ -18,9 +11,15 @@ typedef enum {
 	KEY_3 = 1 << 3
 } Button;
 
-irqreturn_t irq_handler(int irq, void *dev_id);
+/*
+* This function is used to setup the hardware interrupt.
+*/
 int setup_hw_irq(struct priv *priv, struct platform_device *pdev,
 		 const char *name);
+
+/*
+* This function is used to cleanup the hardware interrupt.
+*/
 void cleanup_irq(struct priv *priv);
 
 #endif // IRQ_MANAGER_H

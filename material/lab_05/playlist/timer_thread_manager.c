@@ -3,7 +3,7 @@
 
 #include <linux/kthread.h>
 
-enum hrtimer_restart timer_callback(struct hrtimer *timer)
+static enum hrtimer_restart timer_callback(struct hrtimer *timer)
 {
 	struct priv *priv = container_of(timer, struct priv, time.music_timer);
 
@@ -15,7 +15,7 @@ enum hrtimer_restart timer_callback(struct hrtimer *timer)
 	return HRTIMER_NORESTART;
 }
 
-int playlist_thread_func(void *data)
+static int playlist_thread_func(void *data)
 {
 	struct priv *priv = (struct priv *)data;
 

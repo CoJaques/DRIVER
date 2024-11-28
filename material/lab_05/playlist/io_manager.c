@@ -46,3 +46,12 @@ void set_running_led(bool value, struct io_registers *io)
 	iowrite16(led_value, io->led);
 	spin_unlock_irqrestore(&io->led_running_spinlock, flags);
 }
+
+void map_io(struct io_registers *io, void __iomem *base)
+{
+	io->segment1 = base + SEGMENT1_OFFSET;
+	io->led = base + LED_OFFSET;
+	io->button = base + BUTTON_OFFSET;
+	io->button_edge = base + BUTTON_EDGE_OFFSET;
+	io->button_interrupt_mask = base + BUTTON_INTERRUPT_MASK;
+}

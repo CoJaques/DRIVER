@@ -9,7 +9,7 @@ static bool shouldStartPlayMusic(struct priv *priv)
 		 !kfifo_is_empty(priv->playlist_data.playlist)));
 }
 
-irqreturn_t irq_handler(int irq, void *dev_id)
+static irqreturn_t irq_handler(int irq, void *dev_id)
 {
 	struct priv *priv = (struct priv *)dev_id;
 	uint8_t last_pressed_button = ioread8(priv->io.button_edge);
@@ -47,17 +47,7 @@ irqreturn_t irq_handler(int irq, void *dev_id)
 int setup_hw_irq(struct priv *priv, struct platform_device *pdev,
 		 const char *name)
 {
-	struct resource *mem_info;
-	void __iomem *base_address;
-	int irq_num, ret;
-
-	mem_info = platform_get_resource(pdev, IORESOURCE_MEM, 0);
-	if (!mem_info)
-		return -EINVAL;
-
-	base_address = devm_ioremap_resource(&pdev->dev, mem_info);
-	if (IS_ERR(base_address))
-		return PTR_ERR(base_address);
+	int ret, irq_num;
 
 	irq_num = platform_get_irq(pdev, 0);
 	if (irq_num < 0)
@@ -66,12 +56,6 @@ int setup_hw_irq(struct priv *priv, struct platform_device *pdev,
 	ret = devm_request_irq(&pdev->dev, irq_num, irq_handler, 0, name, priv);
 	if (ret)
 		return ret;
-
-	priv->io.segment1 = base_address + SEGMENT1_OFFSET;
-	priv->io.led = base_address + LED_OFFSET;
-	priv->io.button = base_address + BUTTON_OFFSET;
-	priv->io.button_edge = base_address + BUTTON_EDGE_OFFSET;
-	priv->io.button_interrupt_mask = base_address + BUTTON_INTERRUPT_MASK;
 
 	iowrite8(0xF, priv->io.button_interrupt_mask);
 	iowrite8(0x0F, priv->io.button_edge);

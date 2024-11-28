@@ -14,14 +14,4 @@ int setup_timer_thread(struct priv *priv);
  */
 void cleanup_timer_thread(struct priv *priv);
 
-/*
- * This function is called every time the timer expires and run the threda used for playlist cycle.
- */
-enum hrtimer_restart timer_callback(struct hrtimer *timer);
-
-/*
-*  This function define the behaviour of the thread that will manage the playlist cycle.
-*/
-int playlist_thread_func(void *data);
-
 #endif // TIMER_THREAD_MANAGER_H

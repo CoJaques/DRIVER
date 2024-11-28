@@ -19,7 +19,6 @@
 #include <linux/fs.h>
 
 #include "timer_thread_manager.h"
-#include "playlist.h"
 #include "driver_types.h"
 #include "io_manager.h"
 #include "irq_manager.h"
@@ -31,6 +30,11 @@
 			goto label;                   \
 		}                                     \
 	} while (0)
+
+#define DEVICE_NAME	  "drivify"
+#define MAJOR_NUM	  99
+#define MAJMIN		  MKDEV(MAJOR_NUM, 0)
+#define MAX_PLAYLIST_SIZE 16
 
 static int playlist_uevent(struct device *dev, struct kobj_uevent_env *env)
 {
@@ -83,9 +87,11 @@ static const struct file_operations drivify_fops = {
 	.write = drivify_write,
 };
 
-static int switch_copy_probe(struct platform_device *pdev)
+static int playlist_probe(struct platform_device *pdev)
 {
 	struct priv *priv;
+	struct resource *mem_info;
+	void __iomem *base_address;
 	int ret;
 
 	priv = devm_kzalloc(&pdev->dev, sizeof(struct priv), GFP_KERNEL);
@@ -95,9 +101,23 @@ static int switch_copy_probe(struct platform_device *pdev)
 	platform_set_drvdata(pdev, priv);
 
 	priv->io.dev = &pdev->dev;
-	CLEANUP_ON_ERROR(setup_hw_irq(priv, pdev, DEVICE_NAME),
-			 UNREGISTER_TIMER, priv->io.dev,
-			 "Failed to setup hw irq\n");
+
+	mem_info = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+	if (!mem_info) {
+		dev_err(&pdev->dev, "Failed to get memory resource\n");
+		ret = -EINVAL;
+	}
+
+	base_address = devm_ioremap_resource(&pdev->dev, mem_info);
+	if (IS_ERR(base_address)) {
+		dev_err(&pdev->dev, "Failed to remap memory\n");
+		ret = PTR_ERR(base_address);
+	}
+
+	map_io(&priv->io, base_address);
+
+	CLEANUP_ON_ERROR(setup_hw_irq(priv, pdev, DEVICE_NAME), FREE_PRIV,
+			 priv->io.dev, "Failed to setup hw irq\n");
 
 	set_time_segment(0, &priv->io);
 
@@ -162,11 +182,12 @@ UNREGISTER_KFIFO:
 UNREGISTER_TIMER:
 	hrtimer_cancel(&priv->time.music_timer);
 	kthread_stop(priv->time.display_thread);
+FREE_PRIV:
 	kfree(priv);
 	return ret;
 }
 
-static int switch_copy_remove(struct platform_device *pdev)
+static int playlist_remove(struct platform_device *pdev)
 {
 	struct priv *priv = platform_get_drvdata(pdev);
 	if (!priv) {
@@ -197,23 +218,22 @@ static int switch_copy_remove(struct platform_device *pdev)
 	return 0;
 }
 
-static const struct of_device_id switch_copy_driver_id[] = {
-	{ .compatible = "drv2024" },
-	{ /* sentinel */ }
-};
-MODULE_DEVICE_TABLE(of, switch_copy_driver_id);
+static const struct of_device_id playlist_driver_id[] = { { .compatible =
+								    "drv2024" },
+							  { /* sentinel */ } };
+MODULE_DEVICE_TABLE(of, playlist_driver_id);
 
-static struct platform_driver switch_copy_driver = {
+static struct platform_driver playlist_driver = {
     .driver = {
         .name = "drivify",
         .owner = THIS_MODULE,
-        .of_match_table = of_match_ptr(switch_copy_driver_id),
+        .of_match_table = of_match_ptr(playlist_driver_id),
     },
-    .probe = switch_copy_probe,
-    .remove = switch_copy_remove,
+    .probe = playlist_probe,
+    .remove = playlist_remove,
 };
 
-module_platform_driver(switch_copy_driver);
+module_platform_driver(playlist_driver);
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Colin Jaques");
