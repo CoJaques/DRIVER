@@ -1,0 +1,47 @@
+#include "io_manager.h"
+
+// Lookup table for 7-segment display numbers
+static const uint32_t number_representation_7segment[] = {
+	0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F
+};
+
+void set_7_segment(uint32_t value, struct priv *priv)
+{
+	uint32_t segment1_value = 0;
+
+	if (value > MAX_VALUE_SEGMENT) {
+		value = MAX_VALUE_SEGMENT;
+	}
+
+	for (unsigned i = 0; i < 4; i++) {
+		segment1_value |= number_representation_7segment[value % 10]
+				  << (SEGMENT_VOID_OFFSET * i);
+		value /= 10;
+	}
+
+	iowrite32(segment1_value, priv->io.segment1);
+}
+
+void set_time_segment(uint32_t seconds, struct priv *priv)
+{
+	unsigned long flags;
+	uint32_t minutes = seconds / 60;
+	seconds = seconds % 60;
+
+	spin_lock_irqsave(&priv->io.segments_spinlock, flags);
+	set_7_segment(minutes * 100 + seconds, priv);
+	spin_unlock_irqrestore(&priv->io.segments_spinlock, flags);
+}
+
+void set_running_led(bool value, struct priv *priv)
+{
+	unsigned long flags;
+	uint16_t led_value;
+
+	spin_lock_irqsave(&priv->io.led_running_spinlock, flags);
+	led_value = ioread16(priv->io.led);
+	led_value = value ? (led_value | (1 << RUNNING_LED_OFFSET)) :
+			    (led_value & ~(1 << RUNNING_LED_OFFSET));
+	iowrite16(led_value, priv->io.led);
+	spin_unlock_irqrestore(&priv->io.led_running_spinlock, flags);
+}
