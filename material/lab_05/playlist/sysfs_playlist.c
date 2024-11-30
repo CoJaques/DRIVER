@@ -1,3 +1,4 @@
+#include "io_manager.h"
 #include "linux/dev_printk.h"
 #include "linux/device.h"
 #include "linux/sysfs.h"
@@ -59,12 +60,28 @@ static ssize_t play_pause_store(struct device *dev,
 {
 	struct priv *priv = dev_get_drvdata(dev);
 	int play_state;
+	bool new_value;
 
 	if (kstrtoint(buf, 10, &play_state) ||
 	    (play_state != 0 && play_state != 1))
 		return -EINVAL;
 
-	priv->is_playing = (play_state == 1);
+	new_value = (play_state == 1);
+	if (new_value == priv->is_playing)
+		return count;
+	else
+		priv->is_playing = new_value;
+
+	if (new_value) {
+		priv->playlist_data.next_music_requested = false;
+		hrtimer_start(&priv->time.music_timer, ktime_set(1, 0),
+			      HRTIMER_MODE_REL);
+		set_running_led(true, &priv->io);
+	} else {
+		hrtimer_cancel(&priv->time.music_timer);
+		set_running_led(false, &priv->io);
+	}
+
 	return count;
 }
 
@@ -113,9 +130,14 @@ static ssize_t total_duration_show(struct device *dev,
 	struct music_data *buffer;
 	unsigned int count, num_elements, i, total_duration = 0;
 
+	if (priv->playlist_data.current_music) {
+		total_duration += priv->playlist_data.current_music->duration -
+				  priv->time.current_time;
+	}
+
 	count = kfifo_len(priv->playlist_data.playlist);
 	if (count == 0)
-		return sysfs_emit(buf, "0\n");
+		return sysfs_emit(buf, "%u\n", total_duration);
 
 	buffer = kmalloc(count, GFP_KERNEL);
 	if (!buffer)

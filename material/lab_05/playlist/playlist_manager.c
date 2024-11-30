@@ -65,8 +65,9 @@ void playlist_cycle(struct priv *priv)
 			set_running_led(false, &priv->io);
 		}
 		priv->playlist_data.next_music_requested = false;
+	} else {
+		priv->time.current_time++;
 	}
 
-	priv->time.current_time++;
 	set_time_segment(priv->time.current_time, &priv->io);
 }
