@@ -4,7 +4,7 @@ KERNELDIR := /home/CoJak/Documents/repo/linux-socfpga/
 TOOLCHAIN := /opt/toolchains/arm-linux-gnueabihf_6.4.1/bin/arm-linux-gnueabihf-
 
 # List of object files for the module
-playlist_module-y := playlist.o io_manager.o playlist_manager.o irq_manager.o timer_thread_manager.o
+playlist_module-y := playlist.o io_manager.o playlist_manager.o irq_manager.o timer_thread_manager.o sysfs_playlist.o
 
 # Kernel module target
 obj-m := playlist_module.o

@@ -22,6 +22,7 @@
 #include "driver_types.h"
 #include "io_manager.h"
 #include "irq_manager.h"
+#include "sysfs_playlist.h"
 
 #define CLEANUP_ON_ERROR(action, label, dev, message) \
 	do {                                          \
@@ -164,6 +165,9 @@ static int playlist_probe(struct platform_device *pdev)
 		goto REMOVE_CDEV;
 	}
 
+	CLEANUP_ON_ERROR(initialize_sysfs(pdev), REMOVE_CDEV, priv->io.dev,
+			 "Failed to initialize sysfs\n");
+
 	spin_lock_init(&priv->io.led_running_spinlock);
 	spin_lock_init(&priv->io.segments_spinlock);
 
@@ -211,6 +215,7 @@ static int playlist_remove(struct platform_device *pdev)
 	cdev_del(&priv->playlist_data.cdev);
 	class_destroy(priv->playlist_data.cl);
 	unregister_chrdev_region(priv->playlist_data.majmin, 1);
+	uninitialize_sysfs(pdev);
 
 	kfifo_free(priv->playlist_data.playlist);
 	kfree(priv->playlist_data.playlist);
