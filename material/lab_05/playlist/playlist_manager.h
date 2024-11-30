@@ -12,4 +12,9 @@
 */
 void playlist_cycle(struct priv *priv);
 
+/*
+* This function is used to handle the play/pause boolean.
+*/
+void handle_play_pause(bool should_start_play, struct priv *priv);
+
 #endif // PLAYLIST_MANAGER_H

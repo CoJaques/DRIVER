@@ -1,5 +1,6 @@
 #include "irq_manager.h"
 #include "io_manager.h"
+#include "playlist_manager.h"
 #include "linux/interrupt.h"
 
 static bool shouldStartPlayMusic(struct priv *priv)
@@ -16,20 +17,7 @@ static irqreturn_t irq_handler(int irq, void *dev_id)
 
 	switch (last_pressed_button) {
 	case KEY_0:
-		if (shouldStartPlayMusic(priv)) {
-			priv->is_playing = true;
-
-			// reset if a new music was requested
-			priv->playlist_data.next_music_requested = false;
-
-			hrtimer_start(&priv->time.music_timer, ktime_set(1, 0),
-				      HRTIMER_MODE_REL);
-			set_running_led(true, &priv->io);
-		} else {
-			priv->is_playing = false;
-			hrtimer_cancel(&priv->time.music_timer);
-			set_running_led(false, &priv->io);
-		}
+		handle_play_pause(shouldStartPlayMusic(priv), priv);
 		break;
 	case KEY_1:
 		priv->time.current_time = 0;

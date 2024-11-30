@@ -4,6 +4,7 @@
 #include "linux/sysfs.h"
 #include "sysfs_playlist.h"
 #include "driver_types.h"
+#include "playlist_manager.h"
 
 #define CREATE_SYSFS_FILE(dev, attr, label)                               \
 	do {                                                              \
@@ -60,27 +61,15 @@ static ssize_t play_pause_store(struct device *dev,
 {
 	struct priv *priv = dev_get_drvdata(dev);
 	int play_state;
-	bool new_value;
 
 	if (kstrtoint(buf, 10, &play_state) ||
 	    (play_state != 0 && play_state != 1))
 		return -EINVAL;
 
-	new_value = (play_state == 1);
-	if (new_value == priv->is_playing)
+	if (play_state == priv->is_playing)
 		return count;
-	else
-		priv->is_playing = new_value;
 
-	if (new_value) {
-		priv->playlist_data.next_music_requested = false;
-		hrtimer_start(&priv->time.music_timer, ktime_set(1, 0),
-			      HRTIMER_MODE_REL);
-		set_running_led(true, &priv->io);
-	} else {
-		hrtimer_cancel(&priv->time.music_timer);
-		set_running_led(false, &priv->io);
-	}
+	handle_play_pause(play_state, priv);
 
 	return count;
 }

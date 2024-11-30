@@ -71,3 +71,21 @@ void playlist_cycle(struct priv *priv)
 
 	set_time_segment(priv->time.current_time, &priv->io);
 }
+
+void handle_play_pause(bool play, struct priv *priv)
+{
+	bool kfifo_empty = kfifo_is_empty(priv->playlist_data.playlist);
+	bool current_music_null = priv->playlist_data.current_music == NULL;
+
+	priv->is_playing = play;
+
+	if (play && (!current_music_null || !kfifo_empty)) {
+		priv->playlist_data.next_music_requested = false;
+		hrtimer_start(&priv->time.music_timer, ktime_set(1, 0),
+			      HRTIMER_MODE_REL);
+		set_running_led(true, &priv->io);
+	} else {
+		hrtimer_cancel(&priv->time.music_timer);
+		set_running_led(false, &priv->io);
+	}
+}
