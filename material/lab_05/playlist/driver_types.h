@@ -45,6 +45,7 @@ struct playlist_data {
 	struct device *dev;
 	struct cdev cdev;
 	struct class *cl;
+	dev_t majmin;
 	struct kfifo *playlist;
 	struct music_data *current_music;
 	bool next_music_requested;

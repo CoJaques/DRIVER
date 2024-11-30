@@ -32,8 +32,6 @@
 	} while (0)
 
 #define DEVICE_NAME	  "drivify"
-#define MAJOR_NUM	  99
-#define MAJMIN		  MKDEV(MAJOR_NUM, 0)
 #define MAX_PLAYLIST_SIZE 16
 
 static int playlist_uevent(struct device *dev, struct kobj_uevent_env *env)
@@ -68,7 +66,7 @@ static ssize_t drivify_write(struct file *filp, const char __user *buf,
 
 	if (kfifo_len(data->playlist) >= MAX_PLAYLIST_SIZE * sizeof(music)) {
 		pr_err("No more free place, playlist len = %d\n",
-		       kfifo_len(data->playlist));
+		       kfifo_len(data->playlist) / sizeof(music));
 		return -ENOSPC;
 	}
 
@@ -138,7 +136,8 @@ static int playlist_probe(struct platform_device *pdev)
 			    GFP_KERNEL),
 		UNREGISTER_KFIFO, priv->io.dev, "Failed to initialize kfifo\n");
 
-	CLEANUP_ON_ERROR(register_chrdev_region(MAJMIN, 1, DEVICE_NAME),
+	CLEANUP_ON_ERROR(alloc_chrdev_region(&priv->playlist_data.majmin, 0, 1,
+					     DEVICE_NAME),
 			 UNREGISTER_KFIFO, priv->io.dev,
 			 "Failed to register char device region\n");
 
@@ -151,12 +150,14 @@ static int playlist_probe(struct platform_device *pdev)
 
 	priv->playlist_data.cl->dev_uevent = playlist_uevent;
 	cdev_init(&priv->playlist_data.cdev, &drivify_fops);
-	CLEANUP_ON_ERROR(cdev_add(&priv->playlist_data.cdev, MAJMIN, 1),
+	CLEANUP_ON_ERROR(cdev_add(&priv->playlist_data.cdev,
+				  priv->playlist_data.majmin, 1),
 			 UNREGISTER_CLASS, priv->io.dev,
 			 "Failed to add cdev\n");
-
 	priv->playlist_data.dev = device_create(priv->playlist_data.cl, NULL,
-						MAJMIN, NULL, DEVICE_NAME);
+						priv->playlist_data.majmin,
+
+						NULL, DEVICE_NAME);
 	if (IS_ERR(priv->playlist_data.dev)) {
 		pr_err("Failed to create device\n");
 		ret = PTR_ERR(priv->playlist_data.dev);
@@ -175,13 +176,14 @@ REMOVE_CDEV:
 UNREGISTER_CLASS:
 	class_destroy(priv->playlist_data.cl);
 UNREGISTER_CHRDEV:
-	unregister_chrdev_region(MAJMIN, 1);
+	unregister_chrdev_region(priv->playlist_data.majmin, 1);
 UNREGISTER_KFIFO:
 	kfifo_free(priv->playlist_data.playlist);
 	kfree(priv->playlist_data.playlist);
 UNREGISTER_TIMER:
 	hrtimer_cancel(&priv->time.music_timer);
 	kthread_stop(priv->time.display_thread);
+
 FREE_PRIV:
 	kfree(priv);
 	return ret;
@@ -205,15 +207,15 @@ static int playlist_remove(struct platform_device *pdev)
 
 	hrtimer_cancel(&priv->time.music_timer);
 	kthread_stop(priv->time.display_thread);
-	device_destroy(priv->playlist_data.cl, MAJMIN);
+	device_destroy(priv->playlist_data.cl, priv->playlist_data.majmin);
 	cdev_del(&priv->playlist_data.cdev);
 	class_destroy(priv->playlist_data.cl);
-	unregister_chrdev_region(MAJMIN, 1);
+	unregister_chrdev_region(priv->playlist_data.majmin, 1);
 
 	kfifo_free(priv->playlist_data.playlist);
 	kfree(priv->playlist_data.playlist);
 	kfree(priv);
-	return 0;
+	dev_info(priv->io.dev, "Playlist driver uninitialized\n");
 
 	return 0;
 }
