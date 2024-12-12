@@ -7,7 +7,7 @@ static enum hrtimer_restart timer_callback(struct hrtimer *timer)
 {
 	struct priv *priv = container_of(timer, struct priv, time.music_timer);
 
-	if (priv->is_playing) {
+	if (atomic_read(&priv->is_playing)) {
 		wake_up_process(priv->time.display_thread);
 		hrtimer_forward_now(timer, ktime_set(1, 0));
 		return HRTIMER_RESTART;
@@ -20,7 +20,7 @@ static int playlist_thread_func(void *data)
 	struct priv *priv = (struct priv *)data;
 
 	while (!kthread_should_stop()) {
-		if (priv->is_playing)
+		if (atomic_read(&priv->is_playing))
 			playlist_cycle(priv);
 		set_current_state(TASK_INTERRUPTIBLE);
 		schedule();

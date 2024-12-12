@@ -61,7 +61,7 @@ void playlist_cycle(struct priv *priv)
 			kfree(priv->playlist_data.current_music);
 			priv->playlist_data.current_music = NULL;
 			priv->time.current_time = 0;
-			priv->is_playing = false;
+			atomic_set(&priv->is_playing, false);
 			set_running_led(false, &priv->io);
 		}
 		priv->playlist_data.next_music_requested = false;
@@ -77,7 +77,7 @@ void handle_play_pause(bool play, struct priv *priv)
 	bool kfifo_empty = kfifo_is_empty(priv->playlist_data.playlist);
 	bool current_music_null = priv->playlist_data.current_music == NULL;
 
-	priv->is_playing = play;
+	atomic_set(&priv->is_playing, play);
 
 	if (play && (!current_music_null || !kfifo_empty)) {
 		priv->playlist_data.next_music_requested = false;

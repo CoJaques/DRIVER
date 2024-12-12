@@ -5,7 +5,7 @@
 
 static bool shouldStartPlayMusic(struct priv *priv)
 {
-	return (!priv->is_playing &&
+	return (!atomic_read(&priv->is_playing) &&
 		(priv->playlist_data.current_music != NULL ||
 		 !kfifo_is_empty(priv->playlist_data.playlist)));
 }

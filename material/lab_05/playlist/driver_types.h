@@ -58,7 +58,7 @@ struct priv {
 	struct io_registers io;
 	struct time_management time;
 	struct playlist_data playlist_data;
-	bool is_playing;
+	atomic_t is_playing;
 };
 
 #endif // DRIVER_TYPES_H

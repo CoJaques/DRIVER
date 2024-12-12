@@ -1,4 +1,5 @@
 #include "io_manager.h"
+#include "linux/atomic/atomic-instrumented.h"
 #include "linux/dev_printk.h"
 #include "linux/device.h"
 #include "linux/sysfs.h"
@@ -52,7 +53,7 @@ static ssize_t play_pause_show(struct device *dev,
 			       struct device_attribute *attr, char *buf)
 {
 	struct priv *priv = dev_get_drvdata(dev);
-	return sysfs_emit(buf, "%d\n", priv->is_playing);
+	return sysfs_emit(buf, "%d\n", atomic_read(&priv->is_playing));
 }
 
 static ssize_t play_pause_store(struct device *dev,
@@ -66,7 +67,7 @@ static ssize_t play_pause_store(struct device *dev,
 	    (play_state != 0 && play_state != 1))
 		return -EINVAL;
 
-	if (play_state == priv->is_playing)
+	if (play_state == atomic_read(&priv->is_playing))
 		return count;
 
 	handle_play_pause(play_state, priv);
