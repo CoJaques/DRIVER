@@ -2,6 +2,7 @@
 
 #include "linux/completion.h"
 #include "linux/dev_printk.h"
+#include "linux/mutex.h"
 #include "linux/spinlock.h"
 #include <linux/kernel.h>
 #include <linux/module.h>
@@ -61,6 +62,8 @@ static ssize_t drivify_write(struct file *filp, const char __user *buf,
 		return -EINVAL;
 	}
 
+	mutex_lock(&data->lock);
+
 	if (copy_from_user(&music, buf, count) != 0) {
 		pr_err("Failed to copy data from user\n");
 		return -EFAULT;
@@ -75,6 +78,8 @@ static ssize_t drivify_write(struct file *filp, const char __user *buf,
 	ret = kfifo_in(data->playlist, &music, sizeof(struct music_data));
 	if (ret != sizeof(struct music_data))
 		return -EIO;
+
+	mutex_unlock(&data->lock);
 
 	pr_info("Added music: '%s' by '%s', duration: %u seconds\n",
 		music.title, music.artist, music.duration);

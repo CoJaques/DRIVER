@@ -2,6 +2,7 @@
 #include "linux/atomic/atomic-instrumented.h"
 #include "linux/dev_printk.h"
 #include "linux/device.h"
+#include "linux/spinlock.h"
 #include "linux/sysfs.h"
 #include "sysfs_playlist.h"
 #include "driver_types.h"
@@ -80,7 +81,7 @@ static ssize_t current_elapsed_time_show(struct device *dev,
 					 char *buf)
 {
 	struct priv *priv = dev_get_drvdata(dev);
-	return sysfs_emit(buf, "%u\n", priv->time.current_time);
+	return sysfs_emit(buf, "%u\n", atomic_read(&priv->time.current_time));
 }
 
 static ssize_t current_elapsed_time_store(struct device *dev,
@@ -96,7 +97,7 @@ static ssize_t current_elapsed_time_store(struct device *dev,
 	if (new_time > priv->playlist_data.current_music->duration)
 		return -EINVAL;
 
-	priv->time.current_time = new_time;
+	atomic_set(&priv->time.current_time, new_time);
 
 	return count;
 }
@@ -122,7 +123,7 @@ static ssize_t total_duration_show(struct device *dev,
 
 	if (priv->playlist_data.current_music) {
 		total_duration += priv->playlist_data.current_music->duration -
-				  priv->time.current_time;
+				  atomic_read(&priv->time.current_time);
 	}
 
 	count = kfifo_len(priv->playlist_data.playlist);

@@ -20,8 +20,9 @@ static irqreturn_t irq_handler(int irq, void *dev_id)
 		handle_play_pause(shouldStartPlayMusic(priv), priv);
 		break;
 	case KEY_1:
-		priv->time.current_time = 0;
-		set_time_segment(priv->time.current_time, &priv->io);
+		atomic_set(&priv->time.current_time, 0);
+		set_time_segment(atomic_read(&priv->time.current_time),
+				 &priv->io);
 		break;
 	case KEY_2:
 		priv->playlist_data.next_music_requested = true;

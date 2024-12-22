@@ -24,10 +24,10 @@ struct io_registers {
 * This structure is used to store the current time and the timer used to manage the music time.
 */
 struct time_management {
-	uint32_t current_time;
 	struct hrtimer music_timer;
 	struct task_struct *display_thread;
 	struct completion display_thread_completion;
+	atomic_t current_time;
 };
 
 /*
@@ -49,6 +49,7 @@ struct playlist_data {
 	dev_t majmin;
 	struct kfifo *playlist;
 	struct music_data *current_music;
+	struct mutex lock;
 	bool next_music_requested;
 };
 

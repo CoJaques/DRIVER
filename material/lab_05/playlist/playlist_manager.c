@@ -41,14 +41,14 @@ static int next_music(struct priv *priv)
 		priv->playlist_data.current_music->artist,
 		priv->playlist_data.current_music->duration);
 
-	priv->time.current_time = 0;
+	atomic_set(&priv->time.current_time, 0);
 	return 0;
 }
 
 static bool should_switch_music(struct priv *priv)
 {
 	return !priv->playlist_data.current_music ||
-	       priv->time.current_time >=
+	       atomic_read(&priv->time.current_time) >=
 		       priv->playlist_data.current_music->duration ||
 	       priv->playlist_data.next_music_requested;
 }
@@ -60,16 +60,16 @@ void playlist_cycle(struct priv *priv)
 		    next_music(priv)) {
 			kfree(priv->playlist_data.current_music);
 			priv->playlist_data.current_music = NULL;
-			priv->time.current_time = 0;
+			atomic_set(&priv->time.current_time, 0);
 			atomic_set(&priv->is_playing, false);
 			set_running_led(false, &priv->io);
 		}
 		priv->playlist_data.next_music_requested = false;
 	} else {
-		priv->time.current_time++;
+		atomic_inc(&priv->time.current_time);
 	}
 
-	set_time_segment(priv->time.current_time, &priv->io);
+	set_time_segment(atomic_read(&priv->time.current_time), &priv->io);
 }
 
 void handle_play_pause(bool play, struct priv *priv)
