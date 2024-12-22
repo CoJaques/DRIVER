@@ -27,6 +27,7 @@ struct time_management {
 	uint32_t current_time;
 	struct hrtimer music_timer;
 	struct task_struct *display_thread;
+	struct completion display_thread_completion;
 };
 
 /*

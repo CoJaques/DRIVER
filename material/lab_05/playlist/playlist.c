@@ -1,5 +1,6 @@
 // COLIN JAQUES
 
+#include "linux/completion.h"
 #include "linux/dev_printk.h"
 #include "linux/spinlock.h"
 #include <linux/kernel.h>
