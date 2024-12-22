@@ -174,9 +174,6 @@ static int playlist_probe(struct platform_device *pdev)
 	CLEANUP_ON_ERROR(initialize_sysfs(pdev), REMOVE_CDEV, priv->io.dev,
 			 "Failed to initialize sysfs\n");
 
-	spin_lock_init(&priv->io.led_running_spinlock);
-	spin_lock_init(&priv->io.segments_spinlock);
-
 	dev_info(priv->io.dev, "Playlist driver initialized\n");
 
 	return 0;

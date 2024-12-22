@@ -25,26 +25,20 @@ static void set_7_segment(uint32_t value, struct io_registers *io)
 
 void set_time_segment(uint32_t seconds, struct io_registers *io)
 {
-	unsigned long flags;
 	uint32_t minutes = seconds / 60;
 	seconds = seconds % 60;
 
-	spin_lock_irqsave(&io->segments_spinlock, flags);
 	set_7_segment(minutes * 100 + seconds, io);
-	spin_unlock_irqrestore(&io->segments_spinlock, flags);
 }
 
 void set_running_led(bool value, struct io_registers *io)
 {
-	unsigned long flags;
 	uint16_t led_value;
 
-	spin_lock_irqsave(&io->led_running_spinlock, flags);
 	led_value = ioread16(io->led);
 	led_value = value ? (led_value | (1 << RUNNING_LED_OFFSET)) :
 			    (led_value & ~(1 << RUNNING_LED_OFFSET));
 	iowrite16(led_value, io->led);
-	spin_unlock_irqrestore(&io->led_running_spinlock, flags);
 }
 
 void map_io(struct io_registers *io, void __iomem *base)

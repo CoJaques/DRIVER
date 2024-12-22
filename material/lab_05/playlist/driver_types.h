@@ -7,7 +7,7 @@
 #include <linux/platform_device.h>
 
 /*
-* This structure is used to store the address of i/o and the synchronization objects used to protect io access.
+* This structure is used to store the address of i/o.
 */
 struct io_registers {
 	struct device *dev;
@@ -16,8 +16,6 @@ struct io_registers {
 	void __iomem *button;
 	void __iomem *button_edge;
 	void __iomem *button_interrupt_mask;
-	spinlock_t led_running_spinlock;
-	spinlock_t segments_spinlock;
 };
 
 /*
