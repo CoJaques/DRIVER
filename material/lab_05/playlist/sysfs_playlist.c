@@ -1,8 +1,5 @@
-#include "io_manager.h"
-#include "linux/atomic/atomic-instrumented.h"
 #include "linux/dev_printk.h"
 #include "linux/device.h"
-#include "linux/spinlock.h"
 #include "linux/sysfs.h"
 #include "sysfs_playlist.h"
 #include "driver_types.h"
