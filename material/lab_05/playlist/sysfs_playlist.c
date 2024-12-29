@@ -4,6 +4,7 @@
 #include "sysfs_playlist.h"
 #include "driver_types.h"
 #include "playlist_manager.h"
+#include "io_manager.h"
 
 #define CREATE_SYSFS_FILE(dev, attr, label)                               \
 	do {                                                              \
@@ -78,6 +79,7 @@ static ssize_t current_elapsed_time_show(struct device *dev,
 					 char *buf)
 {
 	struct priv *priv = dev_get_drvdata(dev);
+
 	return sysfs_emit(buf, "%u\n", atomic_read(&priv->time.current_time));
 }
 
@@ -88,6 +90,9 @@ static ssize_t current_elapsed_time_store(struct device *dev,
 	struct priv *priv = dev_get_drvdata(dev);
 	unsigned int new_time;
 
+	if (!priv->playlist_data.current_music)
+		return -EINVAL;
+
 	if (kstrtouint(buf, 10, &new_time))
 		return -EINVAL;
 
@@ -95,6 +100,9 @@ static ssize_t current_elapsed_time_store(struct device *dev,
 		return -EINVAL;
 
 	atomic_set(&priv->time.current_time, new_time);
+
+	if (!atomic_read(&priv->is_playing))
+		set_time_segment(new_time, &priv->io);
 
 	return count;
 }
@@ -118,10 +126,8 @@ static ssize_t total_duration_show(struct device *dev,
 	struct music_data *buffer;
 	unsigned int count, num_elements, i, total_duration = 0;
 
-	if (priv->playlist_data.current_music) {
-		total_duration += priv->playlist_data.current_music->duration -
-				  atomic_read(&priv->time.current_time);
-	}
+	if (priv->playlist_data.current_music)
+		total_duration += priv->playlist_data.current_music->duration;
 
 	count = kfifo_len(priv->playlist_data.playlist);
 	if (count == 0)

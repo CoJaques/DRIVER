@@ -1,6 +1,7 @@
 #include "playlist_manager.h"
 #include "driver_types.h"
 #include "io_manager.h"
+#include "linux/kfifo.h"
 #include <linux/slab.h>
 
 static int instanciate_music_if_null(struct playlist_data *data)
@@ -55,6 +56,9 @@ static bool should_switch_music(struct priv *priv)
 
 void playlist_cycle(struct priv *priv)
 {
+	uint8_t playlist_size = kfifo_len(priv->playlist_data.playlist) /
+				sizeof(struct music_data);
+
 	if (should_switch_music(priv)) {
 		if (kfifo_is_empty(priv->playlist_data.playlist) ||
 		    next_music(priv)) {
@@ -65,6 +69,7 @@ void playlist_cycle(struct priv *priv)
 			set_running_led(false, &priv->io);
 		}
 		priv->playlist_data.next_music_requested = false;
+		set_counting_led(playlist_size, &priv->io);
 	} else {
 		atomic_inc(&priv->time.current_time);
 	}

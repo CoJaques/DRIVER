@@ -32,6 +32,7 @@ static int playlist_thread_func(void *data)
 int setup_timer_thread(struct priv *priv)
 {
 	init_completion(&priv->time.display_thread_completion);
+
 	hrtimer_init(&priv->time.music_timer, CLOCK_MONOTONIC,
 		     HRTIMER_MODE_REL);
 	priv->time.music_timer.function = timer_callback;

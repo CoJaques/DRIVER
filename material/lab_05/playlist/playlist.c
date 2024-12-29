@@ -1,9 +1,7 @@
 // COLIN JAQUES
 
-#include "linux/completion.h"
 #include "linux/dev_printk.h"
 #include "linux/mutex.h"
-#include "linux/spinlock.h"
 #include <linux/kernel.h>
 #include <linux/module.h>
 #include <linux/init.h>
@@ -48,12 +46,19 @@ static ssize_t drivify_write(struct file *filp, const char __user *buf,
 			     size_t count, loff_t *ppos)
 {
 	struct playlist_data *data;
+	struct io_registers *io_data;
 	struct music_data music;
 	int ret;
 
 	data = container_of(filp->f_inode->i_cdev, struct playlist_data, cdev);
 	if (!data) {
 		pr_err("Unable to retrieve playlist data\n");
+		return -ENODEV;
+	}
+
+	io_data = &container_of(data, struct priv, playlist_data)->io;
+	if (!io_data) {
+		pr_err("Unable to retrieve io data\n");
 		return -ENODEV;
 	}
 
@@ -79,6 +84,7 @@ static ssize_t drivify_write(struct file *filp, const char __user *buf,
 	if (ret != sizeof(struct music_data))
 		return -EIO;
 
+	set_counting_led(kfifo_len(data->playlist) / sizeof(music), io_data);
 	mutex_unlock(&data->lock);
 
 	pr_info("Added music: '%s' by '%s', duration: %u seconds\n",
@@ -221,7 +227,6 @@ static int playlist_remove(struct platform_device *pdev)
 	uninitialize_sysfs(pdev);
 
 	kfifo_free(priv->playlist_data.playlist);
-	kfree(priv->playlist_data.playlist);
 	kfree(priv);
 	dev_info(priv->io.dev, "Playlist driver uninitialized\n");
 

@@ -41,6 +41,16 @@ void set_running_led(bool value, struct io_registers *io)
 	iowrite16(led_value, io->led);
 }
 
+void set_counting_led(uint8_t value, struct io_registers *io)
+{
+	uint16_t led_value;
+
+	led_value = ioread16(io->led);
+	led_value &= ~COUNTING_LED_MASK;
+	led_value |= value & COUNTING_LED_MASK;
+	iowrite16(led_value, io->led);
+}
+
 void map_io(struct io_registers *io, void __iomem *base)
 {
 	io->segment1 = base + SEGMENT1_OFFSET;

@@ -7,6 +7,7 @@
 #define SEGMENT_VOID_OFFSET   8
 #define MAX_VALUE_SEGMENT     9999
 #define RUNNING_LED_OFFSET    0x8
+#define COUNTING_LED_MASK     0x1F
 #define SEGMENT1_OFFSET	      0x20
 #define LED_OFFSET	      0x00
 #define BUTTON_OFFSET	      0x50
@@ -23,6 +24,11 @@ void set_time_segment(uint32_t seconds, struct io_registers *io);
 * This function is used to set the running led on or off.
 */
 void set_running_led(bool value, struct io_registers *io);
+
+/*
+ * This function is used to show an uint as binary format on the leds
+*/
+void set_counting_led(uint8_t value, struct io_registers *io);
 
 /*
 * This function is used to map the io registers to tha base address of the device.
