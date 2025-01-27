@@ -78,6 +78,9 @@ static void handle_game_win(struct priv *priv, enum player winner)
 			// Match is won
 			queue_announcement(priv, GAME_AND_SET_AND_MATCH);
 			party->match_in_progress = false;
+
+			dev_info(priv->io.dev, "End match, showing resume\n");
+
 			start_summary_display(priv);
 		} else {
 			queue_announcement(priv, GAME_AND_SET);
@@ -158,6 +161,21 @@ static irqreturn_t button_irq_handler(int irq, void *dev_id)
 	return IRQ_WAKE_THREAD;
 }
 
+static void reset_match_state(struct priv *priv)
+{
+	stop_summary_display(priv);
+	memset(&priv->party, 0, sizeof(struct party_data));
+	priv->party.match_in_progress = false;
+	priv->party.format = 2; // Default: best of 3
+	priv->party.advantage_player = PLAYER_NONE;
+	priv->display.mode = DISPLAY_NORMAL;
+
+	// Clear displays
+	iowrite32(0, priv->io.segment1);
+	iowrite32(0, priv->io.segment2);
+	iowrite32(0, priv->io.led);
+}
+
 /**
  * Bottom half threaded handler - handle the button press
  */
@@ -175,10 +193,11 @@ static irqreturn_t button_thread_handler(int irq, void *dev_id)
 			dev_info(priv->io.dev,
 				 "Starting new match (format: %d sets)\n",
 				 priv->party.format);
-			// Start new match
-			memset(&priv->party, 0, sizeof(struct party_data));
+			reset_match_state(priv);
 			priv->party.match_in_progress = true;
-			priv->party.format = 2; // Default: best of 3
+			priv->party.current_serving = PLAYER2;
+			set_serving_led(priv->party.current_serving, &priv->io);
+
 			set_score_segment(&priv->party, &priv->display,
 					  &priv->io);
 		} else {
@@ -197,23 +216,28 @@ static irqreturn_t button_thread_handler(int irq, void *dev_id)
 		break;
 	}
 
-	// Log current score
-	dev_info(priv->io.dev,
-		 "Current score - Game: %d-%d, Set: %d-%d, Match: %d-%d\n",
-		 priv->party.game_score[PLAYER1],
-		 priv->party.game_score[PLAYER2],
-		 priv->party.set_score[PLAYER1], priv->party.set_score[PLAYER2],
-		 priv->party.match_score[PLAYER1],
-		 priv->party.match_score[PLAYER2]);
+	if (priv->party.match_in_progress) {
+		// Log current score
+		dev_info(
+			priv->io.dev,
+			"Current score - Game: %d-%d, Set: %d-%d, Match: %d-%d\n",
+			priv->party.game_score[PLAYER1],
+			priv->party.game_score[PLAYER2],
+			priv->party.set_score[PLAYER1],
+			priv->party.set_score[PLAYER2],
+			priv->party.match_score[PLAYER1],
+			priv->party.match_score[PLAYER2]);
 
-	if (priv->party.advantage_player != PLAYER_NONE) {
-		dev_info(priv->io.dev, "Advantage: Player %d\n",
-			 priv->party.advantage_player == PLAYER1 ? 1 : 2);
+		if (priv->party.advantage_player != PLAYER_NONE) {
+			dev_info(priv->io.dev, "Advantage: Player %d\n",
+				 priv->party.advantage_player == PLAYER1 ? 1 :
+									   2);
+		}
+
+		// Update display
+		set_score_segment(&priv->party, &priv->display, &priv->io);
+		set_sets_leds(&priv->party, &priv->io);
 	}
-
-	// Update display
-	set_score_segment(&priv->party, &priv->display, &priv->io);
-	set_sets_leds(&priv->party, &priv->io);
 
 	return IRQ_HANDLED;
 }
@@ -240,18 +264,4 @@ int setup_match_irq(struct priv *priv, struct platform_device *pdev)
 	iowrite8(0x0F, priv->io.button_edge);
 
 	return 0;
-}
-
-static void reset_match_state(struct priv *priv)
-{
-	memset(&priv->party, 0, sizeof(struct party_data));
-	priv->party.match_in_progress = false;
-	priv->party.format = 2; // Default: best of 3
-	priv->party.advantage_player = PLAYER_NONE;
-	priv->display.mode = DISPLAY_NORMAL;
-
-	// Clear displays
-	iowrite32(0, priv->io.segment1);
-	iowrite32(0, priv->io.segment2);
-	iowrite32(0, priv->io.led);
 }

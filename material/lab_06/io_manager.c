@@ -113,49 +113,81 @@ static void display_announcement(enum announcement type,
 	iowrite32(segment2_value, io->segment2);
 }
 
-/**
- * Function to display match summary
- */
 static void display_match_summary(struct party_data *party,
 				  struct io_registers *io, bool alternate)
 {
 	uint32_t segment1_value = 0;
 	uint32_t segment2_value = 0;
 
+	dev_info(io->dev, "Display match summary - alternate: %d\n", alternate);
+
+	// Debug: afficher tout l'historique des sets
+	dev_info(io->dev, "Sets history:\n");
+	for (int i = 0; i < 5; i++) {
+		dev_info(io->dev, "Set %d: %d-%d\n", i + 1,
+			 party->sets_history_score[i][0],
+			 party->sets_history_score[i][1]);
+	}
+
 	if (!alternate) {
-		// Display sets 1-3
+		dev_info(io->dev, "Displaying sets 1-3\n");
+
 		// Set 1 on HEX5-4
+		dev_info(io->dev, "Set 1 scores: %d-%d\n",
+			 party->sets_history_score[0][0],
+			 party->sets_history_score[0][1]);
 		segment2_value =
 			segments_lookup[party->sets_history_score[0][1]] |
 			(segments_lookup[party->sets_history_score[0][0]]
 			 << HEX5_SHIFT);
 
 		// Set 2 on HEX3-2
+		dev_info(io->dev, "Set 2 scores: %d-%d\n",
+			 party->sets_history_score[1][0],
+			 party->sets_history_score[1][1]);
 		segment1_value =
-			segments_lookup[party->sets_history_score[1][1]] |
+			(segments_lookup[party->sets_history_score[1][1]]
+			 << HEX2_SHIFT) |
 			(segments_lookup[party->sets_history_score[1][0]]
-			 << HEX1_SHIFT);
+			 << HEX3_SHIFT);
 
 		// Set 3 on HEX1-0
+		dev_info(io->dev, "Set 3 scores: %d-%d\n",
+			 party->sets_history_score[2][0],
+			 party->sets_history_score[2][1]);
 		segment1_value |=
-			segments_lookup[party->sets_history_score[2][1]]
-				<< HEX2_SHIFT |
-			segments_lookup[party->sets_history_score[2][0]]
-				<< HEX3_SHIFT;
-	} else {
-		// Display sets 4-5
-		// Set 4 on HEX3-2
-		segment1_value =
-			segments_lookup[party->sets_history_score[3][1]] |
-			(segments_lookup[party->sets_history_score[3][0]]
+			segments_lookup[party->sets_history_score[2][1]] |
+			(segments_lookup[party->sets_history_score[2][0]]
 			 << HEX1_SHIFT);
 
-		// Set 5 on HEX1-0
-		segment1_value |=
-			segments_lookup[party->sets_history_score[4][1]]
-				<< HEX2_SHIFT |
-			segments_lookup[party->sets_history_score[4][0]]
-				<< HEX3_SHIFT;
+		dev_info(io->dev,
+			 "Writing segments (1-3): seg1=0x%x, seg2=0x%x\n",
+			 segment1_value, segment2_value);
+	} else {
+		dev_info(io->dev, "Displaying sets 4-5\n");
+
+		// Set 4 on HEX5-4
+		dev_info(io->dev, "Set 4 scores: %d-%d\n",
+			 party->sets_history_score[3][0],
+			 party->sets_history_score[3][1]);
+		segment2_value =
+			segments_lookup[party->sets_history_score[3][1]] |
+			(segments_lookup[party->sets_history_score[3][0]]
+			 << HEX5_SHIFT);
+
+		// Set 5 on HEX3-2
+		dev_info(io->dev, "Set 5 scores: %d-%d\n",
+			 party->sets_history_score[4][0],
+			 party->sets_history_score[4][1]);
+		segment1_value =
+			(segments_lookup[party->sets_history_score[4][1]]
+			 << HEX2_SHIFT) |
+			(segments_lookup[party->sets_history_score[4][0]]
+			 << HEX3_SHIFT);
+
+		dev_info(io->dev,
+			 "Writing segments (4-5): seg1=0x%x, seg2=0x%x\n",
+			 segment1_value, segment2_value);
 	}
 
 	iowrite32(segment1_value, io->segment1);
@@ -171,6 +203,7 @@ void announcement_work_func(struct work_struct *work)
 		container_of(work, struct announcement_work, work);
 	struct priv *priv = announce_work->priv;
 
+	enum display_mode old_mode = priv->display.mode;
 	// Change display mode
 	priv->display.mode = DISPLAY_ANNOUNCE;
 
@@ -178,13 +211,15 @@ void announcement_work_func(struct work_struct *work)
 	set_score_segment(&priv->party, &priv->display, &priv->io);
 
 	// Display for 5 seconds
-	msleep(5000);
+	msleep(5);
 
 	// Remove from list and free
 	list_del(&announce_work->list);
 	kfree(announce_work);
 
-	priv->display.mode = DISPLAY_NORMAL;
+	priv->display.mode = old_mode;
+	dev_info(priv->io.dev,
+		 "Previous mode: %d, restoring after announcement\n", old_mode);
 
 	// Update display
 	set_score_segment(&priv->party, &priv->display, &priv->io);
@@ -268,15 +303,19 @@ void set_score_segment(struct party_data *party, struct display_state *display,
 void set_sets_leds(struct party_data *party, struct io_registers *io)
 {
 	uint32_t led_value = ioread32(io->led);
-
 	// Clear set LEDs (0-2 and 7-9)
 	led_value &= ~(0x7 | (0x7 << 7));
 
 	// Set LEDs for player1's sets (0-2)
 	led_value |= (((1 << party->match_score[PLAYER1]) - 1) & 0x7);
 
-	// Set LEDs for player2's sets (7-9)
-	led_value |= (((1 << party->match_score[PLAYER2]) - 1) & 0x7) << 7;
+	// Set LEDs for player2's sets (9-7)
+	// Calculate base mask for player2's score
+	uint32_t p2_mask = 0;
+	for (int i = 0; i < party->match_score[PLAYER2]; i++) {
+		p2_mask |= (1 << (2 - i)); // Start from right (2) and go left
+	}
+	led_value |= (p2_mask << 7); // Shift to position 7-9
 
 	iowrite32(led_value, io->led);
 }
@@ -302,10 +341,14 @@ void start_summary_display(struct priv *priv)
 	priv->display.mode = DISPLAY_SUMMARY;
 	priv->display.summary_alternate = false;
 
-	// Start timer to alternate display every 3 seconds
-	hrtimer_start(&priv->summary_timer,
-		      ms_to_ktime(3000), // 3 seconds
-		      HRTIMER_MODE_REL);
+	set_score_segment(&priv->party, &priv->display, &priv->io);
+
+	if (priv->party.format >= 3) {
+		// Start timer to alternate display every 3 seconds
+		hrtimer_start(&priv->summary_timer,
+			      ms_to_ktime(3000), // 3 seconds
+			      HRTIMER_MODE_REL);
+	}
 }
 
 void stop_summary_display(struct priv *priv)

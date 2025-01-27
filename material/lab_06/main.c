@@ -114,6 +114,8 @@ static int tennis_remove(struct platform_device *pdev)
 		destroy_workqueue(priv->announcement_wq);
 	}
 
+	stop_summary_display(priv);
+
 	// Clear displays
 	iowrite32(0, priv->io.segment1);
 	iowrite32(0, priv->io.segment2);
