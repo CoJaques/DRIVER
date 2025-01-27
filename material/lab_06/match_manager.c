@@ -19,8 +19,8 @@ static bool is_game_point(struct party_data *party, enum player player)
 	uint8_t opponent_score =
 		party->game_score[player == PLAYER1 ? PLAYER2 : PLAYER1];
 
-	return (player_score >= 30 && player_score > opponent_score &&
-		(player_score - opponent_score) >= 20);
+	return (player_score > 30 && (player_score > opponent_score ||
+				      party->advantage_player == player));
 }
 
 /**
@@ -28,7 +28,7 @@ static bool is_game_point(struct party_data *party, enum player player)
  */
 static bool is_set_point(struct party_data *party, enum player player)
 {
-	return party->set_score[player] == 5;
+	return party->set_score[player] == 5 && is_game_point(party, player);
 }
 
 /**
@@ -90,6 +90,7 @@ static void handle_game_win(struct priv *priv, enum player winner)
 		   0) {
 		// Side change every two games
 		queue_announcement(priv, SIDE_CHANGE);
+		queue_announcement(priv, GAME);
 	} else {
 		queue_announcement(priv, GAME);
 	}

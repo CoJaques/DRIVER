@@ -1,4 +1,5 @@
 #include "io_manager.h"
+#include "linux/dev_printk.h"
 #include <linux/types.h>
 #include <linux/io.h>
 #include <linux/delay.h>
@@ -74,34 +75,34 @@ static void display_announcement(enum announcement type,
 		break;
 
 	case GAME_AND_SET:
-		segment1_value = LETTER_G;
-		segment1_value |= LETTER_S << HEX1_SHIFT;
+		segment1_value = LETTER_G << HEX1_SHIFT;
+		segment1_value |= LETTER_S;
 		break;
 
 	case GAME_AND_SET_AND_MATCH:
-		segment1_value = LETTER_G;
-		segment1_value |= LETTER_S << HEX1_SHIFT;
-		segment1_value |= LETTER_M << HEX2_SHIFT;
+		segment1_value = LETTER_G << HEX1_SHIFT;
+		segment1_value |= LETTER_S << HEX2_SHIFT;
+		segment1_value |= LETTER_M;
 		break;
 
 	case GAME_POINT:
-		segment1_value = LETTER_G;
-		segment1_value |= LETTER_P << HEX1_SHIFT;
+		segment1_value = LETTER_G << HEX1_SHIFT;
+		segment1_value |= LETTER_P;
 		break;
 
 	case SET_POINT:
-		segment1_value = LETTER_S;
-		segment1_value |= LETTER_P << HEX1_SHIFT;
+		segment1_value = LETTER_S << HEX1_SHIFT;
+		segment1_value |= LETTER_P;
 		break;
 
 	case MATCH_POINT:
-		segment1_value = LETTER_M;
-		segment1_value |= LETTER_P << HEX1_SHIFT;
+		segment1_value = LETTER_M << HEX1_SHIFT;
+		segment1_value |= LETTER_P;
 		break;
 
 	case SIDE_CHANGE:
-		segment1_value = LETTER_S;
-		segment1_value |= LETTER_C << HEX1_SHIFT;
+		segment1_value = LETTER_S << HEX1_SHIFT;
+		segment1_value |= LETTER_C;
 		break;
 
 	default:
@@ -211,7 +212,8 @@ void announcement_work_func(struct work_struct *work)
 	set_score_segment(&priv->party, &priv->display, &priv->io);
 
 	// Display for 5 seconds
-	msleep(5);
+	dev_info(priv->io.dev, "Announcement: %d\n", announce_work->type);
+	msleep(5000);
 
 	// Remove from list and free
 	list_del(&announce_work->list);
